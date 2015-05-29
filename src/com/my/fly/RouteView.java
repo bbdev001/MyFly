@@ -42,7 +42,6 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private ScaleGestureDetector scaleGestureDetector = null;
 	private ScreenPoint scrollOffset = new ScreenPoint(); 
 	private ScreenPoint scrCenter = new ScreenPoint();
-	private Scroller scroller = null;
 	private String routeName = "";
 	private MrcPoint homePosition = new MrcPoint();
 	private MrcPoint dronePosition = new MrcPoint();
@@ -60,6 +59,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private int missionTargetWP = 0;
 	private int missionReachedWP = 0;
 	private int selectedPointIndex = -1;
+	protected boolean isShowPress = false;
 
 	public interface OnWayPointSelected
 	{
@@ -89,8 +89,6 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		
 		gestureDetector = new GestureDetector(context, this);
 		scaleGestureDetector = new ScaleGestureDetector(context, this);
-		
-		scroller = new Scroller(context);
 	}
 
 	public void AddOnWayPointSelectedListener(OnWayPointSelected listener)
@@ -100,9 +98,6 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	
 	public void Reset()
 	{
-		if (!scroller.isFinished()) 
-			scroller.abortAnimation();	
-	
 		gestureScale = 1.0f;
 		scrCenter = new ScreenPoint(width / 2.0f, height / 2.0f);
 		
@@ -290,11 +285,32 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (event.getAction() == MotionEvent.ACTION_DOWN)
-		{	
-			selectedPointIndex = GetNearestPointIndex(event.getX(), event.getY());
-			//if (!scroller.isFinished()) 
-		 	//	scroller.abortAnimation();			
+		switch(event.getAction())
+		{
+			case MotionEvent.ACTION_DOWN:
+			{
+				selectedPointIndex = GetNearestPointIndex(event.getX(), event.getY());
+				break;
+			}
+			case MotionEvent.ACTION_MOVE:
+			{
+				if (selectedPointIndex >= 0 && isShowPress)
+				{
+					scrollOffset.Set(0.0, 0.0);
+					p.Set(event.getX(), event.getY());
+					p.ToMercator(route.get(selectedPointIndex), mapCenter, scrCenter, scale);
+					invalidate();
+					return true;
+				}
+				
+				break;
+			}
+			case MotionEvent.ACTION_UP:
+			{
+				isShowPress = false;
+				//scrollOffset.Set(0.0, 0.0);
+				break;
+			}
 		}
 		
 		gestureDetector.onTouchEvent(event);
@@ -328,12 +344,13 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	@Override
 	public void onShowPress(MotionEvent e)
 	{
+		isShowPress = true;
 	}
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e)
 	{
-		//selectedPointIndex = GetNearestPointIndex(e.getX(), e.getY());
+		scrollOffset.Set(0.0, 0.0);
 		if (selectedPointIndex < 0)
 			return false;
 		
@@ -351,8 +368,8 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
 	{
 		scrollOffset.Set(-distanceX, -distanceY);
-		
-		postInvalidate();
+
+		invalidate();
 		
 		return true;
 	}
@@ -360,35 +377,18 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	@Override
 	public void onLongPress(MotionEvent e)
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
 	{
-		scroller.startScroll(0, 0, (int)scrollOffset.dX, (int)scrollOffset.dY);
-
-		//Log.e("onFling", "Fling " + scrollOffset.X + " " + scrollOffset.Y);
-
 		return true;
 	}
 	
 	@Override
     public void computeScroll()
     {
-        if (scroller.computeScrollOffset())
-        {
-        	float decreaseSpeed = scroller.timePassed() < scroller.getDuration() ? 1.0f - ((float)scroller.timePassed() / (float)scroller.getDuration()) : 0.0f;
-        	
-            scrollOffset.Scale(decreaseSpeed);
 
-            if (decreaseSpeed == 0.0f)
-            	scrollOffset.Set(0.0, 0.0);
-            
-            //Log.e("onFling", "computeScroll " + scrollOffset.X + " " + scrollOffset.Y + " " + decreaseSpeed);
-            postInvalidate();
-        }
     }
 
 	@Override
@@ -432,8 +432,8 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 			}
 		}
 		
-		Log.e(TAG, "x " + x + " y " + y + " Nearest index " + result + " distance " + minValue + " px");
-		
+		Log.e(TAG, "Index " + result + " x " + x + " y " + y + " distance " + minValue + " px");
+
 		return result;
 	}
 

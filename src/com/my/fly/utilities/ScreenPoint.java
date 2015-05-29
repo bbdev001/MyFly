@@ -96,7 +96,7 @@ public class ScreenPoint
 	public void FromMercator(MrcPoint point, MrcPoint mapCenter, double scale)
 	{
 		dX = (point.Lon - mapCenter.Lon) * scale;
-		dY = -(point.Lat - mapCenter.Lat) * scale;
+		dY = (mapCenter.Lat - point.Lat) * scale;
 		X = (float)dX;
 		Y = (float)dY;
 	}
@@ -104,17 +104,23 @@ public class ScreenPoint
 	public void FromMercator(MrcPoint point, MrcPoint mapCenter, ScreenPoint scrCenter, double scale)
 	{
 		dX = (point.Lon - mapCenter.Lon) * scale;
-		dY = -(point.Lat - mapCenter.Lat) * scale;
+		dY = (mapCenter.Lat - point.Lat) * scale;
 		dX += scrCenter.dX;
 		dY += scrCenter.dY;
 		X = (float)dX;
 		Y = (float)dY;
 	}
 	
-	public void ToMercator(MrcPoint mapCenter, MrcPoint mrcPoint, double scale)
+	public void ToMercator(MrcPoint mrcPoint, MrcPoint mapCenter, double scale)
 	{
 		mrcPoint.Lon = dX / scale + mapCenter.Lon;
 		mrcPoint.Lat = -dY / scale + mapCenter.Lat;
+	}
+	
+	public void ToMercator(MrcPoint mrcPoint, MrcPoint mapCenter, ScreenPoint scrCenter, double scale)
+	{
+		mrcPoint.Lon = (dX - scrCenter.dX) / scale + mapCenter.Lon;
+		mrcPoint.Lat = (scrCenter.dY - dY) / scale + mapCenter.Lat;
 	}
 	
 	public double DistanceTo(ScreenPoint point)
