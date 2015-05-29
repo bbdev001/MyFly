@@ -299,7 +299,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		
 		gestureDetector.onTouchEvent(event);
 		scaleGestureDetector.onTouchEvent(event);
-			
+		//test
 		return true;
 	}
 	
