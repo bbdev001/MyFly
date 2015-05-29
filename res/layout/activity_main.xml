@@ -1,0 +1,281 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.my.fly.MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/surfaceView_Rl_02"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="0dp">
+        <dji.sdk.widget.DjiGLSurfaceView
+            android:id="@+id/DjiSurfaceView_02"
+            android:layout_centerHorizontal="true"
+            android:layout_width="400dp"
+            android:layout_height="fill_parent" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/droneSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="90dp"
+        android:text="s 0ms"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#00ee00" />
+        
+    <TextView
+        android:id="@+id/droneAltitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="90dp"
+        android:text="h 0m"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#00ee00" />
+
+    <TextView
+        android:id="@+id/droneDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="90dp"
+        android:textColor="#00ee00"
+        android:text="d 0m"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ScrollView
+        android:id="@+id/scrollViewMessages"
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp" >
+
+        <TextView
+            android:id="@+id/errorMessages"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:textColor="#00ee00"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/autoStart"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@android:color/transparent"
+        android:onClick="OnTakeOff"
+        android:paddingRight="8dp"
+        android:text="Take off"
+        android:textColor="#ee0000" />
+
+    <GridLayout
+        android:id="@+id/joystikLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:columnCount="4"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp" >
+
+        <ImageButton
+            android:id="@+id/camTop"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/top" />
+
+        <ImageButton
+            android:id="@+id/droneRotLeftTop"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/lefttop" />
+
+        <ImageButton
+            android:id="@+id/droneTop"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/top" />
+
+        <ImageButton
+            android:id="@+id/droneRotRightTop"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:src="@drawable/righttop"
+            android:padding="2dp" />
+
+        <Space />
+
+        <ImageButton
+            android:id="@+id/droneRotLeft"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/left" />
+
+        <Space />
+
+        <ImageButton
+            android:id="@+id/droneRotRight"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/right" />
+
+        <ImageButton
+            android:id="@+id/camBottom"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/bottom" />
+
+        <ImageButton
+            android:id="@+id/droneRotLeftBottom"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/leftbottom" />
+
+        <ImageButton
+            android:id="@+id/droneBottom"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/bottom" />
+
+        <ImageButton
+            android:id="@+id/droneRotRightBottom"
+            android:layout_gravity="left"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/rightbottom" />
+    </GridLayout>
+
+    <GridLayout
+        android:id="@+id/joystikRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:columnCount="3"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingRight="40dp" >
+
+        <ImageButton
+            android:id="@+id/droneStrafeLeftForward"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/lefttop" />
+
+        <ImageButton
+            android:id="@+id/droneForward"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/top" />
+
+        <ImageButton
+            android:id="@+id/droneStrafeRightForward"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/righttop" />
+
+        <ImageButton
+            android:id="@+id/droneStrafeLeft"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/left" />
+
+        <Space />
+
+        <ImageButton
+            android:id="@+id/droneStrafeRight"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/right" />
+
+        <ImageButton
+            android:id="@+id/droneStrafeLeftBackward"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/leftbottom" />
+
+        <ImageButton
+            android:id="@+id/droneBackward"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/bottom" />
+
+        <ImageButton
+            android:id="@+id/droneStrafeRightBackward"
+            android:layout_gravity="bottom"
+            android:background="@android:color/transparent"
+            android:padding="2dp"
+            android:src="@drawable/rightbottom" />
+    </GridLayout>
+
+    <RadioGroup
+        android:id="@+id/speedLimit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_rowSpan="3"
+        android:orientation="vertical"
+        android:paddingRight="8dp" >
+
+        <RadioButton
+            android:id="@+id/speedLimitFast"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:onClick="onSpeedLimitChanged"
+            android:text="F"
+            android:textColor="#EE0000"
+            android:textSize="11dp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:id="@+id/speedLimitMiddle"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:onClick="onSpeedLimitChanged"
+            android:text="M"
+            android:textColor="#EEEE00"
+            android:textSize="11dp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:id="@+id/speedLimitSlow"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:onClick="onSpeedLimitChanged"
+            android:text="S"
+            android:textColor="#00EE00"
+            android:textSize="11dp"
+            android:textStyle="bold" />
+    </RadioGroup>
+
+</RelativeLayout>
