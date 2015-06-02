@@ -18,6 +18,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.dji.wrapper.DJIGroundStation;
 import com.dji.wrapper.DJIWrapper;
+import com.dji.wrapper.TaskBuilder;
 import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.WayPoint;
 
@@ -67,6 +68,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private ListView routesList = null;
 	private RouteView routeView = null;
 	private ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
+	private ArrayList<WayPoint> wayPointsMapping = new ArrayList<WayPoint>();
 	private ArrayList<String> routes = new ArrayList<String>();
 	private ArrayAdapter<String> routesListArapter = null;
 	private Handler uiHandler = new Handler(this);
@@ -85,7 +87,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private boolean routePaused = false;
 	private int scrollViewMessagesDefSize = 0;
 	private double lastAltitude = 3.0;
-	private RadioButton defDrone = null;
 	private Button errorMsgSize = null;
 	private String currentRouteName = "";
 	private DjiGLSurfaceView djiSurfaceView;
@@ -93,6 +94,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
 	public String BASE_PATH = Environment.getExternalStorageDirectory() + "/MyFly";
+	public boolean isMapping = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -115,9 +117,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		errorMessages = (TextView) findViewById(R.id.errorMessages);
 		errorMsgSize = (Button) findViewById(R.id.errorMsgSize);
 		djiSurfaceView = (DjiGLSurfaceView) findViewById(R.id.djiSurfaceView);
-		defDrone = (RadioButton) findViewById(R.id.droneInspire);
+		((RadioButton) findViewById(R.id.droneInspire)).setChecked(true);
+		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		
-		defDrone.setChecked(true);
 		// djiSurfaceViewLayout = (RelativeLayout)
 		// findViewById(R.id.djiSurfaceViewLayout);
 
@@ -157,7 +159,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				AppendString(djiWrapper.GetPermissionErrorResultMessage);
 
 				LoadRoutesList();
-				// DownloadRoutes();
+				//DownloadRoutes();
 
 				djiWrapper.ConnectDroneDevices(djiSurfaceView);
 				break;
@@ -468,7 +470,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected void LoadRoute(String curRouteName)
 	{
 		currentRouteName = curRouteName;
-
+		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
+		
 		BufferedReader br = null;
 		wayPoints.clear();
 		try
@@ -484,7 +487,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				wayPoints.add(wayPoint);
 			}
 
-			routeView.SetRoute(wayPoints, curRouteName);
+			routeView.SetRoute(wayPoints, curRouteName, true);
 
 			br.close();
 		}
@@ -590,27 +593,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (!routeStarted)
 		{
 			AppendString("Start task");
-			gsTask.RemoveAllWaypoint();
-			for (int i = 0; i < wayPoints.size(); i++)
-			{
-				WayPoint wp = wayPoints.get(i);
-				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wp.coord.Lat, wp.coord.Lon, 3, 1);
-				gsWayPoint.altitude = (float) wp.Alt;
-				gsWayPoint.heading = 179;//wp.Heading;
-				gsWayPoint.speed = (float) wp.Speed;
-				gsWayPoint.maxReachTime = (short) wp.MaxReachTime;
-				gsWayPoint.stayTime = (short) wp.HoverTime;
-				gsWayPoint.turnMode = wp.HoverTime > 0 ? 0 : 2;
-				gsWayPoint.hasAction = true;
-
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, 45/*this.ConvertHeading(wp.Heading)*/);
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Yaw, 90);
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, -45);
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wp.HoverTime * 10);
-                
-				gsTask.addWaypoint(gsWayPoint);
-			}
 
 			djiWrapper.GetGroundStation().StartTask(gsTask);
 		}
@@ -777,6 +759,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		Log.e(TAG, "onWayPointSelected");
 
+		if (isMapping)
+			return;
+		
 		if (wayPoints.size() == 0)
 			return;
 
@@ -832,5 +817,50 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		djiWrapper.Destroy();
 		AppendString("Connecting to drone");
 		djiWrapper.InitSDK(droneType, getApplicationContext(), this);
+	}
+	
+	public void OnRouteTypeChanged(View view)
+	{
+		boolean checked = ((RadioButton) view).isChecked();
+
+		switch (view.getId())
+		{
+			case R.id.routeTypeRouting:
+			{
+				if (checked)
+				{
+					isMapping = false;
+					ChangeRouteType();
+				}
+
+				break;
+			}
+
+			case R.id.routeTypeMapping:
+			{
+				if (checked)
+				{
+					isMapping = true;
+					ChangeRouteType();
+				}
+
+				break;
+			}
+		}
+	}
+
+	private void ChangeRouteType()
+	{
+		if (isMapping)
+		{
+			TaskBuilder.BuildMappingRoute(gsTask, wayPoints, wayPointsMapping);
+			routeView.SetRoute(wayPointsMapping, currentRouteName + " mapping", false);
+		}
+		else
+		{
+			TaskBuilder.BuildSequientialRoute(gsTask, wayPoints);
+			
+			routeView.SetRoute(wayPoints, currentRouteName, true);
+		}
 	}
 }

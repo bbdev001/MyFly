@@ -9,6 +9,7 @@
     tools:context="com.my.fly.RoutesActivity" >
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
@@ -50,7 +51,8 @@
                 android:id="@+id/routes"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="0.75" />
+                android:layout_weight="0.75" >
+            </ListView>
         </LinearLayout>
 
         <LinearLayout
@@ -114,6 +116,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -172,5 +175,34 @@
                 android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/routeType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/linearLayout2"
+        android:layout_marginRight="42dp"
+        android:layout_toLeftOf="@+id/linearLayout1"
+        android:orientation="horizontal"
+        android:paddingRight="8dp" >
+
+        <RadioButton
+            android:id="@+id/routeTypeRouting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Routing"
+            android:onClick="OnRouteTypeChanged"
+            android:textSize="11dp"
+            android:textStyle="bold" />
+
+             <RadioButton
+            android:id="@+id/routeTypeMapping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="OnRouteTypeChanged"
+            android:text="Mapping"
+            android:textSize="11dp"
+            android:textStyle="bold" />
+    </RadioGroup>
 
 </RelativeLayout>
