@@ -2,6 +2,7 @@ package com.dji.wrapper;
 
 import java.util.ArrayList;
 
+import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.WayPoint;
 
 import dji.sdk.api.GroundStation.DJIGroundStationTask;
@@ -33,6 +34,55 @@ public class TaskBuilder
             
 			gsTask.addWaypoint(gsWayPoint);
 		}
+	}
+	
+	public static void BuildMyHomeRoute(DJIGroundStationTask gsTask, DegPoint lastPosition, DegPoint userPosition)
+	{
+		gsTask.RemoveAllWaypoint();
+		
+		//Move top
+		DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(lastPosition.Lat, lastPosition.Lon);
+		gsWayPoint.altitude = 45.0f;
+		gsWayPoint.heading = 0.0f;
+		gsWayPoint.speed = 0.0f;
+		gsWayPoint.maxReachTime = 0;
+		gsWayPoint.stayTime = 1;
+		gsWayPoint.turnMode = 0;
+		gsWayPoint.hasAction = false;
+		gsTask.addWaypoint(gsWayPoint);
+
+		//Move to home
+		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
+		gsWayPoint.altitude = 45.0f;
+		gsWayPoint.heading = 0.0f;
+		gsWayPoint.speed = 10.0f;
+		gsWayPoint.maxReachTime = 0;
+		gsWayPoint.stayTime = 1;
+		gsWayPoint.turnMode = 0;
+		gsWayPoint.hasAction = false;
+		gsTask.addWaypoint(gsWayPoint);
+
+		//Move down
+		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
+		gsWayPoint.altitude = 3.0f;
+		gsWayPoint.heading = 0.0f;
+		gsWayPoint.speed = 0.0f;
+		gsWayPoint.maxReachTime = 0;
+		gsWayPoint.stayTime = 1;
+		gsWayPoint.turnMode = 0;
+		gsWayPoint.hasAction = false;
+		gsTask.addWaypoint(gsWayPoint);
+		
+		//Shot shift
+		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat + 0.00002, userPosition.Lon + 0.00002);
+		gsWayPoint.altitude = 2.5f;
+		gsWayPoint.heading = 0.0f;
+		gsWayPoint.speed = 1.0f;
+		gsWayPoint.maxReachTime = 0;
+		gsWayPoint.stayTime = 10;
+		gsWayPoint.turnMode = 0;
+		gsWayPoint.hasAction = false;
+		gsTask.addWaypoint(gsWayPoint);
 	}
 	
 	public static void BuildMappingRoute(DJIGroundStationTask gsTask, ArrayList<WayPoint> wayPoints, ArrayList<WayPoint> mappingWayPoints)

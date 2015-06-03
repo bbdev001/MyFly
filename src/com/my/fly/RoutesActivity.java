@@ -73,6 +73,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private ArrayAdapter<String> routesListArapter = null;
 	private Handler uiHandler = new Handler(this);
 	private DJIGroundStationTask gsTask = new DJIGroundStationTask();
+	private DJIGroundStationTask gsMyHomeTask = new DJIGroundStationTask();
 	private ImageButton startRoute = null;
 	private ImageButton pauseRoute = null;
 	private ImageButton stopRoute = null;
@@ -470,7 +471,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected void LoadRoute(String curRouteName)
 	{
 		currentRouteName = curRouteName;
-		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		
 		BufferedReader br = null;
 		wayPoints.clear();
@@ -495,6 +495,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		{
 			e.printStackTrace();
 		}
+		
+		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
+		ChangeRouteType(false);
 	}
 
 	protected void SaveRoute(String curRouteName)
@@ -553,39 +556,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private void RunGoHomeCommand()
 	{
 		AppendString("RunGoHome");
-		gsTask.RemoveAllWaypoint();
 
-		DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(lastPosition.Lat, lastPosition.Lon);
-		gsWayPoint.altitude = 45.0f;
-		gsWayPoint.heading = 0.0f;
-		gsWayPoint.speed = 0.0f;
-		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 0;
-		gsWayPoint.turnMode = 0;
-		gsWayPoint.hasAction = false;
-		gsTask.addWaypoint(gsWayPoint);
-
-		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
-		gsWayPoint.altitude = 45.0f;
-		gsWayPoint.heading = 0.0f;
-		gsWayPoint.speed = 10.0f;
-		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 0;
-		gsWayPoint.turnMode = 0;
-		gsWayPoint.hasAction = false;
-		gsTask.addWaypoint(gsWayPoint);
-
-		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat + 0.00001, userPosition.Lon + 0.00001);
-		gsWayPoint.altitude = 2.5f;
-		gsWayPoint.heading = 0.0f;
-		gsWayPoint.speed = 2.0f;
-		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 999;
-		gsWayPoint.turnMode = 0;
-		gsWayPoint.hasAction = false;
-		gsTask.addWaypoint(gsWayPoint);
-
-		djiWrapper.GetGroundStation().StartTask(gsTask);
+		TaskBuilder.BuildMyHomeRoute(gsMyHomeTask, lastPosition, userPosition);
+		djiWrapper.GetGroundStation().StartTask(gsMyHomeTask);
 	}
 
 	public void OnStartRoute(View v)
@@ -828,10 +801,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case R.id.routeTypeRouting:
 			{
 				if (checked)
-				{
-					isMapping = false;
-					ChangeRouteType();
-				}
+					ChangeRouteType(false);
 
 				break;
 			}
@@ -839,28 +809,27 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case R.id.routeTypeMapping:
 			{
 				if (checked)
-				{
-					isMapping = true;
-					ChangeRouteType();
-				}
+					ChangeRouteType(true);
 
 				break;
 			}
 		}
 	}
 
-	private void ChangeRouteType()
+	private void ChangeRouteType(boolean isMapping)
 	{
+		Log.i(TAG, "ChangeRouteType");
+		this.isMapping = isMapping;
+		
 		if (isMapping)
 		{
 			TaskBuilder.BuildMappingRoute(gsTask, wayPoints, wayPointsMapping);
-			routeView.SetRoute(wayPointsMapping, currentRouteName + " mapping", false);
+			routeView.SetRoute(wayPointsMapping, currentRouteName + " mapping", !isMapping);
 		}
 		else
 		{
 			TaskBuilder.BuildSequientialRoute(gsTask, wayPoints);
-			
-			routeView.SetRoute(wayPoints, currentRouteName, true);
+			routeView.SetRoute(wayPoints, currentRouteName, !isMapping);
 		}
 	}
 }
