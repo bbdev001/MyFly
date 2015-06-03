@@ -72,11 +72,12 @@ public final class R {
     public static final class id {
         public static final int DjiSurfaceView_02=0x7f0c0005;
         public static final int action=0x7f0c0047;
-        public static final int action_settings=0x7f0c004c;
+        public static final int action_settings=0x7f0c004d;
         public static final int altitude=0x7f0c0041;
         public static final int autoStart=0x7f0c000b;
         public static final int bold=0x7f0c0000;
         public static final int btnCancel=0x7f0c004b;
+        public static final int btnDelete=0x7f0c004c;
         public static final int btnOk=0x7f0c004a;
         public static final int camBottom=0x7f0c0013;
         public static final int camTop=0x7f0c000d;

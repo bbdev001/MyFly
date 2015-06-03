@@ -325,7 +325,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 				case MotionEvent.ACTION_UP:
 				{
 					isShowPress = false;
-					// scrollOffset.Set(0.0, 0.0);
+					scrollOffset.Set(0.0, 0.0);
 					break;
 				}
 			}
@@ -362,7 +362,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	@Override
 	public void onShowPress(MotionEvent e)
 	{
-		isShowPress = true;
+		
 	}
 
 	@Override
@@ -395,6 +395,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	@Override
 	public void onLongPress(MotionEvent e)
 	{
+		isShowPress = true;
 	}
 
 	@Override
@@ -492,5 +493,12 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	{
 		// TODO Auto-generated method stub
 
+	}
+
+	public void RemoveWayPoint(int wayPointIndex)
+	{
+		route.remove(wayPointIndex);
+		routeWP.remove(wayPointIndex);
+		invalidate();
 	}
 }

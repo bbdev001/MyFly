@@ -24,7 +24,7 @@ public class WayPoint
 	public WayPoint(String value)
 	{
 		String[] fields = value.split(",");
-		
+	
 		coord = new DegPoint(Double.parseDouble(fields[0]), Double.parseDouble(fields[1]));
 		Alt = Integer.parseInt(fields[2]);
 		Heading = Integer.parseInt(fields[3]);

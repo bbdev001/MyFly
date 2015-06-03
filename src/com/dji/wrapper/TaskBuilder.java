@@ -19,16 +19,16 @@ public class TaskBuilder
 			WayPoint wp = wayPoints.get(i);
 			DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wp.coord.Lat, wp.coord.Lon, 3, 1);
 			gsWayPoint.altitude = (float) wp.Alt;
-			gsWayPoint.heading = 179;//wp.Heading;
+			gsWayPoint.heading = 0;//wp.Heading;
 			gsWayPoint.speed = (float) wp.Speed;
 			gsWayPoint.maxReachTime = (short) wp.MaxReachTime;
 			gsWayPoint.stayTime = (short) wp.HoverTime;
 			gsWayPoint.turnMode = wp.HoverTime > 0 ? 0 : 2;
 			gsWayPoint.hasAction = true;
 
-			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, 45/*this.ConvertHeading(wp.Heading)*/);
+			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, wp.Heading);
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Yaw, 90);
-			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, -45);
+			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, 45);
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wp.HoverTime * 10);
             
@@ -66,7 +66,7 @@ public class TaskBuilder
 		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
 		gsWayPoint.altitude = 3.0f;
 		gsWayPoint.heading = 0.0f;
-		gsWayPoint.speed = 0.0f;
+		gsWayPoint.speed = 1.0f;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 1;
 		gsWayPoint.turnMode = 0;

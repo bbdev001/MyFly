@@ -740,7 +740,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		selectedWayPointId = wayPointId;
 
-		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPoints.get(wayPointId), new WPEditor.OnDialogClosedListener()
+		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoints.get(wayPointId), new WPEditor.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel)
 			{
@@ -751,6 +751,16 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 					SaveRoute(currentRouteName);
 					routeView.SetWayPoint(selectedWayPointId, wayPoints.get(selectedWayPointId));
 				}
+			}
+		},
+		new WPEditor.OnWPDeletedListener()
+		{
+			@Override
+			public void OnDeleted(int wayPointIndex)
+			{
+				wayPoints.remove(wayPointIndex);
+				routeView.RemoveWayPoint(wayPointIndex);
+				selectedWayPointId = -1;
 			}
 		});
 
