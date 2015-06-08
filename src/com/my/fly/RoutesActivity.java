@@ -833,7 +833,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		if (isMapping)
 		{
-			TaskBuilder.BuildMappingRoute(gsTask, wayPoints, wayPointsMapping);
+			TaskBuilder.BuildMappingRoute(gsTask, wayPointsMapping, wayPoints);
 			routeView.SetRoute(wayPointsMapping, currentRouteName + " mapping", !isMapping);
 		}
 		else

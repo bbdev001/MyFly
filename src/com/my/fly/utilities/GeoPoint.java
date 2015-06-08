@@ -39,4 +39,19 @@ public class GeoPoint
 		Lat += point.Lat;
 		Lon += point.Lon;
 	}
+	
+	public void ToMeters()
+	{
+		double EarthsRadius = 6378137.0;
+		Lat *= (EarthsRadius / 2.0);
+		Lon *= EarthsRadius;
+	}
+	
+	public void FromMeters()
+	{
+		double EarthsRadius = 6378137.0;
+		Lat /= (EarthsRadius / 2.0);
+		Lon /= EarthsRadius;
+	}
+
 }

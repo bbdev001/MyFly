@@ -37,7 +37,8 @@ public class DJIWrapper
     public static final int EXECUTION_STATUS_UPLOAD_FINISH = 0;
     public static final int EXECUTION_STATUS_FINISH = 1;
     public static final int EXECUTION_STATUS_REACH_POINT = 2;
-    		
+    public static final int CAMERA_FOV = 90;
+    
 	private static final String TAG = "DjiWrapper";
 	private com.dji.wrapper.DJICamera camera = null;
 	private com.dji.wrapper.DJIMcu mcu = null;
