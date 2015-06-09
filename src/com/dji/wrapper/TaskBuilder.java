@@ -143,8 +143,12 @@ public class TaskBuilder
 		int speed = viewRadius > 10 ? 10 : 2;
 		
 		MrcPoint cur = new DegPoint(mbr.GetCenterY(), mbr.GetCenterX()).ToMercator();
-		cur.Lon -= Utilities.MetersToDeg(widthInMeters / 2.0);
-		cur.Lat += Utilities.MetersToDeg(heightInMeters / 2.0);
+		
+		if (width > 1 || height > 1)
+		{
+			cur.Lon -= Utilities.MetersToDeg(widthInMeters / 2.0);
+			cur.Lat += Utilities.MetersToDeg(heightInMeters / 2.0);
+		}
 		
 		for (int j = 0; j < height; j++)
 		{

@@ -31,6 +31,7 @@ public class DJIWrapper
 	public static final int CAMERA_TAKE_PHOTO = 14;
 	public static final int CAMERA_TAKE_PHOTO_DONE = 15;
 	public static final int REMOTE_CONTROLLER_STATE = 16;
+	public static final int CAMERA_FILE_INFO = 17;
 		
     public static final int NAVI_MODE_ATTITUDE = 0;
     public static final int NAVI_MODE_WAYPOINT = 1;

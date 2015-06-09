@@ -13,6 +13,7 @@ import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraCaptureMode;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraMode;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPreviewResolustionType;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraVisionType;
+import dji.sdk.api.Camera.DJICameraTypeDef;
 import dji.sdk.api.Camera.DJIPhantomCamera;
 import dji.sdk.api.Gimbal.DJIGimbalRotation;
 import dji.sdk.interfaces.DJICameraFileNameInfoCallBack;
@@ -31,6 +32,21 @@ public class DJICamera
 	private Handler uiHandler = null;
 	private dji.sdk.api.Camera.DJICamera object = null;
 	private DJIDroneType droneType = null;
+
+	public class CameraFileInfo
+	{
+		public DJICameraTypeDef.CameraFileNamePushType Type;
+		public String Path = "";
+		public String Name = "";
+		
+		public CameraFileInfo(DJICameraTypeDef.CameraFileNamePushType type, String path, String name)
+		{
+			Type = type;
+			Path = path;
+			Name = name;
+		}
+	};
+	
 	
 	public DJICamera(DJIDroneType droneType, Context context, Handler handler)
 	{
@@ -68,9 +84,7 @@ public class DJICamera
 			@Override
 			public void onResult(final DJICameraFileNamePushInfo Info)
 			{
-				Log.d(TAG, "camera file info type = " + Info.type.toString());
-				Log.d(TAG, "camera file info filePath = " + Info.filePath);
-				Log.d(TAG, "camera file info fileName = " + Info.fileName);
+				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.CAMERA_FILE_INFO, new CameraFileInfo(Info.type, Info.filePath, Info.fileName)));
 			}
 		});
 
