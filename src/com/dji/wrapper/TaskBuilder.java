@@ -2,6 +2,8 @@ package com.dji.wrapper;
 
 import java.util.ArrayList;
 
+import android.location.Location;
+
 import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.GeoPoint;
 import com.my.fly.utilities.Mbr;
@@ -108,38 +110,44 @@ public class TaskBuilder
 		double mappingAlt = 0.0;
 		for (int i = 0; i < wayPoints.size(); i++)
 		{
-			MrcPoint mrcPoint = wayPoints.get(i).coord.ToMercator();
-			mbr.Adjust(mrcPoint.Lon, mrcPoint.Lat);
+			mbr.Adjust(wayPoints.get(i).coord.Lon , wayPoints.get(i).coord.Lat);
 			
 			if (wayPoints.get(i).Alt > mappingAlt)
 				mappingAlt = wayPoints.get(i).Alt;
 		}
 		
-		mappingAlt *= 2.0;
+		mappingAlt /= 2.0;
 		if (mappingAlt == 0.0)
 			return;
 
 		double viewRadius = GetViewRadius(DJIWrapper.CAMERA_FOV, mappingAlt);
-		MrcPoint leftTop = new MrcPoint(mbr.Ymax, mbr.Xmin);
-		MrcPoint rightBottom = new MrcPoint(mbr.Ymin, mbr.Xmax);
-		
-		leftTop.ToMeters();
-		rightBottom.ToMeters();
+		float[] distance = new float[3];
+		Location.distanceBetween(mbr.Ymin, mbr.Xmin, mbr.Ymin, mbr.Xmax, distance);
+		double widthInMeters = distance[0]; 
+		Location.distanceBetween(mbr.Ymin, mbr.Xmin, mbr.Ymax, mbr.Xmin, distance);
+		double heightInMeters = distance[0];
 
-		double width = Math.ceil((rightBottom.Lon - leftTop.Lon) / (viewRadius * 2.0));
-		double height = Math.ceil((leftTop.Lat - rightBottom.Lat) / (viewRadius * 2.0));
 		double stepH = viewRadius * 2.0;
-		double stepV = viewRadius * 2.0;
+		double stepV = viewRadius * 2.0;				
+		double width = Math.ceil(widthInMeters / stepV);
+		double height = Math.ceil(heightInMeters / stepH);
 		int heading = 270;
 		int speed = viewRadius > 10 ? 10 : 2;
 		
-		MrcPoint cur = new MrcPoint(leftTop.Lat, leftTop.Lon);
+		MrcPoint cur = new DegPoint(mbr.GetCenterY(), mbr.GetCenterX()).ToMercator();
+		cur.Lon -= Utilities.MetersToDeg(widthInMeters / 2.0);
+		cur.Lat += Utilities.MetersToDeg(heightInMeters / 2.0);
+		
 		for (int j = 0; j < height; j++)
 		{
+			if ((j % 2) == 0)
+				heading = 90;
+			else
+				heading = 270;
+						
 			for (int i = 0; i < width; i++)
 			{
 				MrcPoint coord = new MrcPoint(cur.Lat, cur.Lon);
-				coord.FromMeters();
 
 				WayPoint wayPoint = new WayPoint();
 				wayPoint.coord = coord.ToDegrees();
@@ -162,15 +170,10 @@ public class TaskBuilder
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);		
 				gsTask.addWaypoint(gsWayPoint);
 				
-				cur.Lon += stepH;
+				cur.Lon += Utilities.MetersToDeg(stepH);
 			}
-			
-			if ((j % 2) == 0)
-				heading = 270;
-			else
-				heading = 180;
 
-			cur.Lat += stepV;			
+			cur.Lat -= Utilities.MetersToDeg(stepV);			
 			stepH *= -1.0;
 		}			
 	}

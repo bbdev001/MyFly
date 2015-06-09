@@ -1,0 +1,77 @@
+package com.dji.wrapper;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import com.my.fly.utilities.WayPoint;
+
+public class Route
+{
+	public ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
+	public ArrayList<WayPoint> mappingWayPoints = new ArrayList<WayPoint>();
+	public String name = "";
+	public float mappingAltitude = 0.0f;
+	public boolean isMappingDefault = false;
+	
+	public boolean LoadFromCSV(String basePath, String name)
+	{
+		BufferedReader br = null;
+		wayPoints.clear();
+		try
+		{
+			File file = new File(basePath + "/" + name + ".csv");
+
+			br = new BufferedReader(new FileReader(file.getAbsoluteFile()));
+			String line = "";
+
+			while ((line = br.readLine()) != null)
+			{
+				WayPoint wayPoint = new WayPoint(line);
+				wayPoints.add(wayPoint);
+			}
+
+			br.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+				
+		return true;
+	}
+	
+	public boolean SaveToCSV(String basePath, String name)
+	{
+		BufferedWriter bw = null;
+		try
+		{
+			File file = new File(basePath + "/" + name + ".csv");
+
+			if (file.exists())
+				file.delete();
+
+			bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
+			for (WayPoint wp : wayPoints)
+			{
+				bw.write(wp.toString());
+				bw.newLine();
+			}
+
+			bw.flush();
+			bw.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;	
+	}
+}

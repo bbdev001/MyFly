@@ -18,6 +18,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.dji.wrapper.DJIGroundStation;
 import com.dji.wrapper.DJIWrapper;
+import com.dji.wrapper.Route;
 import com.dji.wrapper.TaskBuilder;
 import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.WayPoint;
@@ -67,8 +68,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private ScrollView scrollViewMessages = null;
 	private ListView routesList = null;
 	private RouteView routeView = null;
-	private ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
-	private ArrayList<WayPoint> wayPointsMapping = new ArrayList<WayPoint>();
 	private ArrayList<String> routes = new ArrayList<String>();
 	private ArrayAdapter<String> routesListArapter = null;
 	private Handler uiHandler = new Handler(this);
@@ -143,6 +142,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString("Can't init sdk");
+			
+		LoadRoutesList();
 	}
 
 	@Override
@@ -158,8 +159,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case DJIWrapper.PERMISSION_STATUS:
 			{
 				AppendString(djiWrapper.GetPermissionErrorResultMessage);
-
-				LoadRoutesList();
+				
 				//DownloadRoutes();
 
 				djiWrapper.ConnectDroneDevices(djiSurfaceView);
@@ -468,33 +468,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		return t.responseStrings;
 	}
 
+	private Route route = new Route();
 	protected void LoadRoute(String curRouteName)
 	{
 		currentRouteName = curRouteName;
 		
-		BufferedReader br = null;
-		wayPoints.clear();
-		try
-		{
-			File file = new File(BASE_PATH + "/" + currentRouteName + ".csv");
-
-			br = new BufferedReader(new FileReader(file.getAbsoluteFile()));
-			String line = "";
-
-			while ((line = br.readLine()) != null)
-			{
-				WayPoint wayPoint = new WayPoint(line);
-				wayPoints.add(wayPoint);
-			}
-
-			routeView.SetRoute(wayPoints, curRouteName, true);
-
-			br.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		route.LoadFromCSV(BASE_PATH, currentRouteName);
+		
+		routeView.SetRoute(route, curRouteName, true);
 		
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		ChangeRouteType(false);
@@ -502,28 +483,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	protected void SaveRoute(String curRouteName)
 	{
-		BufferedWriter bw = null;
-		try
-		{
-			File file = new File(BASE_PATH + "/" + currentRouteName + ".csv");
-
-			if (file.exists())
-				file.delete();
-
-			bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-			for (WayPoint wp : wayPoints)
-			{
-				bw.write(wp.toString());
-				bw.newLine();
-			}
-
-			bw.flush();
-			bw.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		route.SaveToCSV(BASE_PATH, currentRouteName);
 	}
 
 	@Override
@@ -735,12 +695,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (isMapping)
 			return;
 		
-		if (wayPoints.size() == 0)
+		if (route.wayPoints.size() == 0)
 			return;
 
 		selectedWayPointId = wayPointId;
 
-		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoints.get(wayPointId), new WPEditor.OnDialogClosedListener()
+		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, route.wayPoints.get(wayPointId), new WPEditor.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel)
 			{
@@ -749,7 +709,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				if (!isCancel)
 				{
 					SaveRoute(currentRouteName);
-					routeView.SetWayPoint(selectedWayPointId, wayPoints.get(selectedWayPointId));
+					routeView.SetWayPoint(selectedWayPointId, route.wayPoints.get(selectedWayPointId));
 				}
 			}
 		},
@@ -758,7 +718,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			@Override
 			public void OnDeleted(int wayPointIndex)
 			{
-				wayPoints.remove(wayPointIndex);
+				route.wayPoints.remove(wayPointIndex);
 				routeView.RemoveWayPoint(wayPointIndex);
 				selectedWayPointId = -1;
 			}
@@ -833,13 +793,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		if (isMapping)
 		{
-			TaskBuilder.BuildMappingRoute(gsTask, wayPointsMapping, wayPoints);
-			routeView.SetRoute(wayPointsMapping, currentRouteName + " mapping", !isMapping);
+			TaskBuilder.BuildMappingRoute(gsTask, route);
+			routeView.SetRoute(route, currentRouteName + " mapping", !isMapping);
 		}
 		else
 		{
-			TaskBuilder.BuildSequientialRoute(gsTask, wayPoints);
-			routeView.SetRoute(wayPoints, currentRouteName, !isMapping);
+			TaskBuilder.BuildSequientialRoute(gsTask, route);
+			routeView.SetRoute(route, currentRouteName, !isMapping);
 		}
 	}
 }
