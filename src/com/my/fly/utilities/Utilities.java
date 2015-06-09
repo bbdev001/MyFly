@@ -46,11 +46,11 @@ public class Utilities
 
 		tst = tx * lcos;
 		tst1 = ty * lsin;
-		dx = tst + tst1;
+		dx = tst - tst1;
 
 		tst = ty * lcos;
 		tst1 = tx * lsin;
-		dy = tst - tst1;
+		dy = tst + tst1;
 
 		point.Set(dx + centerPoint.dX, dy + centerPoint.dY);
 	}
@@ -67,4 +67,17 @@ public class Utilities
 		paint.setColor(textColor);			
 		canvas.drawText(text, x, y, paint);	
 	}
+	
+	public static double DegToMeters(double value)
+	{
+		double k = 40000000.0 / 360.0;	
+		return value * k;
+	}
+	
+	public static double MetersToDeg(double value)
+	{
+		double k = 360.0 / 40000000.0;	
+		return value * k;
+	}
+	
 }

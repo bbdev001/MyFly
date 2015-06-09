@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import com.dji.wrapper.DJIWrapper;
+import com.dji.wrapper.Route;
 import com.my.fly.utilities.*;
 
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationStatusPushType;
@@ -35,8 +36,8 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private Context context = null;
 	private Paint paint;
 	private Paint textPaint;
-	private ArrayList<MrcPoint> route = new ArrayList<MrcPoint>();
-	private ArrayList<WayPoint> routeWP = new ArrayList<WayPoint>();
+	private ArrayList<MrcPoint> routePoints = new ArrayList<MrcPoint>();
+	private Route route = null;
 	private static final float LINE_WIDTH = 10.0f;
 	private Mbr mbr = new Mbr();
 	private GestureDetector gestureDetector = null;
@@ -61,7 +62,6 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private int missionReachedWP = 0;
 	private int selectedPointIndex = -1;
 	protected boolean isShowPress = false;
-	private boolean isEditable = true;
 
 	public interface OnWayPointSelected
 	{
@@ -100,13 +100,24 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 	public void Reset()
 	{
+		scale = 1.0f;
 		gestureScale = 1.0f;
 		scrCenter = new ScreenPoint(width / 2.0f, height / 2.0f);
-
+		
 		if (height < width)
-			scale = (float) ((height - LINE_WIDTH * 4.0f) / (mbr.Ymax - mbr.Ymin));
+		{
+			double d = mbr.Ymax - mbr.Ymin;
+		
+			if (d != 0.0)
+				scale = (float) ((height - LINE_WIDTH * 4.0f) / d);
+		}
 		else
-			scale = (float) ((width - LINE_WIDTH * 4.0f) / (mbr.Xmax - mbr.Xmin));
+		{
+			double d = mbr.Ymax - mbr.Ymin;
+			
+			if (d != 0.0)
+				scale = (float) ((width - LINE_WIDTH * 4.0f) / d);
+		}
 	}
 
 	public void SetHomePosition(DegPoint position)
@@ -148,21 +159,19 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		Reset();
 	}
 
-	public void SetRoute(ArrayList<WayPoint> wayPoints, String routeName, boolean isEditable)
+	public void SetRoute(Route route, String routeName)
 	{
 		Log.i(TAG, "SetRoute " + width + " " + height + " " + scale);
-		routeWP.clear();
-		route.clear();
+		this.route = route;
+		routePoints.clear();
 		mbr.Reset();
 		this.routeName = routeName;
-		this.isEditable = isEditable;
-
-		for (int i = 0; i < wayPoints.size(); i++)
+		
+		for (int i = 0; i < route.wayPoints.size(); i++)
 		{
-			MrcPoint mrcPoint = wayPoints.get(i).coord.ToMercator();
+			MrcPoint mrcPoint = route.wayPoints.get(i).coord.ToMercator();
 			mbr.Adjust(mrcPoint.Lon, mrcPoint.Lat);
-			route.add(mrcPoint);
-			routeWP.add(wayPoints.get(i));
+			routePoints.add(mrcPoint);
 		}
 
 		mapCenter.Lat = mbr.GetCenterY();
@@ -205,31 +214,31 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 		// Route
 		paint.setColor(Color.RED);
-		for (int i = 1; i < route.size(); i++)
+		for (int i = 1; i < routePoints.size(); i++)
 		{
-			p.FromMercator(route.get(i - 1), mapCenter, scrCenter, scale);
-			p1.FromMercator(route.get(i), mapCenter, scrCenter, scale);
+			p.FromMercator(routePoints.get(i - 1), mapCenter, scrCenter, scale);
+			p1.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale);
 			canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
 		}
 
-		for (int i = 0; i < route.size(); i++)
+		for (int i = 0; i < routePoints.size(); i++)
 		{
-			p.FromMercator(route.get(i), mapCenter, scrCenter, scale);
+			p.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale);
 			paint.setStyle(Paint.Style.FILL);
 			paint.setColor(Color.BLUE);
 			canvas.drawCircle(p.X, p.Y, LINE_WIDTH, paint);
 			paint.setStyle(Paint.Style.STROKE);
 
-			if (routeWP.get(i).HoverTime > 0)
+			if (route.wayPoints.get(i).HoverTime > 0)
 			{
 				p.CopyTo(p1);
 				p1.SetY(p1.dY - 30);
-				Utilities.Rotate(p1, p, routeWP.get(i).Heading);
+				Utilities.Rotate(p1, p, route.wayPoints.get(i).Heading);
 				paint.setStrokeWidth(LINE_WIDTH);
 				canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
 			}
 
-			Utilities.DrawTextWithBorder(Integer.toString(i) + ": " + formatter.format(routeWP.get(i).Alt) + "m", p.X, p.Y, Color.GRAY, Color.WHITE, 1, 3, canvas, textPaint);
+			Utilities.DrawTextWithBorder(Integer.toString(i) + ": " + formatter.format(route.wayPoints.get(i).Alt) + "m", p.X, p.Y, Color.GRAY, Color.WHITE, 1, 3, canvas, textPaint);
 		}
 
 		// Home
@@ -255,9 +264,9 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		canvas.drawPoint(p.X, p.Y, paint);
 
 		// Selected point;
-		if (selectedPointIndex >= 0 && route.size() > selectedPointIndex)
+		if (selectedPointIndex >= 0 && routePoints.size() > selectedPointIndex)
 		{
-			p.FromMercator(route.get(selectedPointIndex), mapCenter, scrCenter, scale);
+			p.FromMercator(routePoints.get(selectedPointIndex), mapCenter, scrCenter, scale);
 			paint.setStyle(Paint.Style.FILL);
 			paint.setColor(Color.GREEN);
 			canvas.drawCircle(p.X, p.Y, LINE_WIDTH, paint);
@@ -315,7 +324,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 					{
 						scrollOffset.Set(0.0, 0.0);
 						p.Set(event.getX(), event.getY());
-						p.ToMercator(route.get(selectedPointIndex), mapCenter, scrCenter, scale);
+						p.ToMercator(routePoints.get(selectedPointIndex), mapCenter, scrCenter, scale);
 						invalidate();
 						return true;
 					}
@@ -440,9 +449,9 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		double minValue = Double.MAX_VALUE;
 		ScreenPoint p = new ScreenPoint(x, y);
 
-		for (int i = 0; i < route.size(); i++)
+		for (int i = 0; i < routePoints.size(); i++)
 		{
-			p1.FromMercator(route.get(i), mapCenter, scrCenter, scale);
+			p1.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale);
 			double d = p.DistanceTo(p1);
 			if (d < 50 && d < minValue)
 			{
@@ -458,7 +467,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 	public void SetWayPoint(int wayPointId, WayPoint wayPoint)
 	{
-		routeWP.set(wayPointId, wayPoint);
+		route.wayPoints.set(wayPointId, wayPoint);
 		invalidate();
 	}
 
@@ -497,8 +506,8 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 	public void RemoveWayPoint(int wayPointIndex)
 	{
-		route.remove(wayPointIndex);
-		routeWP.remove(wayPointIndex);
+		routePoints.remove(wayPointIndex);
+		route.wayPoints.remove(wayPointIndex);
 		invalidate();
 	}
 }
