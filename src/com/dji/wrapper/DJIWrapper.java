@@ -41,6 +41,8 @@ public class DJIWrapper
     public static final int CAMERA_FOV = 90;
     
 	private static final String TAG = "DjiWrapper";
+	
+	private DJIDroneType droneType = DJIDroneType.DJIDrone_Inspire1;
 	private com.dji.wrapper.DJICamera camera = null;
 	private com.dji.wrapper.DJIMcu mcu = null;
 	private com.dji.wrapper.DJIGroundStation groundStation = null;
@@ -55,6 +57,7 @@ public class DJIWrapper
 	{
 		Log.i(TAG, "Init SDK");
 		
+		this.droneType = droneType;
 		this.context = context;
 		uiHandler = new Handler(handlerCallback);
 		
@@ -87,8 +90,10 @@ public class DJIWrapper
 		{
 			if (cameraSurface != null)
 				GetCamera().Connect(cameraSurface, 250);
+
+			if (droneType == DJIDroneType.DJIDrone_Inspire1)
+				GetRemoteController().Connect(250);
 			
-			GetRemoteController().Connect(250);
 			GetMcu().Connect(250);
 			GetGroundStation().Connect(250);
 			GetBattery().Connect(2000);
@@ -97,7 +102,9 @@ public class DJIWrapper
 	
 	public void  DisconnectDroneDevices()
 	{
-		GetRemoteController().Disconnect();
+		if (droneType == DJIDroneType.DJIDrone_Inspire1)
+			GetRemoteController().Disconnect();
+		
 		GetCamera().Disconnect();
 		GetMcu().Disconnect();
 		GetGroundStation().Disconnect();
@@ -168,11 +175,14 @@ public class DJIWrapper
 	
 	public void Destroy()
 	{
+		if (droneType == DJIDroneType.DJIDrone_Inspire1)
+			remoteController.Disconnect();
+		
 		camera.Disconnect();
 		mcu.Disconnect();
 		groundStation.Disconnect();	
 		battery.Disconnect();
-		remoteController.Disconnect();
+				
 		DJIDrone.disconnectToDrone();
 		
 		Log.i(TAG, "Destroy");

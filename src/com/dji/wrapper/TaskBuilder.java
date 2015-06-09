@@ -119,15 +119,14 @@ public class TaskBuilder
 				mappingAlt = route.wayPoints.get(i).Alt;
 		}
 		
-		if (route.mappingAltitude == 0.0)
-		{
-			mappingAlt /= 2.0;
-			if (mappingAlt == 0.0)
-				return;
-		}
+		if (route.mappingAltitude == 0.0)		
+			route.mappingAltitude = (float)mappingAlt;
 		else
 			mappingAlt = route.mappingAltitude;
 
+		if (mappingAlt == 0.0)
+			return;
+			
 		double viewRadius = GetViewRadius(DJIWrapper.CAMERA_FOV, mappingAlt);
 		float[] distance = new float[3];
 		Location.distanceBetween(mbr.Ymin, mbr.Xmin, mbr.Ymin, mbr.Xmax, distance);

@@ -706,9 +706,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				Log.e(TAG, "WPEditor.OnClosed");
 
 				if (!isCancel)
-				{
-					SaveRoute(currentRouteName);
-					
+				{				
 					if (isMapping)
 					{
 						route.mappingAltitude = wayPoint.Alt;
@@ -716,6 +714,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 					}
 					else
 						routeView.SetWayPoint(selectedWayPointId, wayPoint);
+					
+					SaveRoute(currentRouteName);					
 				}
 			}
 		},
