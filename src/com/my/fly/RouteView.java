@@ -166,10 +166,11 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		routePoints.clear();
 		mbr.Reset();
 		this.routeName = routeName;
+		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
 		
-		for (int i = 0; i < route.wayPoints.size(); i++)
+		for (int i = 0; i < wayPoints.size(); i++)
 		{
-			MrcPoint mrcPoint = route.wayPoints.get(i).coord.ToMercator();
+			MrcPoint mrcPoint = wayPoints.get(i).coord.ToMercator();
 			mbr.Adjust(mrcPoint.Lon, mrcPoint.Lat);
 			routePoints.add(mrcPoint);
 		}
@@ -221,6 +222,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 			canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
 		}
 
+		ArrayList<WayPoint> routeWP = route.GetWayPoints();
 		for (int i = 0; i < routePoints.size(); i++)
 		{
 			p.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale);
@@ -229,16 +231,16 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 			canvas.drawCircle(p.X, p.Y, LINE_WIDTH, paint);
 			paint.setStyle(Paint.Style.STROKE);
 
-			if (route.wayPoints.get(i).HoverTime > 0)
+			if (routeWP.get(i).HoverTime > 0)
 			{
 				p.CopyTo(p1);
 				p1.SetY(p1.dY - 30);
-				Utilities.Rotate(p1, p, route.wayPoints.get(i).Heading);
+				Utilities.Rotate(p1, p, routeWP.get(i).Heading);
 				paint.setStrokeWidth(LINE_WIDTH);
 				canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
 			}
 
-			Utilities.DrawTextWithBorder(Integer.toString(i) + ": " + formatter.format(route.wayPoints.get(i).Alt) + "m", p.X, p.Y, Color.GRAY, Color.WHITE, 1, 3, canvas, textPaint);
+			Utilities.DrawTextWithBorder(Integer.toString(i) + ": " + formatter.format(routeWP.get(i).Alt) + "m", p.X, p.Y, Color.GRAY, Color.WHITE, 1, 3, canvas, textPaint);
 		}
 
 		// Home
@@ -309,7 +311,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (isEditable)
+		if (!route.isMapping)
 		{
 			switch (event.getAction())
 			{
@@ -378,9 +380,14 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	public boolean onSingleTapUp(MotionEvent e)
 	{
 		scrollOffset.Set(0.0, 0.0);
-		if (selectedPointIndex < 0)
-			return false;
-
+		if (!route.isMapping)
+		{
+			if (selectedPointIndex < 0)
+				return false;
+		}
+		else
+			selectedPointIndex = -1;
+		
 		for (OnWayPointSelected listener : wayPointSelectedListeners)
 		{
 			listener.onWayPointSelected(selectedPointIndex);
@@ -467,7 +474,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 	public void SetWayPoint(int wayPointId, WayPoint wayPoint)
 	{
-		route.wayPoints.set(wayPointId, wayPoint);
+		route.GetWayPoints().set(wayPointId, wayPoint);
 		invalidate();
 	}
 
@@ -507,7 +514,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	public void RemoveWayPoint(int wayPointIndex)
 	{
 		routePoints.remove(wayPointIndex);
-		route.wayPoints.remove(wayPointIndex);
+		route.GetWayPoints().remove(wayPointIndex);
 		invalidate();
 	}
 }

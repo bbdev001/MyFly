@@ -17,12 +17,14 @@ import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOnWayPoint
 
 public class TaskBuilder
 {
-	public static void BuildSequientialRoute(DJIGroundStationTask gsTask, ArrayList<WayPoint> wayPoints)
+	public static void BuildSequientialRoute(DJIGroundStationTask gsTask, Route route)
 	{
 		gsTask.RemoveAllWaypoint();
-		for (int i = 0; i < wayPoints.size(); i++)
+		route.isMapping = false;
+		
+		for (int i = 0; i < route.wayPoints.size(); i++)
 		{
-			WayPoint wp = wayPoints.get(i);
+			WayPoint wp = route.wayPoints.get(i);
 			DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wp.coord.Lat, wp.coord.Lon, 5, 1);
 			gsWayPoint.altitude = (float) wp.Alt;
 			gsWayPoint.heading = 0;//wp.Heading;
@@ -101,24 +103,30 @@ public class TaskBuilder
 		return altitude * (Math.sin(Utilities.DegToRad(halfFov)) / Math.sin(Utilities.DegToRad(y)));
 	}
 	
-	public static void BuildMappingRoute(DJIGroundStationTask gsTask, ArrayList<WayPoint> mappingWayPoints, ArrayList<WayPoint> wayPoints)
+	public static void BuildMappingRoute(DJIGroundStationTask gsTask, Route route)
 	{
 		gsTask.RemoveAllWaypoint();
-		mappingWayPoints.clear();
+		route.mappingWayPoints.clear();
+		route.isMapping = true;
 
 		Mbr mbr = new Mbr();
 		double mappingAlt = 0.0;
-		for (int i = 0; i < wayPoints.size(); i++)
+		for (int i = 0; i < route.wayPoints.size(); i++)
 		{
-			mbr.Adjust(wayPoints.get(i).coord.Lon , wayPoints.get(i).coord.Lat);
+			mbr.Adjust(route.wayPoints.get(i).coord.Lon , route.wayPoints.get(i).coord.Lat);
 			
-			if (wayPoints.get(i).Alt > mappingAlt)
-				mappingAlt = wayPoints.get(i).Alt;
+			if (route.wayPoints.get(i).Alt > mappingAlt)
+				mappingAlt = route.wayPoints.get(i).Alt;
 		}
 		
-		mappingAlt /= 2.0;
-		if (mappingAlt == 0.0)
-			return;
+		if (route.mappingAltitude == 0.0)
+		{
+			mappingAlt /= 2.0;
+			if (mappingAlt == 0.0)
+				return;
+		}
+		else
+			mappingAlt = route.mappingAltitude;
 
 		double viewRadius = GetViewRadius(DJIWrapper.CAMERA_FOV, mappingAlt);
 		float[] distance = new float[3];
@@ -155,7 +163,7 @@ public class TaskBuilder
 				wayPoint.Speed = speed;
 				wayPoint.Heading = heading;
 				wayPoint.HoverTime = 1;
-				mappingWayPoints.add(wayPoint);
+				route.mappingWayPoints.add(wayPoint);
 				
 				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon, 3, 1);
 				gsWayPoint.altitude = wayPoint.Alt;
@@ -175,6 +183,7 @@ public class TaskBuilder
 
 			cur.Lat -= Utilities.MetersToDeg(stepV);			
 			stepH *= -1.0;
+			cur.Lon += Utilities.MetersToDeg(stepH);
 		}			
 	}
 }

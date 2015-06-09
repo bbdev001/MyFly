@@ -16,12 +16,15 @@ public class Route
 	public ArrayList<WayPoint> mappingWayPoints = new ArrayList<WayPoint>();
 	public String name = "";
 	public float mappingAltitude = 0.0f;
-	public boolean isMappingDefault = false;
+	public boolean isMapping = false;
 	
 	public boolean LoadFromCSV(String basePath, String name)
 	{
 		BufferedReader br = null;
 		wayPoints.clear();
+		mappingAltitude = 0.0f;
+		isMapping = false;
+		
 		try
 		{
 			File file = new File(basePath + "/" + name + ".csv");
@@ -73,5 +76,13 @@ public class Route
 		}
 		
 		return true;	
+	}
+	
+	public ArrayList<WayPoint> GetWayPoints()
+	{
+		if (isMapping)
+			return mappingWayPoints;
+		
+		return wayPoints;
 	}
 }

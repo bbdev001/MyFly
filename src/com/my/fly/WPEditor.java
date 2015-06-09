@@ -36,7 +36,7 @@ public class WPEditor extends Dialog implements View.OnClickListener
 	protected OnDialogClosedListener onClosedListener = null;
 	protected Activity context = null;
 
-	public WPEditor(Activity context, String title, int wayPointId, WayPoint wayPoint, OnDialogClosedListener onClosedListener, OnWPDeletedListener onWPDeleted)
+	public WPEditor(Activity context, String title, int wayPointId, WayPoint wayPoint, boolean isMapping, OnDialogClosedListener onClosedListener, OnWPDeletedListener onWPDeleted)
 	{
 		super(context);
 		this.context = context;
@@ -78,6 +78,14 @@ public class WPEditor extends Dialog implements View.OnClickListener
 		((Button) findViewById(R.id.btnCancel)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnDelete)).setOnClickListener(this);
 
+		if (isMapping)
+		{
+			heading.setEnabled(false);
+			hoverTime.setEnabled(false);
+			speed.setEnabled(false);
+			action.setEnabled(false);
+			((Button) findViewById(R.id.btnDelete)).setEnabled(false);
+		}
 		super.show();
 	}
 

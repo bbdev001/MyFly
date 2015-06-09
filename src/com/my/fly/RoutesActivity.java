@@ -475,7 +475,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		route.LoadFromCSV(BASE_PATH, currentRouteName);
 		
-		routeView.SetRoute(route, curRouteName, true);
+		routeView.SetRoute(route, curRouteName);
 		
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		ChangeRouteType(false);
@@ -692,15 +692,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		Log.e(TAG, "onWayPointSelected");
 
-		if (isMapping)
-			return;
-		
 		if (route.wayPoints.size() == 0)
 			return;
 
+		final WayPoint wayPoint = wayPointId >= 0 ? route.wayPoints.get(wayPointId) : route.mappingWayPoints.get(0);
+		
 		selectedWayPointId = wayPointId;
 
-		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, route.wayPoints.get(wayPointId), new WPEditor.OnDialogClosedListener()
+		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoint, isMapping, new WPEditor.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel)
 			{
@@ -709,7 +708,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				if (!isCancel)
 				{
 					SaveRoute(currentRouteName);
-					routeView.SetWayPoint(selectedWayPointId, route.wayPoints.get(selectedWayPointId));
+					
+					if (isMapping)
+					{
+						route.mappingAltitude = wayPoint.Alt;
+						ChangeRouteType(true);					
+					}
+					else
+						routeView.SetWayPoint(selectedWayPointId, wayPoint);
 				}
 			}
 		},
@@ -794,12 +800,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (isMapping)
 		{
 			TaskBuilder.BuildMappingRoute(gsTask, route);
-			routeView.SetRoute(route, currentRouteName + " mapping", !isMapping);
+			routeView.SetRoute(route, currentRouteName + " mapping");
 		}
 		else
 		{
 			TaskBuilder.BuildSequientialRoute(gsTask, route);
-			routeView.SetRoute(route, currentRouteName, !isMapping);
+			routeView.SetRoute(route, currentRouteName);
 		}
 	}
 }
