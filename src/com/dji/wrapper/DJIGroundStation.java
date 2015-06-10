@@ -10,6 +10,8 @@ import dji.sdk.api.GroundStation.DJIGroundStationExecutionPushInfo;
 import dji.sdk.api.GroundStation.DJIGroundStationFlyingInfo;
 import dji.sdk.api.GroundStation.DJIGroundStationMissionPushInfo;
 import dji.sdk.api.GroundStation.DJIGroundStationTask;
+import dji.sdk.api.GroundStation.DJIGroundStationTypeDef;
+import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationFlightMode;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationGoHomeResult;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationHoverResult;
@@ -59,6 +61,12 @@ public class DJIGroundStation
 
 	public void Connect(int interval)
 	{
+		if (droneType == DJIDroneType.DJIDrone_Inspire1)
+		{	
+			((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setHorizontalControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
+			((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setYawControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
+		}		
+	
 		object.setGroundStationFlyingInfoCallBack(new DJIGroundStationFlyingInfoCallBack()
 		{
 			@Override

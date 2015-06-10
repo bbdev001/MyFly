@@ -478,11 +478,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routeView.SetRoute(route, curRouteName);
 		
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
-		ChangeRouteType(false);
+		BuildRouteForType(false);
 	}
 
 	protected void SaveRoute(String curRouteName)
 	{
+		BuildRouteForType(isMapping);	
 		route.SaveToCSV(BASE_PATH, currentRouteName);
 	}
 
@@ -526,7 +527,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (!routeStarted)
 		{
 			AppendString("Start task");
-
 			djiWrapper.GetGroundStation().StartTask(gsTask);
 		}
 		else if (routePaused)
@@ -708,10 +708,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				if (!isCancel)
 				{				
 					if (isMapping)
-					{
 						route.mappingAltitude = wayPoint.Alt;
-						ChangeRouteType(true);					
-					}
 					else
 						routeView.SetWayPoint(selectedWayPointId, wayPoint);
 					
@@ -727,6 +724,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				route.wayPoints.remove(wayPointIndex);
 				routeView.RemoveWayPoint(wayPointIndex);
 				selectedWayPointId = -1;
+				
+				//SaveRoute(currentRouteName);
 			}
 		});
 
@@ -777,7 +776,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case R.id.routeTypeRouting:
 			{
 				if (checked)
-					ChangeRouteType(false);
+					BuildRouteForType(false);
 
 				break;
 			}
@@ -785,14 +784,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case R.id.routeTypeMapping:
 			{
 				if (checked)
-					ChangeRouteType(true);
+					BuildRouteForType(true);
 
 				break;
 			}
 		}
 	}
 
-	private void ChangeRouteType(boolean isMapping)
+	private void BuildRouteForType(boolean isMapping)
 	{
 		Log.i(TAG, "ChangeRouteType");
 		this.isMapping = isMapping;
