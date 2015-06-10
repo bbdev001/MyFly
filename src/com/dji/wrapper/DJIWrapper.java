@@ -32,6 +32,7 @@ public class DJIWrapper
 	public static final int CAMERA_TAKE_PHOTO_DONE = 15;
 	public static final int REMOTE_CONTROLLER_STATE = 16;
 	public static final int CAMERA_FILE_INFO = 17;
+	public static final int GIMBAL_STATUS = 18;
 		
     public static final int NAVI_MODE_ATTITUDE = 0;
     public static final int NAVI_MODE_WAYPOINT = 1;
@@ -48,6 +49,7 @@ public class DJIWrapper
 	private com.dji.wrapper.DJIGroundStation groundStation = null;
 	private com.dji.wrapper.DJIBattery battery = null;
 	private com.dji.wrapper.DJIRemoteController remoteController = null;
+	private com.dji.wrapper.DJIGimbal gimbal = null;
 	private Context context = null;
 	private Handler uiHandler = null;
 
@@ -79,6 +81,7 @@ public class DJIWrapper
 		mcu = new DJIMcu(droneType, context, uiHandler);
 		groundStation = new DJIGroundStation(droneType, context, uiHandler);
 		battery = new DJIBattery(droneType, context, uiHandler);
+		gimbal = new DJIGimbal(droneType, context, uiHandler);
 		remoteController = new DJIRemoteController(droneType, context, uiHandler);
 		
 		return true;
@@ -96,6 +99,7 @@ public class DJIWrapper
 			
 			GetMcu().Connect(250);
 			GetGroundStation().Connect(250);
+			GetGimbal().Connect(250);
 			GetBattery().Connect(2000);
 		}
 	}
@@ -108,6 +112,7 @@ public class DJIWrapper
 		GetCamera().Disconnect();
 		GetMcu().Disconnect();
 		GetGroundStation().Disconnect();
+		GetGimbal().Disconnect();
 		GetBattery().Disconnect();
 	}
 	
@@ -161,6 +166,11 @@ public class DJIWrapper
 	public DJIGroundStation GetGroundStation()
 	{
 		return groundStation;
+	}
+
+	public DJIGimbal GetGimbal()
+	{
+		return gimbal;
 	}
 
 	public DJIBattery GetBattery()
@@ -385,5 +395,27 @@ public class DJIWrapper
 		}
 		
 		return result;
+	}
+	
+	public static double ConvertYawToHeading(double yaw)
+	{
+		double heading = yaw;
+
+		if (heading < 0)
+			heading = 360 + heading;
+
+		return heading;
+	}
+	
+	public static double ConvertHeadingToYaw(double heading)
+	{
+		double yaw = 0.0;
+
+		if (heading > 180)
+			yaw = heading - 360;
+		else
+			yaw = heading;
+
+		return yaw;
 	}
 }

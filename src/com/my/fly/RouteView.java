@@ -37,7 +37,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private Paint paint;
 	private Paint textPaint;
 	private ArrayList<MrcPoint> routePoints = new ArrayList<MrcPoint>();
-	private Route route = null;
+	private Route route = new Route();
 	private static final float LINE_WIDTH = 10.0f;
 	private Mbr mbr = new Mbr();
 	private GestureDetector gestureDetector = null;
@@ -55,7 +55,10 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private double dronePowerLevel = 0.0;
 	private double dronePitch = 0.0;
 	private double droneRoll = 0.0;
-	private double droneYaw = 0.0;
+	private double droneHeading = 0.0;
+	private double gimbalPitch = 0.0;
+	private double gimbalRoll = 0.0;
+	private double gimbalYaw = 0.0;
 	private String missionType = "";
 	private String missionState = "";
 	private int missionTargetWP = 0;
@@ -106,14 +109,14 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		
 		if (height < width)
 		{
-			double d = mbr.Ymax - mbr.Ymin;
+			double d = Math.max(mbr.Ymax - mbr.Ymin, mbr.Xmax - mbr.Xmin);
 		
 			if (d != 0.0)
 				scale = (float) ((height - LINE_WIDTH * 4.0f) / d);
 		}
 		else
 		{
-			double d = mbr.Ymax - mbr.Ymin;
+			double d = Math.max(mbr.Ymax - mbr.Ymin, mbr.Xmax - mbr.Xmin);
 			
 			if (d != 0.0)
 				scale = (float) ((width - LINE_WIDTH * 4.0f) / d);
@@ -125,20 +128,28 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		Utilities.ToMercator(position, homePosition);
 	}
 
-	public void SetDronePosition(DegPoint position, double alt, double speed, double distance, double remainFlyTime, double powerLevel, double pitch, double roll, double yaw)
+	public void SetDronePosition(DegPoint position, double alt, double speed, double distance, double remainFlyTime, double powerLevel, double pitch, double roll, double heading)
 	{
 		Utilities.ToMercator(position, dronePosition);
+
 		droneAlt = alt;
 		droneSpeed = speed;
 		droneDistance = distance;
 		droneRemainFlyTime = remainFlyTime;
 		dronePitch = pitch;
 		droneRoll = roll;
-		droneYaw = yaw;
+		droneHeading = heading;
 
 		invalidate();
 	}
 
+	public void SetGimbalStatus(double pitch, double roll, double yaw)
+	{
+		gimbalPitch = pitch;
+		gimbalRoll = roll;
+		gimbalYaw = yaw;
+	}
+	
 	public void SetDroneUserPosition(DegPoint position)
 	{
 		Utilities.ToMercator(position, droneUserPosition);
@@ -183,7 +194,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		this.SetDroneUserPosition(defPoint);
 
 		if (width == 0 || height == 0)
-			return;
+			return;		
 
 		Reset();
 		invalidate();
@@ -205,8 +216,6 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 		scale *= gestureScale;
 
-		mapCenter.Lat = mbr.GetCenterY();
-		mapCenter.Lon = mbr.GetCenterX();
 		scrCenter.Add(scrollOffset);
 
 		canvas.setDensity(DisplayMetrics.DENSITY_LOW);
@@ -245,20 +254,25 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 		// Home
 		p.FromMercator(homePosition, mapCenter, scrCenter, scale);
-		paint.setColor(Color.GRAY);
+		paint.setColor(Color.DKGRAY);
 		paint.setStrokeWidth(LINE_WIDTH * 4.0f);
 		canvas.drawPoint(p.X, p.Y, paint);
 
 		// Drone
 		p.FromMercator(dronePosition, mapCenter, scrCenter, scale);
-		paint.setColor(Color.GRAY);
-		paint.setStrokeWidth(LINE_WIDTH * 4.0f);
-		canvas.drawPoint(p.X, p.Y, paint);
-
+		paint.setStyle(Paint.Style.FILL);
 		paint.setColor(Color.MAGENTA);
-		paint.setStrokeWidth(LINE_WIDTH * 3.0f);
-		canvas.drawPoint(p.X, p.Y, paint);
+		canvas.drawCircle(p.X, p.Y, (LINE_WIDTH * 2) - (LINE_WIDTH / 2), paint);
+		paint.setStyle(Paint.Style.STROKE);
+		
+		p.CopyTo(p1);
+		p1.SetY(p1.dY - 50);
+		Utilities.Rotate(p1, p, droneHeading);
+		paint.setColor(Color.MAGENTA);
+		paint.setStrokeWidth(LINE_WIDTH);
+		canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
 
+				
 		// User
 		p.FromMercator(droneUserPosition, mapCenter, scrCenter, scale);
 		paint.setColor(Color.GREEN);
@@ -296,8 +310,10 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Roll: " + formatter.format(droneRoll), 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
-		Utilities.DrawTextWithBorder("Yaw: " + formatter.format(droneYaw), 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
+		Utilities.DrawTextWithBorder("Heading: " + formatter.format(droneHeading), 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
+		Utilities.DrawTextWithBorder("Gim pitch: " + formatter.format(gimbalPitch), 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
+		linePos += lineHeight;		
 		Utilities.DrawTextWithBorder("GS Type: " + missionType, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("GS State: " + missionState, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);

@@ -25,6 +25,7 @@ import com.my.fly.utilities.WayPoint;
 
 import dji.sdk.api.DJIDroneTypeDef.DJIDroneType;
 import dji.sdk.api.Battery.DJIBatteryProperty;
+import dji.sdk.api.Gimbal.DJIGimbalAttitude;
 import dji.sdk.api.GroundStation.DJIGroundStationExecutionPushInfo;
 import dji.sdk.api.GroundStation.DJIGroundStationFlyingInfo;
 import dji.sdk.api.GroundStation.DJIGroundStationMissionPushInfo;
@@ -240,6 +241,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 				break;
 			}
+			case DJIWrapper.GIMBAL_STATUS:
+			{
+				DJIGimbalAttitude status = (DJIGimbalAttitude)msg.obj;
+				
+				routeView.SetGimbalStatus(status.pitch, status.roll, status.yaw);
+				break;
+			}
 			case DJIWrapper.MCU_STATUS:
 			{
 				DJIMainControllerSystemState status = (DJIMainControllerSystemState) msg.obj;
@@ -257,9 +265,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, distance);
 				
 				if (droneType == DJIDroneType.DJIDrone_Inspire1)
-					routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, status.yaw / 10.0);
+					routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, DJIWrapper.ConvertYawToHeading(status.yaw / 10.0));
 				else
-					routeView.SetDronePosition(lastPosition, status.altitude, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch, status.roll, status.yaw);
+					routeView.SetDronePosition(lastPosition, status.altitude, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch, status.roll, DJIWrapper.ConvertYawToHeading(status.yaw));
 				
 				break;
 			}
@@ -534,18 +542,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			AppendString("Resume task");
 			djiWrapper.GetGroundStation().ResumeTask();
 		}
-	}
-
-	private int ConvertHeading(int heading)
-	{
-		int result = Math.abs(heading);
-
-		if (result < 180)
-			result = -result;
-		else
-			result -= 180;
-
-		return result;
 	}
 
 	public void OnStopRoute(View v)
