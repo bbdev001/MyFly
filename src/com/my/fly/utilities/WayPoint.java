@@ -8,23 +8,19 @@ public class WayPoint
 	public int HoverTime;
 	public int Action;
 	public int Speed;
+	public int CamAngle;
 	public int MaxReachTime;
 	
 	public WayPoint()
 	{
-		coord = new DegPoint();
-		Alt = 5;
-		Heading = 0;
-		HoverTime = 0;
-		Action = 0;
-		Speed = 10;
-		MaxReachTime = 0;
+		LoadDefaultValues();
 	}
 	
 	public WayPoint(String value)
 	{
-		String[] fields = value.split(",");
-	
+		LoadDefaultValues();
+		
+		String[] fields = value.split(",");		
 		coord = new DegPoint(Double.parseDouble(fields[0]), Double.parseDouble(fields[1]));
 		Alt = Integer.parseInt(fields[2]);
 		Heading = Integer.parseInt(fields[3]);
@@ -33,15 +29,30 @@ public class WayPoint
 		
 		if (fields.length > 6)
 			Speed = Integer.parseInt(fields[6]);
-			
+		
 		if (fields.length > 7)
 			MaxReachTime = Integer.parseInt(fields[7]);
+		
+		if (fields.length > 8)
+			CamAngle = Integer.parseInt(fields[8]);
+	}
+
+	public void LoadDefaultValues()
+	{
+		coord = new DegPoint();
+		Alt = 5;
+		Heading = 0;
+		HoverTime = 0;
+		Action = 0;
+		Speed = 10;
+		MaxReachTime = 0;
+		CamAngle = 45;		
 	}
 	
 	@Override
 	public String toString()
 	{
-		String result = coord.Lat + "," + coord.Lon + "," + Alt + "," + Heading + "," + HoverTime + "," + Action + "," + Speed + "," + MaxReachTime;
+		String result = coord.Lat + "," + coord.Lon + "," + Alt + "," + Heading + "," + HoverTime + "," + Action + "," + Speed + "," + MaxReachTime + "," + CamAngle;
 		
 		return result;
 	}

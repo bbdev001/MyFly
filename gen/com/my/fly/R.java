@@ -71,14 +71,15 @@ public final class R {
     }
     public static final class id {
         public static final int DjiSurfaceView_02=0x7f0c0005;
-        public static final int action=0x7f0c0047;
-        public static final int action_settings=0x7f0c004d;
+        public static final int action=0x7f0c0049;
+        public static final int action_settings=0x7f0c004f;
         public static final int altitude=0x7f0c0041;
         public static final int autoStart=0x7f0c000b;
         public static final int bold=0x7f0c0000;
-        public static final int btnCancel=0x7f0c004b;
-        public static final int btnDelete=0x7f0c004c;
-        public static final int btnOk=0x7f0c004a;
+        public static final int btnCancel=0x7f0c004d;
+        public static final int btnDelete=0x7f0c004e;
+        public static final int btnOk=0x7f0c004c;
+        public static final int camAngle=0x7f0c0045;
         public static final int camBottom=0x7f0c0013;
         public static final int camTop=0x7f0c000d;
         public static final int demi=0x7f0c0001;
@@ -112,7 +113,7 @@ public final class R {
         public static final int errorMsgSize=0x7f0c0036;
         public static final int goHome=0x7f0c0030;
         public static final int heading=0x7f0c0043;
-        public static final int hoverTime=0x7f0c0045;
+        public static final int hoverTime=0x7f0c0047;
         public static final int joystikLeft=0x7f0c000c;
         public static final int joystikRight=0x7f0c0017;
         public static final int linearLayout1=0x7f0c0032;
@@ -134,7 +135,7 @@ public final class R {
         public static final int scrollView1=0x7f0c003f;
         public static final int scrollViewMessages=0x7f0c0009;
         public static final int selectRoutesCaption=0x7f0c002c;
-        public static final int speed=0x7f0c0049;
+        public static final int speed=0x7f0c004b;
         public static final int speedLimit=0x7f0c0020;
         public static final int speedLimitFast=0x7f0c0021;
         public static final int speedLimitMiddle=0x7f0c0022;
@@ -145,9 +146,10 @@ public final class R {
         public static final int takePhoto=0x7f0c0031;
         public static final int textView1=0x7f0c0040;
         public static final int textView2=0x7f0c0042;
-        public static final int textView3=0x7f0c0044;
-        public static final int textView4=0x7f0c0046;
-        public static final int textView5=0x7f0c0048;
+        public static final int textView3=0x7f0c0046;
+        public static final int textView4=0x7f0c0048;
+        public static final int textView5=0x7f0c004a;
+        public static final int textView6=0x7f0c0044;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;

@@ -604,14 +604,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			prevMessage = text;
 
 			Log.e(TAG, text);
-			/*
-			 * if (textBuilder.length() > 1024)
-			 * textBuilder.delete(textBuilder.length() - 1024,
-			 * textBuilder.length() - 1);
-			 * 
-			 * textBuilder.append(text); textBuilder.append("\n");
-			 * errorMessages.setText(textBuilder.toString());
-			 */
 			Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
 		}
 		catch (Exception e)

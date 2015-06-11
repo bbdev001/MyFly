@@ -35,7 +35,7 @@ public class TaskBuilder
 			gsWayPoint.hasAction = true;
 
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wp.Heading));
-			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, -45);
+			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wp.HoverTime * 10);
             
@@ -126,7 +126,6 @@ public class TaskBuilder
 		double stepV = viewRadius * 2.0;				
 		double width = Math.ceil(widthInMeters / stepV);
 		double height = Math.ceil(heightInMeters / stepH);
-		int heading = 270;
 		int speed = viewRadius > 10 ? 10 : 2;
 		
 		MrcPoint cur = new DegPoint(mbr.GetCenterY(), mbr.GetCenterX()).ToMercator();
@@ -136,6 +135,16 @@ public class TaskBuilder
 			cur.Lon -= Utilities.MetersToDeg(widthInMeters / 2.0);
 			cur.Lat += Utilities.MetersToDeg(heightInMeters / 2.0);
 		}
+
+		if (width > height)
+			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, stepH, stepV);
+		else
+			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, stepH, stepV);
+	}
+	
+	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, double stepH, double stepV)
+	{
+		int heading = 270;
 		
 		for (int j = 0; j < height; j++)
 		{
@@ -165,7 +174,7 @@ public class TaskBuilder
 				gsWayPoint.turnMode = 0;
 				gsWayPoint.hasAction = true;
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wayPoint.Heading));
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, -90);
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, 0);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
 				gsTask.addWaypoint(gsWayPoint);
@@ -176,6 +185,52 @@ public class TaskBuilder
 			cur.Lat -= Utilities.MetersToDeg(stepV);			
 			stepH *= -1.0;
 			cur.Lon += Utilities.MetersToDeg(stepH);
-		}			
+		}	
 	}
+	
+	protected static void VerticalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, double stepH, double stepV)
+	{
+		int heading = 180;
+		
+		for (int j = 0; j < width; j++)
+		{
+			if ((j % 2) == 0)
+				heading = 180;
+			else
+				heading = 0;
+						
+			for (int i = 0; i < height; i++)
+			{
+				MrcPoint coord = new MrcPoint(cur.Lat, cur.Lon);
+
+				WayPoint wayPoint = new WayPoint();
+				wayPoint.coord = coord.ToDegrees();
+				wayPoint.Alt = (int)mappingAlt;
+				wayPoint.Speed = speed;
+				wayPoint.Heading = heading;
+				wayPoint.HoverTime = 1;
+				route.mappingWayPoints.add(wayPoint);
+				
+				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon, 4, 1);
+				gsWayPoint.altitude = wayPoint.Alt;
+				gsWayPoint.heading = 0;
+				gsWayPoint.speed = wayPoint.Speed;
+				gsWayPoint.maxReachTime = 0;
+				gsWayPoint.stayTime = (short)(wayPoint.HoverTime * 10);
+				gsWayPoint.turnMode = 0;
+				gsWayPoint.hasAction = true;
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wayPoint.Heading));
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, 0);
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
+				gsTask.addWaypoint(gsWayPoint);
+				
+				cur.Lat -= Utilities.MetersToDeg(stepV);
+			}
+
+			cur.Lon += Utilities.MetersToDeg(stepH);		
+			stepV *= -1.0;
+			cur.Lat -= Utilities.MetersToDeg(stepV);			
+		}	
+	}	
 }

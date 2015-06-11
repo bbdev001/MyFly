@@ -18,6 +18,7 @@ public class WPEditor extends Dialog implements View.OnClickListener
 	protected EditText altitude;
 	protected EditText heading;
 	protected EditText hoverTime;
+	protected EditText camAngle;
 	protected Spinner action;
 	protected Spinner speed;
 	protected int wayPointId = -1;
@@ -58,6 +59,9 @@ public class WPEditor extends Dialog implements View.OnClickListener
 		hoverTime = (EditText) findViewById(R.id.hoverTime);
 		hoverTime.setText(Integer.toString(wayPoint.HoverTime));
 
+		camAngle = (EditText) findViewById(R.id.camAngle);
+		camAngle.setText(Integer.toString(wayPoint.CamAngle));
+		
 		String[] dataAction = { "Nothing", "StartVideo", "StopVideo", "Start Photo", "Stop Photo" };
 		ArrayAdapter<String> adapterAction = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, dataAction);
 		adapterAction.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -82,6 +86,7 @@ public class WPEditor extends Dialog implements View.OnClickListener
 		{
 			heading.setEnabled(false);
 			hoverTime.setEnabled(false);
+			camAngle.setEnabled(false);
 			speed.setEnabled(false);
 			action.setEnabled(false);
 			((Button) findViewById(R.id.btnDelete)).setEnabled(false);
@@ -120,6 +125,7 @@ public class WPEditor extends Dialog implements View.OnClickListener
 			wayPoint.Alt = Integer.parseInt(altitude.getText().toString());
 			wayPoint.Heading = Integer.parseInt(heading.getText().toString());
 			wayPoint.HoverTime = Integer.parseInt(hoverTime.getText().toString());
+			wayPoint.CamAngle = Integer.parseInt(camAngle.getText().toString());
 			wayPoint.Action = action.getSelectedItemPosition();
 			wayPoint.Speed = Integer.parseInt(speed.getSelectedItem().toString());
 		}
