@@ -38,9 +38,11 @@ public class TaskBuilder
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wp.HoverTime * 10);
-            
+            		
 			gsTask.addWaypoint(gsWayPoint);
 		}
+		
+		route.RecalculateLength();
 	}
 	
 	public static void BuildMyHomeRoute(DJIGroundStationTask gsTask, DegPoint lastPosition, DegPoint userPosition)
@@ -147,6 +149,8 @@ public class TaskBuilder
 			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, stepH, stepV);
 		else
 			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, stepH, stepV);
+		
+		route.RecalculateLength();
 	}
 	
 	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, double stepH, double stepV)

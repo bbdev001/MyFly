@@ -296,6 +296,8 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Name: " + routeName, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
+		Utilities.DrawTextWithBorder("Length: " + formatter.format(route.routeLength) + "m", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
+		linePos += lineHeight;	
 		Utilities.DrawTextWithBorder("Power level: " + formatter.format(dronePowerLevel) + "%", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Remain fly time: " + formatter.format(droneRemainFlyTime) + "min", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
