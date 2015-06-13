@@ -52,9 +52,9 @@ public class TaskBuilder
 		float[] result = new float[3];
 		Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, result);
 		
-		float speed = 5;	
-		if (result[0] > 15)
-			speed = 10;
+		float speed = 5.0f;	
+		if (result[0] > 15.0f)
+			speed = 10.0f;
 		
 		//Move top
 		DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(lastPosition.Lat, lastPosition.Lon);
@@ -63,7 +63,7 @@ public class TaskBuilder
 		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 1;
-		gsWayPoint.turnMode = 2;
+		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -74,7 +74,7 @@ public class TaskBuilder
 		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 1;
-		gsWayPoint.turnMode = 2;
+		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -85,7 +85,7 @@ public class TaskBuilder
 		gsWayPoint.speed = 2.0f;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 100;
-		gsWayPoint.turnMode = 2;
+		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 	}
@@ -146,14 +146,14 @@ public class TaskBuilder
 		}
 
 		if (width > height)
-			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, stepH, stepV);
+			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
 		else
-			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, stepH, stepV);
+			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
 		
 		route.RecalculateLength();
 	}
 	
-	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, double stepH, double stepV)
+	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
 	{
 		int heading = 270;
 		
@@ -185,7 +185,7 @@ public class TaskBuilder
 				gsWayPoint.turnMode = 0;
 				gsWayPoint.hasAction = true;
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wayPoint.Heading));
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, -89);
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, camAngle);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
 				gsTask.addWaypoint(gsWayPoint);
@@ -199,7 +199,7 @@ public class TaskBuilder
 		}	
 	}
 	
-	protected static void VerticalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, double stepH, double stepV)
+	protected static void VerticalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
 	{
 		int heading = 180;
 		
@@ -231,7 +231,7 @@ public class TaskBuilder
 				gsWayPoint.turnMode = 0;
 				gsWayPoint.hasAction = true;
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wayPoint.Heading));
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, 0);
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, camAngle);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
 				gsTask.addWaypoint(gsWayPoint);
