@@ -39,7 +39,8 @@ public class DJIGimbal
             @Override
             public void onError(int error)
             {
-            	uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Gimbal error " + error));
+            	if (error != 0)
+            		uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Gimbal error " + error));
             }
             
         });

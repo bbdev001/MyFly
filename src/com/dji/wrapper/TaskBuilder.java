@@ -47,25 +47,32 @@ public class TaskBuilder
 	{
 		gsTask.RemoveAllWaypoint();
 		
+		float[] result = new float[3];
+		Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, result);
+		
+		float speed = 5;	
+		if (result[0] > 15)
+			speed = 10;
+		
 		//Move top
 		DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(lastPosition.Lat, lastPosition.Lon);
 		gsWayPoint.altitude = 45.0f;
 		gsWayPoint.heading = 0.0f;
-		gsWayPoint.speed = 0.0f;
+		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 1;
-		gsWayPoint.turnMode = 0;
+		gsWayPoint.turnMode = 2;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
 		//Move to home
-		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
+		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat - 10.0, userPosition.Lon - 10.0);
 		gsWayPoint.altitude = 45.0f;
 		gsWayPoint.heading = 0.0f;
-		gsWayPoint.speed = 10.0f;
+		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 1;
-		gsWayPoint.turnMode = 0;
+		gsWayPoint.turnMode = 2;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -73,10 +80,10 @@ public class TaskBuilder
 		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
 		gsWayPoint.altitude = 3.0f;
 		gsWayPoint.heading = 0.0f;
-		gsWayPoint.speed = 1.0f;
+		gsWayPoint.speed = 2.0f;
 		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 1;
-		gsWayPoint.turnMode = 0;
+		gsWayPoint.stayTime = 100;
+		gsWayPoint.turnMode = 2;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 	}
@@ -174,7 +181,7 @@ public class TaskBuilder
 				gsWayPoint.turnMode = 0;
 				gsWayPoint.hasAction = true;
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wayPoint.Heading));
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, 0);
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, -89);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
 				gsTask.addWaypoint(gsWayPoint);

@@ -11,6 +11,10 @@ import dji.sdk.api.Camera.DJICameraFileNamePushInfo;
 import dji.sdk.api.Camera.DJICameraPlaybackState;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraCaptureMode;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraMode;
+import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoFormatType;
+import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoQualityType;
+import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoRatioType;
+import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoSizeType;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPreviewResolustionType;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraVisionType;
 import dji.sdk.api.Camera.DJICameraTypeDef;
@@ -63,6 +67,7 @@ public class DJICamera
 		mDjiGLSurfaceView.start();
 		mDjiGLSurfaceView.setStreamType(CameraPreviewResolustionType.Resolution_Type_640x480_15fps);
 		mDjiGLSurfaceView.invalidate();
+		
 		object.setReceivedVideoDataCallBack(new DJIReceivedVideoDataCallBack()
 		{
 			@Override
@@ -97,6 +102,36 @@ public class DJICamera
 			}
 		});
 
+		object.setCameraPhotoQuality(CameraPhotoQualityType.Camera_Photo_Quality_Normal , new DJIExecuteResultCallback()
+		{
+			@Override 
+			public void onResult(DJIError result)
+			{
+				if (result.errorCode != DJIError.RESULT_OK)
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera quality error " + result));
+			}
+		});
+
+		object.setCameraPhotoFormat(CameraPhotoFormatType.Camera_Photo_JPEG , new DJIExecuteResultCallback()
+		{
+			@Override 
+			public void onResult(DJIError result)
+			{
+					if (result.errorCode != DJIError.RESULT_OK)
+						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera format error " + result));				
+			}
+		});
+		
+		object.setCameraPhotoSizeAndRatio(CameraPhotoSizeType.Camera_Photo_Size_4384x2922, CameraPhotoRatioType.Camera_Photo_Ratio_4_3, new DJIExecuteResultCallback()
+		{
+			@Override 
+			public void onResult(DJIError result)
+			{
+					if (result.errorCode != DJIError.RESULT_OK)
+						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera size error " + result));								
+			}
+		});
+		
 		StartUpdateTimer(updateInterval);
 	}
 
