@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import android.location.Location;
 
+import com.my.fly.utilities.Mbr;
 import com.my.fly.utilities.WayPoint;
 
 public class Route
@@ -19,7 +20,10 @@ public class Route
 	public String name = "";
 	public float mappingAltitude = 0.0f;
 	public boolean isMapping = false;
+	public boolean lookAtViewPoint = true;
 	public float routeLength = 0.0f;
+	public Mbr mbr = new Mbr();
+	public WayPoint viewPoint = new WayPoint();
 	
 	public boolean LoadFromCSV(String basePath, String name)
 	{
@@ -27,7 +31,8 @@ public class Route
 		wayPoints.clear();
 		mappingAltitude = 0.0f;
 		isMapping = false;
-		routeLength = 0.0f;
+		
+		mbr.Reset();
 		
 		try
 		{
@@ -39,17 +44,12 @@ public class Route
 			while ((line = br.readLine()) != null)
 			{
 				WayPoint wayPoint = new WayPoint(line);
-				
-				if (wayPoints.size() > 1)
-				{
-					WayPoint prevPoint = wayPoints.get(wayPoints.size() - 1);
-					float[] results = new float[3];
-					Location.distanceBetween(prevPoint.coord.Lat, prevPoint.coord.Lon, wayPoint.coord.Lat, wayPoint.coord.Lon, results);
-					routeLength += results[0];
-				}
-				
-				wayPoints.add(wayPoint);				
+				mbr.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
+				wayPoints.add(wayPoint);
 			}
+
+			viewPoint.coord.Lon = mbr.GetCenterX();
+			viewPoint.coord.Lat = mbr.GetCenterY();
 
 			br.close();
 		}
@@ -72,6 +72,7 @@ public class Route
 			e.printStackTrace();
 		}
 		
+		RecalculateLength();
 		return true;
 	}
 	
@@ -135,10 +136,13 @@ public class Route
 	public void RecalculateLength()
 	{
 		routeLength = 0.0f;
-		
+
+		mbr.Reset();
 		ArrayList<WayPoint> points = GetWayPoints();
 		for (int i = 0; i < points.size(); i++)
 		{
+			mbr.Adjust(points.get(i).coord.Lon, points.get(i).coord.Lat);
+			
 			if (i > 0)
 			{
 				WayPoint p1 = points.get(i - 1);
@@ -147,6 +151,6 @@ public class Route
 				Location.distanceBetween(p1.coord.Lat, p1.coord.Lon, p2.coord.Lat, p2.coord.Lon, results);
 				routeLength += results[0];
 			}
-		}
+		}		
 	}
 }

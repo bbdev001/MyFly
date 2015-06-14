@@ -16,11 +16,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.dji.wrapper.DJICamera.CameraFileInfo;
 import com.dji.wrapper.DJIGroundStation;
 import com.dji.wrapper.DJIWrapper;
 import com.dji.wrapper.Route;
 import com.dji.wrapper.TaskBuilder;
 import com.my.fly.utilities.DegPoint;
+import com.my.fly.utilities.MrcPoint;
 import com.my.fly.utilities.WayPoint;
 
 import dji.sdk.api.DJIDroneTypeDef.DJIDroneType;
@@ -62,7 +64,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, RouteView.OnWayPointSelected
+public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, RouteView.OnWayPointSelected, RouteView.OnWayPointPositionChanged
 {
 	private DJIWrapper djiWrapper = new DJIWrapper();
 	private static final String TAG = "RoutesActivity";
@@ -92,6 +94,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private String currentRouteName = "";
 	private DjiGLSurfaceView djiSurfaceView;
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Inspire1;
+
+			
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
 	public String BASE_PATH = Environment.getExternalStorageDirectory() + "/MyFly";
@@ -131,6 +135,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		goHome.setEnabled(true);
 
 		routeView.AddOnWayPointSelectedListener(this);
+		routeView.AddOnWayPointPositionChangedListener(this);
 
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -311,6 +316,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				}
 				break;
 			}
+			case DJIWrapper.CAMERA_FILE_INFO:
+			{
+				CameraFileInfo info = (CameraFileInfo)msg.obj;
+				AppendString("Done " + info.Name);
+				break;
+			}
 		}
 
 		return false;
@@ -482,8 +493,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		currentRouteName = curRouteName;
 		
 		route.LoadFromCSV(BASE_PATH, currentRouteName);
-		
-		routeView.SetRoute(route, curRouteName);
+			
+		routeView.SetRoute(route, curRouteName, true);
 		
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		BuildRouteForType(false);
@@ -787,12 +798,27 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (isMapping)
 		{
 			TaskBuilder.BuildMappingRoute(gsTask, route);
-			routeView.SetRoute(route, currentRouteName + " mapping");
+			routeView.SetRoute(route, currentRouteName + " mapping", true);
 		}
 		else
 		{
-			TaskBuilder.BuildSequientialRoute(gsTask, route);
-			routeView.SetRoute(route, currentRouteName);
+			TaskBuilder.BuildSequientialRoute(gsTask, route, true);
+			routeView.SetRoute(route, currentRouteName, true);
 		}
+	}
+
+	@Override
+	public void onWayPointPositionChanged(int wayPointId, MrcPoint newCoord)
+	{
+		if (this.isMapping)
+			return;
+
+		if (wayPointId >= 0)
+			route.GetWayPoints().get(wayPointId).coord = newCoord.ToDegrees();
+		else if (wayPointId == -2)
+			route.viewPoint.coord = newCoord.ToDegrees();
+		
+		TaskBuilder.BuildSequientialRoute(gsTask, route, true);
+		routeView.SetRoute(route, currentRouteName, false);		
 	}
 }

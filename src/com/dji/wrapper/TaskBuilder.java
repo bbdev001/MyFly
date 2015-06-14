@@ -17,7 +17,7 @@ import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOnWayPoint
 
 public class TaskBuilder
 {
-	public static void BuildSequientialRoute(DJIGroundStationTask gsTask, Route route)
+	public static void BuildSequientialRoute(DJIGroundStationTask gsTask, Route route, boolean useViewPoint)
 	{
 		gsTask.RemoveAllWaypoint();
 		route.isMapping = false;
@@ -25,19 +25,23 @@ public class TaskBuilder
 		for (int i = 0; i < route.wayPoints.size(); i++)
 		{
 			WayPoint wp = route.wayPoints.get(i);
-			DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wp.coord.Lat, wp.coord.Lon, 4, 1);
+			DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wp.coord.Lat, wp.coord.Lon, useViewPoint ? 4 : 2, 1);
 			gsWayPoint.altitude = (float) wp.Alt;
-			gsWayPoint.heading = 0;
+			gsWayPoint.heading = 0;//Does not work, uses action
 			gsWayPoint.speed = (float) wp.Speed;
-			gsWayPoint.maxReachTime = (short) wp.MaxReachTime;
-			gsWayPoint.stayTime = (short) (wp.HoverTime * 10);
-			gsWayPoint.turnMode = wp.HoverTime > 0 ? 0 : 2;
+			gsWayPoint.maxReachTime = 0;//Does not work
+			gsWayPoint.stayTime = 0;//Does not work, uses action
+			gsWayPoint.turnMode = 0;
 			gsWayPoint.hasAction = true;
 
-			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wp.Heading));
-			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);
+			if (useViewPoint)
+			{
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wp.Heading));				
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);
+			}
+			
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
-			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wp.HoverTime * 10);
+			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wp.HoverTime * 5);
             		
 			gsTask.addWaypoint(gsWayPoint);
 		}
@@ -62,7 +66,7 @@ public class TaskBuilder
 		gsWayPoint.heading = 0.0f;
 		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 1;
+		gsWayPoint.stayTime = 0;
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
@@ -73,7 +77,7 @@ public class TaskBuilder
 		gsWayPoint.heading = 0.0f;
 		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 1;
+		gsWayPoint.stayTime = 0;
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
@@ -84,7 +88,7 @@ public class TaskBuilder
 		gsWayPoint.heading = 0.0f;
 		gsWayPoint.speed = 2.0f;
 		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 100;
+		gsWayPoint.stayTime = 0;
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
@@ -176,7 +180,7 @@ public class TaskBuilder
 				wayPoint.HoverTime = 1;
 				route.mappingWayPoints.add(wayPoint);
 				
-				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon, 4, 1);
+				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon, 4, 2);
 				gsWayPoint.altitude = wayPoint.Alt;
 				gsWayPoint.heading = 0;
 				gsWayPoint.speed = wayPoint.Speed;
