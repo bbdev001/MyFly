@@ -10,7 +10,9 @@ import java.util.ArrayList;
 
 import android.location.Location;
 
+import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.Mbr;
+import com.my.fly.utilities.Utilities;
 import com.my.fly.utilities.WayPoint;
 
 public class Route
@@ -21,7 +23,7 @@ public class Route
 	public float mappingAltitude = 0.0f;
 	public boolean isMapping = false;
 	public boolean lookAtViewPoint = true;
-	public float routeLength = 0.0f;
+	public float length = 0.0f;
 	public Mbr mbr = new Mbr();
 	public WayPoint viewPoint = new WayPoint();
 	
@@ -64,7 +66,20 @@ public class Route
 			File file = new File(basePath + "/" + name + ".info");
 			
 			br = new BufferedReader(new FileReader(file.getAbsoluteFile()));
-			mappingAltitude = (float)Double.parseDouble(br.readLine());		
+			
+			String line = new String();
+			line = br.readLine();
+			if (line != null)
+				mappingAltitude = (float)Double.parseDouble(line);
+			
+			line = br.readLine();
+			if (line != null)
+				viewPoint.coord.Lat = Double.parseDouble(line);
+			
+			line = br.readLine();
+			if (line != null)
+				viewPoint.coord.Lon = Double.parseDouble(line);
+			
 			br.close();
 		}
 		catch (IOException e)
@@ -73,6 +88,7 @@ public class Route
 		}
 		
 		RecalculateLength();
+		
 		return true;
 	}
 	
@@ -92,7 +108,7 @@ public class Route
 				bw.write(wp.toString());
 				bw.newLine();
 			}
-
+			
 			bw.flush();
 			bw.close();
 		}
@@ -114,6 +130,11 @@ public class Route
 			bw.write(Double.toString(mappingAltitude));
 			bw.newLine();
 
+			bw.write(Double.toString(viewPoint.coord.Lat));
+			bw.newLine();
+			bw.write(Double.toString(viewPoint.coord.Lon));
+			bw.newLine();
+			
 			bw.flush();
 			bw.close();
 		}
@@ -135,7 +156,7 @@ public class Route
 	
 	public void RecalculateLength()
 	{
-		routeLength = 0.0f;
+		length = 0.0f;
 
 		mbr.Reset();
 		ArrayList<WayPoint> points = GetWayPoints();
@@ -149,8 +170,31 @@ public class Route
 				WayPoint p2 = points.get(i);
 				float[] results = new float[3];
 				Location.distanceBetween(p1.coord.Lat, p1.coord.Lon, p2.coord.Lat, p2.coord.Lon, results);
-				routeLength += results[0];
+				length += results[0];
 			}
 		}		
+	}
+
+	protected int GetCamAngle(WayPoint p1, WayPoint p2)
+	{
+		float[] results = new float[3];
+		Location.distanceBetween(p1.coord.Lat, p1.coord.Lon, p2.coord.Lat, p2.coord.Lon, results);
+		
+		double dx = results[0];
+		double dy = p1.Alt - 2;//Means that view point alt is 2m
+		double angle = Utilities.RadToDeg(Math.atan2(-dy, dx));
+		
+		return (int)angle;
+	}
+	
+	public void SetHeadingsToViewPoint()
+	{
+		ArrayList<WayPoint> points = wayPoints;
+		for (int i = 0; i < points.size(); i++)
+		{
+			WayPoint wp = points.get(i);
+			wp.Heading = wp.coord.AzimutToPoint(viewPoint.coord);
+			wp.CamAngle = GetCamAngle(wp, viewPoint);
+		}
 	}
 }

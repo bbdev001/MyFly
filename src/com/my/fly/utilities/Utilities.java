@@ -8,13 +8,13 @@ public class Utilities
 {
 	protected static double y2lat(double a)
 	{
-		return 180.0 / Math.PI * (2.0 * Math.atan(Math.exp(a * Math.PI / 180.0)) - Math.PI / 2.0);
+		return RadToDeg(2.0 * Math.atan(Math.exp(DegToRad(a))) - Math.PI / 2.0);
 	}
 
 	protected static double lat2y(double a)
 	{
-		double arg = Math.tan(Math.PI / 4 + a * (Math.PI / 180.0) / 2.0);
-		return 180.0 / Math.PI * Math.log(Math.abs(arg) > 0.0000001 ? arg : 0.0000001);
+		double arg = Math.tan(Math.PI / 4 + DegToRad(a) / 2.0);
+		return RadToDeg(Math.log(Math.abs(arg) > 0.0000001 ? arg : 0.0000001));
 	}
 	
 	public static void ToMercator(DegPoint deg, MrcPoint mrc)
@@ -32,6 +32,11 @@ public class Utilities
 	public static double DegToRad(double deg)
 	{
 		return (deg * Math.PI / 180.0);
+	}
+	
+	public static double RadToDeg(double rad)
+	{
+		return (180.0 / Math.PI * rad);
 	}
 	
 	public static void Rotate(ScreenPoint point, ScreenPoint centerPoint, double angle)

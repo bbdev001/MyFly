@@ -27,4 +27,17 @@ public class DegPoint extends GeoPoint
 	{
 		return new MrcPoint(Utilities.lat2y(Lat), Lon);
 	}
+	
+	public int AzimutToPoint(DegPoint viewPoint)
+	{
+		MrcPoint a = ToMercator();
+		MrcPoint b = viewPoint.ToMercator();
+		
+		double dx = b.Lon - a.Lon;
+		double dy = a.Lat - b.Lat;
+		double angle = Utilities.RadToDeg(Math.atan2(dy, dx)) + 90.0;
+		
+		return (int)Math.round(angle);
+	}
 }
+

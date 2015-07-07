@@ -33,7 +33,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Heading (deg 0-360)"
+        android:text="Heading (deg 0 - 359)"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
@@ -41,13 +41,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Heading (deg 0-360)" />
+        android:hint="Heading (deg 0 - 359)" />
     
 	<TextView
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cam angle (deg 0-90)"
+        android:text="Cam angle (deg 0 - 89)"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
@@ -55,7 +55,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Cam angle (deg 0-90)" >
+        android:hint="Cam angle (deg 0 - 89)" >
 
     </EditText>
         

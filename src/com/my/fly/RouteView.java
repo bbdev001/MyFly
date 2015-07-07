@@ -259,14 +259,11 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 			canvas.drawCircle(p.X, p.Y, LINE_WIDTH, paint);
 			paint.setStyle(Paint.Style.STROKE);
 
-			if (routeWP.get(i).HoverTime > 0)
-			{
-				p.CopyTo(p1);
-				p1.SetY(p1.dY - 30);
-				Utilities.Rotate(p1, p, routeWP.get(i).Heading);
-				paint.setStrokeWidth(LINE_WIDTH);
-				canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
-			}
+			p.CopyTo(p1);
+			p1.SetY(p1.dY - 30);
+			Utilities.Rotate(p1, p, routeWP.get(i).Heading);
+			paint.setStrokeWidth(LINE_WIDTH);
+			canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
 
 			Utilities.DrawTextWithBorder(Integer.toString(i) + ": " + formatter.format(routeWP.get(i).Alt) + "m", p.X, p.Y, Color.GRAY, Color.WHITE, 1, 3, canvas, textPaint);
 		}
@@ -330,7 +327,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Name: " + routeName, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
-		Utilities.DrawTextWithBorder("Length: " + formatter.format(route.routeLength) + "m", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
+		Utilities.DrawTextWithBorder("Length: " + formatter.format(route.length) + "m", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;	
 		Utilities.DrawTextWithBorder("Power level: " + formatter.format(dronePowerLevel) + "%", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;

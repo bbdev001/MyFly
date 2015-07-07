@@ -794,17 +794,18 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		Log.i(TAG, "ChangeRouteType");
 		this.isMapping = isMapping;
+		String routeName = currentRouteName;
 		
 		if (isMapping)
 		{
 			TaskBuilder.BuildMappingRoute(gsTask, route);
-			routeView.SetRoute(route, currentRouteName + " mapping", true);
+			routeName += " mapping";
 		}
 		else
-		{
 			TaskBuilder.BuildSequientialRoute(gsTask, route, true);
-			routeView.SetRoute(route, currentRouteName, true);
-		}
+		
+		route.RecalculateLength();
+		routeView.SetRoute(route, routeName, true);
 	}
 
 	@Override
@@ -814,9 +815,15 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			return;
 
 		if (wayPointId >= 0)
+		{
 			route.GetWayPoints().get(wayPointId).coord = newCoord.ToDegrees();
+			route.RecalculateLength();
+		}
 		else if (wayPointId == -2)
+		{
 			route.viewPoint.coord = newCoord.ToDegrees();
+			route.SetHeadingsToViewPoint();
+		}
 		
 		TaskBuilder.BuildSequientialRoute(gsTask, route, true);
 		routeView.SetRoute(route, currentRouteName, false);		
