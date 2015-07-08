@@ -122,7 +122,7 @@ public class DJICamera
 			}
 		});
 		
-		object.setCameraPhotoSizeAndRatio(CameraPhotoSizeType.Camera_Photo_Size_4384x2922, CameraPhotoRatioType.Camera_Photo_Ratio_4_3, new DJIExecuteResultCallback()
+		/*object.setCameraPhotoSizeAndRatio(CameraPhotoSizeType.Camera_Photo_Size_4384x2922, CameraPhotoRatioType.Camera_Photo_Ratio_4_3, new DJIExecuteResultCallback()
 		{
 			@Override 
 			public void onResult(DJIError result)
@@ -130,7 +130,7 @@ public class DJICamera
 					if (result.errorCode != DJIError.RESULT_OK)
 						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera size error " + result.errorCode));								
 			}
-		});
+		});*/
 		
 		StartUpdateTimer(updateInterval);
 	}

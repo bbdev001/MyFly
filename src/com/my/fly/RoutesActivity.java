@@ -23,6 +23,7 @@ import com.dji.wrapper.Route;
 import com.dji.wrapper.TaskBuilder;
 import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.MrcPoint;
+import com.my.fly.utilities.Utilities;
 import com.my.fly.utilities.WayPoint;
 
 import dji.sdk.api.DJIDroneTypeDef.DJIDroneType;
@@ -270,9 +271,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, distance);
 				
 				if (droneType == DJIDroneType.DJIDrone_Inspire1)
-					routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, DJIWrapper.ConvertYawToHeading(status.yaw / 10.0));
+					routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, Utilities.ConvertYawToHeading(status.yaw / 10.0));
 				else
-					routeView.SetDronePosition(lastPosition, status.altitude, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch, status.roll, DJIWrapper.ConvertYawToHeading(status.yaw));
+					routeView.SetDronePosition(lastPosition, status.altitude, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch, status.roll, Utilities.ConvertYawToHeading(status.yaw));
 				
 				break;
 			}

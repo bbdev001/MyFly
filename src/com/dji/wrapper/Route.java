@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.Mbr;
@@ -194,6 +195,7 @@ public class Route
 		{
 			WayPoint wp = points.get(i);
 			wp.Heading = wp.coord.AzimutToPoint(viewPoint.coord);
+			//Log.e("angle", "wp" + i + " " + wp.Heading);
 			wp.CamAngle = GetCamAngle(wp, viewPoint);
 		}
 	}

@@ -36,7 +36,7 @@ public class TaskBuilder
 
 			if (useViewPoint)
 			{
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wp.Heading));				
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)Utilities.ConvertHeadingToYaw(wp.Heading));				
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);// 0 - -89
 			}
 			
@@ -184,7 +184,7 @@ public class TaskBuilder
 				gsWayPoint.stayTime = (short)(wayPoint.HoverTime * 10);
 				gsWayPoint.turnMode = 0;
 				gsWayPoint.hasAction = true;
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wayPoint.Heading));
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)Utilities.ConvertHeadingToYaw(wayPoint.Heading));
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, camAngle);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
@@ -230,7 +230,7 @@ public class TaskBuilder
 				gsWayPoint.stayTime = (short)(wayPoint.HoverTime * 10);
 				gsWayPoint.turnMode = 0;
 				gsWayPoint.hasAction = true;
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)DJIWrapper.ConvertHeadingToYaw(wayPoint.Heading));
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)Utilities.ConvertHeadingToYaw(wayPoint.Heading));
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, (camAngle > 0 ? -camAngle : camAngle));
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		

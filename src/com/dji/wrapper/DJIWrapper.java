@@ -396,26 +396,4 @@ public class DJIWrapper
 		
 		return result;
 	}
-	
-	public static double ConvertYawToHeading(double yaw)
-	{
-		double heading = yaw;
-
-		if (heading < 0)
-			heading = 360 + heading;
-
-		return heading;
-	}
-	
-	public static double ConvertHeadingToYaw(double heading)
-	{
-		double yaw = 0.0;
-
-		if (heading > 180)
-			yaw = heading - 360;
-		else
-			yaw = heading;
-
-		return yaw;
-	}
 }

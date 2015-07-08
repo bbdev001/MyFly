@@ -77,9 +77,15 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	{
 		public void onWayPointPositionChanged(int wayPointId, MrcPoint newCoord);
 	}
-		
+	
+	public interface OnWayPointPositionChangingDone
+	{
+		public void onWayPointPositionChangingDone(int wayPointId);
+	}
+	
 	protected OnWayPointSelected wayPointSelected = null;
 	protected OnWayPointPositionChanged wayPointPositionChanged = null;
+	protected OnWayPointPositionChangingDone wayPointPositionChangingDone = null;
 
 	public RouteView(Context c, AttributeSet attrs)
 	{
