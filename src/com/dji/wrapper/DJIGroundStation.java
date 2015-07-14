@@ -63,8 +63,8 @@ public class DJIGroundStation
 	{
 		if (droneType == DJIDroneType.DJIDrone_Inspire1)
 		{	
-			((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setHorizontalControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
-			((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setYawControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
+			//((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setHorizontalControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
+			//((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setYawControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
 		}		
 	
 		object.setGroundStationFlyingInfoCallBack(new DJIGroundStationFlyingInfoCallBack()

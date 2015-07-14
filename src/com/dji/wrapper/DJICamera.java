@@ -15,7 +15,7 @@ import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoFormatType;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoQualityType;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoRatioType;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPhotoSizeType;
-import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPreviewResolustionType;
+import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraPreviewResolutionType;
 import dji.sdk.api.Camera.DJICameraSettingsTypeDef.CameraVisionType;
 import dji.sdk.api.Camera.DJICameraTypeDef;
 import dji.sdk.api.Camera.DJIPhantomCamera;
@@ -65,7 +65,7 @@ public class DJICamera
 	{
 		mDjiGLSurfaceView = surface;
 		mDjiGLSurfaceView.start();
-		mDjiGLSurfaceView.setStreamType(CameraPreviewResolustionType.Resolution_Type_640x480_15fps);
+		mDjiGLSurfaceView.setStreamType(CameraPreviewResolutionType.Resolution_Type_640x480_15fps);
 		mDjiGLSurfaceView.invalidate();
 		
 		object.setReceivedVideoDataCallBack(new DJIReceivedVideoDataCallBack()

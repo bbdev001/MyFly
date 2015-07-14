@@ -135,7 +135,7 @@ public class DJIMcu
 		{
 			result = context.getString(R.string.MCU_INVALID_BATTERY_COMMUNICATION_ERROR);
 		}
-		else if (errCode == DJIMcErrorType.Mc_Unkown_Error)
+		else if (errCode == DJIMcErrorType.Mc_Unknown_Error)
 		{
 			result = context.getString(R.string.MCU_UNKOWN_ERROR);
 		}

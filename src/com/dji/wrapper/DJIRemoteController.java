@@ -26,9 +26,10 @@ public class DJIRemoteController
 		object.setRemoteControllerUpdateAttitudeCallBack(new DJIRemoteControllerUpdateAttitudeCallBack()
 		{
 			@Override
-			public void onResutl(DJIRemoteControllerAttitude state)
+			public void onResult(DJIRemoteControllerAttitude state)
 			{
 				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.REMOTE_CONTROLLER_STATE, state));
+				
 			}
 		});
 		
