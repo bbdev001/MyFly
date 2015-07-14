@@ -108,7 +108,7 @@ public class DJICamera
 			public void onResult(DJIError result)
 			{
 				if (result.errorCode != DJIError.RESULT_OK)
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera quality error " + result.errorCode));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera quality error " + result.errorCode + " " + result.errorDescription));
 			}
 		});
 
@@ -118,7 +118,7 @@ public class DJICamera
 			public void onResult(DJIError result)
 			{
 					if (result.errorCode != DJIError.RESULT_OK)
-						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera format error " + result.errorCode));				
+						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Camera format error " + result.errorCode + " " + result.errorDescription));				
 			}
 		});
 		

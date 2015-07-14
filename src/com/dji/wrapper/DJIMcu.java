@@ -33,7 +33,7 @@ public class DJIMcu
 			public void onError(DJIMcErrorType error)
 			{
 				if (error != DJIMcErrorType.Mc_No_Error)
-				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "MCU " + GetErrorDescriptionByErrorCode(error)));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "MCU " + GetErrorDescriptionByErrorCode(error)));
 			}
 		});
 		

@@ -101,7 +101,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
 	public String BASE_PATH = Environment.getExternalStorageDirectory() + "/MyFly";
 	public boolean isMapping = false;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -621,15 +621,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		catch (Exception e)
 		{
 		}
-
-		scrollViewMessages.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				scrollViewMessages.fullScroll(View.FOCUS_DOWN);
-			}
-		});
 	}
 
 	@Override
