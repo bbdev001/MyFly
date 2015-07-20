@@ -36,6 +36,9 @@ public class DegPoint extends GeoPoint
 		double dx = b.Lon - a.Lon;
 		double dy = a.Lat - b.Lat;
 		double angle = Utilities.ConvertYawToHeading(Utilities.RadToDeg(Math.atan2(dy, dx))) + 90.0;
+		if (angle >= 360)
+			angle -= 360;
+		 
 		return (int)Math.round(angle);
 	}
 }
