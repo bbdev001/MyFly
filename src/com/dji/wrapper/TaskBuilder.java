@@ -13,9 +13,6 @@ import com.my.fly.utilities.WayPoint;
 
 import dji.sdk.api.GroundStation.DJIGroundStationTask;
 import dji.sdk.api.GroundStation.DJIGroundStationWaypoint;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationFinishAction;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationMovingMode;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationPathMode;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOnWayPointAction;
 
 public class TaskBuilder
@@ -93,10 +90,6 @@ public class TaskBuilder
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
-		
-		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
-		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
-		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 	}
 	
 	public static double GetViewRadius(int fov, double altitude)
@@ -158,10 +151,6 @@ public class TaskBuilder
 			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
 		else
 			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
-		
-		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
-		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
-		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 	}
 	
 	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)

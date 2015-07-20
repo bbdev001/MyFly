@@ -178,15 +178,12 @@ public class DJIGroundStation
 	public void StartTask(DJIGroundStationTask task)
 	{
 		gsTask = task;
-
 		object.closeGroundStation(new DJIGroundStationExecuteCallBack()
 		{
 			@Override
 			public void onResult(GroundStationResult result)
 			{
-				if (result != GroundStationResult.GS_Result_Navigation_Is_Not_Open)
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));
-				
+				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));
 				object.openGroundStation(new DJIGroundStationExecuteCallBack()
 				{
 					@Override
