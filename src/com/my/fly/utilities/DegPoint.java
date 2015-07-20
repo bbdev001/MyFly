@@ -1,6 +1,7 @@
 package com.my.fly.utilities;
 
 import android.location.Location;
+import android.util.Log;
 
 public class DegPoint extends GeoPoint
 {
@@ -35,7 +36,11 @@ public class DegPoint extends GeoPoint
 		
 		double dx = b.Lon - a.Lon;
 		double dy = a.Lat - b.Lat;
-		double angle = Utilities.ConvertYawToHeading(Utilities.RadToDeg(Math.atan2(dy, dx))) + 90.0;
+		double angleYaw = Utilities.RadToDeg(Math.atan2(dy, dx));
+		double angle = Utilities.ConvertYawToHeading(angleYaw) + 90.0;
+		if (angle >= 360)
+			angle -= 360;
+		//Log.e("angle", "angle " + (int)angle + " yaw " + (int)angleYaw);
 		return (int)Math.round(angle);
 	}
 }

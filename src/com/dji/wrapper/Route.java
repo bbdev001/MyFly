@@ -194,8 +194,10 @@ public class Route
 		for (int i = 0; i < points.size(); i++)
 		{
 			WayPoint wp = points.get(i);
+			
+			Log.e("angle", "wp" + i);
 			wp.Heading = wp.coord.AzimutToPoint(viewPoint.coord);
-			//Log.e("angle", "wp" + i + " " + wp.Heading);
+
 			wp.CamAngle = GetCamAngle(wp, viewPoint);
 		}
 	}
