@@ -244,7 +244,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		scrCenter.Add(scrollOffset);
 
 		canvas.setDensity(DisplayMetrics.DENSITY_LOW);
-		canvas.drawColor(Color.WHITE);
+		canvas.drawColor(Color.TRANSPARENT);
 		paint.setStrokeWidth(LINE_WIDTH);
 
 		// Route

@@ -73,7 +73,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 {
 	private DJIWrapper djiWrapper = new DJIWrapper();
 	private static final String TAG = "RoutesActivity";
-	private ScrollView scrollViewMessages = null;
 	private ListView routesList = null;
 	private RouteView routeView = null;
 	private ArrayList<String> routes = new ArrayList<String>();
@@ -121,7 +120,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesList = (ListView) findViewById(R.id.routes);
 		routeView = (RouteView) findViewById(R.id.routeView);
 		mapView = (ViewGroup) findViewById(R.id.mapSurface);
-		scrollViewMessages = (ScrollView) findViewById(R.id.scrollViewMessages);
 		startRoute = (ImageButton) findViewById(R.id.startRoute);
 		pauseRoute = (ImageButton) findViewById(R.id.pauseRoute);
 		stopRoute = (ImageButton) findViewById(R.id.stopRoute);
@@ -133,11 +131,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		((RadioButton) findViewById(R.id.droneInspire)).setChecked(true);
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		
-		// djiSurfaceViewLayout = (RelativeLayout)
-		// findViewById(R.id.djiSurfaceViewLayout);
-
 		errorMsgSize.setText("-");
-		scrollViewMessagesDefSize = scrollViewMessages.getLayoutParams().height;
 		pauseRoute.setEnabled(false);
 		stopRoute.setEnabled(false);
 		goHome.setEnabled(true);
@@ -158,9 +152,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			AppendString("Can't init sdk");
 		
 		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
-		navigationSystem = new NavigationSystem(this);		
-		navigationSystem.onCreate(mapView, resourcePath);
-				
+		navigationSystem = new NavigationSystem(this);
+		
+		navigationSystem.onCreate(mapView, resourcePath);	
+
 		LoadRoutesList();
 	}
 
@@ -180,6 +175,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				
 				//DownloadRoutes();
 
+				navigationSystem.SetMapViewMode3D(false);//Temporary		
 				djiWrapper.ConnectDroneDevices(djiSurfaceView);
 				break;
 			}
@@ -601,7 +597,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		}
 
 		djiSurfaceView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
-		scrollViewMessages.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
 	}
 
 	public void OnErrorMsgClear(View v)
@@ -632,15 +627,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		catch (Exception e)
 		{
 		}
-
-		scrollViewMessages.post(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				scrollViewMessages.fullScroll(View.FOCUS_DOWN);
-			}
-		});
 	}
 
 	@Override
