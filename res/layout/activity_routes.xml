@@ -68,11 +68,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="0.15" >
-
-                <View
-                    android:id="@+id/stubView"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent" />
             </FrameLayout>
 
             <LinearLayout
@@ -172,21 +167,6 @@
                 android:id="@+id/djiSurfaceView"
                 android:layout_width="fill_parent"
                 android:layout_height="75dp" />
-
-            <ScrollView
-                android:id="@+id/scrollViewMessages"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp" >
-
-                <TextView
-                    android:id="@+id/errorMessages"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="#aaaaaa"
-                    android:textSize="10sp" />
-            </ScrollView>
         </RelativeLayout>
 
         <LinearLayout
