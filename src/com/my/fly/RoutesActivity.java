@@ -1,5 +1,8 @@
 package com.my.fly;
 
+import geolife.android.navigationsystem.NavmiiControl;
+import geolife.android.navigationsystem.NavigationSystem;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -52,6 +55,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -82,6 +86,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private ImageButton stopRoute = null;
 	private ImageButton goHome = null;
 	private ImageButton takePhoto = null;
+	private ViewGroup mapView = null;
 	private LocationManager locationManager = null;
 	private DegPoint userPosition = new DegPoint();
 	private DegPoint homePosition = new DegPoint();
@@ -95,13 +100,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private String currentRouteName = "";
 	private DjiGLSurfaceView djiSurfaceView;
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Inspire1;
-
-			
+	private NavmiiControl navigationSystem;
+	private String resourcePath = "";
+	
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
 	public String BASE_PATH = Environment.getExternalStorageDirectory() + "/MyFly";
 	public boolean isMapping = false;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -114,6 +120,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		routesList = (ListView) findViewById(R.id.routes);
 		routeView = (RouteView) findViewById(R.id.routeView);
+		mapView = (ViewGroup) findViewById(R.id.mapSurface);
 		scrollViewMessages = (ScrollView) findViewById(R.id.scrollViewMessages);
 		startRoute = (ImageButton) findViewById(R.id.startRoute);
 		pauseRoute = (ImageButton) findViewById(R.id.pauseRoute);
@@ -149,7 +156,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString("Can't init sdk");
-			
+		
+		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
+		navigationSystem = new NavigationSystem(this);		
+		navigationSystem.onCreate(mapView, resourcePath);
+				
 		LoadRoutesList();
 	}
 
@@ -621,6 +632,15 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		catch (Exception e)
 		{
 		}
+
+		scrollViewMessages.post(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				scrollViewMessages.fullScroll(View.FOCUS_DOWN);
+			}
+		});
 	}
 
 	@Override

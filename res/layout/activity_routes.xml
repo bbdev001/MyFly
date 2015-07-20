@@ -10,13 +10,15 @@
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:baselineAligned="false"
         android:orientation="horizontal" >
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/linearLayoutLeft1"
+            android:layout_weight="0.75"
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:baselineAligned="false"
             android:orientation="vertical" >
@@ -33,7 +35,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:onClick="OnDroneChanged"
-                    android:text="Phantom"
+                    android:text="Ph"
                     android:textSize="11dp"
                     android:textStyle="bold" />
 
@@ -42,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:onClick="OnDroneChanged"
-                    android:text="Inspire 1"
+                    android:text="Insp 1"
                     android:textSize="11dp"
                     android:textStyle="bold" />
             </RadioGroup>
@@ -50,28 +52,32 @@
             <ListView
                 android:id="@+id/routes"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="0.75" >
+                android:layout_height="fill_parent" >
             </ListView>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearLayoutLeft2"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.25"
             android:orientation="vertical" >
 
-            <com.my.fly.RouteView
-                android:id="@+id/routeView"
+            <FrameLayout
+                android:id="@+id/mapSurface"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="0.15"
-                android:textColor="#ffffff" />
+                android:layout_weight="0.15" >
+
+                <View
+                    android:id="@+id/stubView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_below="@+id/selectRoutesCaption"
                 android:layout_gravity="bottom"
                 android:layout_weight="0.85"
                 android:gravity="center"
@@ -157,15 +163,6 @@
             android:orientation="horizontal" >
 
             <Button
-                android:id="@+id/errorMsgClear"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:onClick="OnErrorMsgClear"
-                android:padding="0dp"
-                android:text="C"
-                android:textSize="15sp" />
-
-            <Button
                 android:id="@+id/errorMsgSize"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
@@ -173,6 +170,39 @@
                 android:padding="0dp"
                 android:text="S"
                 android:textSize="15sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <Space
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.75" />
+
+        <LinearLayout
+            android:id="@+id/linearLayoutLeft4"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.25"
+            android:orientation="vertical" >
+        <com.my.fly.RouteView
+            android:id="@+id/routeView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.15"
+            android:background="@android:color/transparent"
+            android:textColor="#ffffff" />
+        <Space
+            android:id="@+id/stubView1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.85" />        
         </LinearLayout>
     </LinearLayout>
 
@@ -190,12 +220,12 @@
             android:id="@+id/routeTypeRouting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Routing"
             android:onClick="OnRouteTypeChanged"
+            android:text="Routing"
             android:textSize="11dp"
             android:textStyle="bold" />
 
-             <RadioButton
+        <RadioButton
             android:id="@+id/routeTypeMapping"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
