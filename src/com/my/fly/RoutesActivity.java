@@ -2,6 +2,7 @@ package com.my.fly;
 
 import geolife.android.navigationsystem.NavmiiControl;
 import geolife.android.navigationsystem.NavigationSystem;
+import geolife.android.navigationsystem.NavmiiControl.MapCoord;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -44,6 +45,7 @@ import dji.sdk.api.RemoteController.DJIRemoteControllerAttitude;
 import dji.sdk.widget.DjiGLSurfaceView;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -69,7 +71,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, RouteView.OnWayPointSelected, RouteView.OnWayPointPositionChanged
+public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, NavmiiControl.ReverseLookupCallback, NavmiiControl.ItemsOnMapEventListener, NavmiiControl.ControlEventListener, NavmiiControl.MapControlEventListener
 {
 	private DJIWrapper djiWrapper = new DJIWrapper();
 	private static final String TAG = "RoutesActivity";
@@ -136,9 +138,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		stopRoute.setEnabled(false);
 		goHome.setEnabled(true);
 
-		routeView.AddOnWayPointSelectedListener(this);
-		routeView.AddOnWayPointPositionChangedListener(this);
-
+		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
+		navigationSystem = new NavigationSystem(this);	
+		navigationSystem.onCreate(mapView, resourcePath);	
+		routeView.SetNavigationSystem(navigationSystem, resourcePath);
+		
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
@@ -151,11 +155,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString("Can't init sdk");
 		
-		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
-		navigationSystem = new NavigationSystem(this);
-		
-		navigationSystem.onCreate(mapView, resourcePath);	
-
 		LoadRoutesList();
 	}
 
@@ -174,8 +173,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				AppendString(djiWrapper.GetPermissionErrorResultMessage);
 				
 				//DownloadRoutes();
-
-				navigationSystem.SetMapViewMode3D(false);//Temporary		
+	
+				navigationSystem.SetMapViewMode3D(false);	
+				navigationSystem.SetMapRotation(0.0f);
+				navigationSystem.SetSnapToGps(false);	
+			
 				djiWrapper.ConnectDroneDevices(djiSurfaceView);
 				break;
 			}
@@ -664,6 +666,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		super.onPause();
 
 		djiWrapper.DisconnectDroneDevices();
+		navigationSystem.onPause();
 	}
 
 	@Override
@@ -672,6 +675,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		super.onResume();
 
 		djiWrapper.ConnectDroneDevices(djiSurfaceView);
+		navigationSystem.onResume();
 	}
 
 	@Override
@@ -680,12 +684,49 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		djiWrapper.Destroy();
 
 		super.onDestroy();
+		navigationSystem.onDestroy();
 	}
 
-	protected int selectedWayPointId = -1;
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+		navigationSystem.onStop();
+	}
 
 	@Override
-	public void onWayPointSelected(int wayPointId)
+	protected void onStart()
+	{
+		super.onStart();
+		navigationSystem.onStart();
+	}
+
+	@Override
+	protected void onRestart()
+	{
+		super.onRestart();
+		navigationSystem.onRestart();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig)
+	{
+		super.onConfigurationChanged(newConfig);
+
+		navigationSystem.onConfigurationChanged(newConfig);
+	}
+	
+	// ControlEventListener
+	@Override
+	public void OnControlInitialized()
+	{
+
+	}
+		
+	protected int selectedWayPointId = -1;
+
+
+	public void OnWayPointSelected(int wayPointId)
 	{
 		Log.e(TAG, "onWayPointSelected");
 
@@ -806,24 +847,85 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routeView.SetRoute(route, routeName, true);
 	}
 
-	@Override
-	public void onWayPointPositionChanged(int wayPointId, MrcPoint newCoord)
+	public void OnWayPointPositionChanged(int wayPointId, DegPoint newCoord)
 	{
 		if (this.isMapping)
 			return;
 
 		if (wayPointId >= 0)
 		{
-			route.GetWayPoints().get(wayPointId).coord = newCoord.ToDegrees();
+			route.GetWayPoints().get(wayPointId).coord = newCoord;
 			route.RecalculateLength();
 		}
 		else if (wayPointId == -2)
 		{
-			route.viewPoint.coord = newCoord.ToDegrees();
+			newCoord.CopyTo(route.viewPoint.coord);
 			route.SetHeadingsToViewPoint();
 		}
 		
 		TaskBuilder.BuildSequientialRoute(gsTask, route, true);
 		routeView.SetRoute(route, currentRouteName, false);		
+	}
+
+
+	@Override
+	public void OnMapCenterChanged(MapCoord arg0)
+	{
+	}
+
+	@Override
+	public void OnPositionChanged(MapCoord arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void OnRotationChanged(float arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void OnZoomChanged(float arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void OnRouteCalculationFinished(int arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void OnRouteCalculationStarted()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUserMarkerClicked(long arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReverseLookupFinished()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReverseLookupItemAdded(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

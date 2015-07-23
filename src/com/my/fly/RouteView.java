@@ -1,5 +1,9 @@
 package com.my.fly;
 
+import geolife.android.navigationsystem.NavigationSystem;
+import geolife.android.navigationsystem.NavmiiControl;
+import geolife.android.navigationsystem.NavmiiControl.MapCoord;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -14,6 +18,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -26,7 +31,7 @@ import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
 import android.widget.Scroller;
 
-public class RouteView extends View implements OnGestureListener, OnScaleGestureListener
+public class RouteView extends View
 {
 	public int width = 0;
 	public int height = 0;
@@ -36,19 +41,18 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private Context context = null;
 	private Paint paint;
 	private Paint textPaint;
-	private ArrayList<MrcPoint> routePoints = new ArrayList<MrcPoint>();
+	private ArrayList<Long> routePointsId = new ArrayList<Long>();
 	private Route route = new Route();
 	private static final float LINE_WIDTH = 10.0f;
 	private Mbr mbr = new Mbr();
-	private GestureDetector gestureDetector = null;
+	private NavmiiControl.MapCoord lastClickGeoPosition = new NavmiiControl.MapCoord();
 	private ScaleGestureDetector scaleGestureDetector = null;
-	private ScreenPoint scrollOffset = new ScreenPoint();
-	private ScreenPoint scrCenter = new ScreenPoint();
+	private RotationDetector rotateDetector = null;
 	private String routeName = "";
-	private MrcPoint homePosition = new MrcPoint();
-	private MrcPoint dronePosition = new MrcPoint();
-	private MrcPoint droneUserPosition = new MrcPoint();
-	private MrcPoint viewPoint = new MrcPoint();
+	private DegPoint homePosition = new DegPoint();
+	private DegPoint dronePosition = new DegPoint();
+	private DegPoint droneUserPosition = new DegPoint();
+	private DegPoint viewPoint = new DegPoint();
 
 	private double droneSpeed = 0.0;
 	private double droneAlt = 0.0;
@@ -66,6 +70,9 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	private int missionTargetWP = 0;
 	private int missionReachedWP = 0;
 	private int selectedPointIndex = -1;
+	private NavmiiControl navigationSystem = null;
+	private String resourcePath = "";
+
 	protected boolean isShowPress = false;
 
 	public interface OnWayPointSelected
@@ -77,12 +84,12 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	{
 		public void onWayPointPositionChanged(int wayPointId, MrcPoint newCoord);
 	}
-	
+
 	public interface OnWayPointPositionChangingDone
 	{
 		public void onWayPointPositionChangingDone(int wayPointId);
 	}
-	
+
 	protected OnWayPointSelected wayPointSelected = null;
 	protected OnWayPointPositionChanged wayPointPositionChanged = null;
 	protected OnWayPointPositionChangingDone wayPointPositionChangingDone = null;
@@ -105,16 +112,21 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 		width = (int) this.GetWidth();
 		height = (int) this.GetHeight();
+	}
 
-		gestureDetector = new GestureDetector(context, this);
-		scaleGestureDetector = new ScaleGestureDetector(context, this);
+	public void SetNavigationSystem(NavmiiControl navigationSystem, String resourcePath)
+	{
+		this.resourcePath = resourcePath;
+		this.navigationSystem = navigationSystem;
+		scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener(this.navigationSystem));
+		rotateDetector = new RotationDetector(this, this.navigationSystem);		
 	}
 
 	public void AddOnWayPointSelectedListener(OnWayPointSelected listener)
 	{
 		wayPointSelected = listener;
 	}
-	
+
 	public void AddOnWayPointPositionChangedListener(OnWayPointPositionChanged listener)
 	{
 		wayPointPositionChanged = listener;
@@ -124,32 +136,32 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 	{
 		scale = 1.0f;
 		gestureScale = 1.0f;
-		scrCenter = new ScreenPoint(width / 2.0f, height / 2.0f);
-		
+		navigationSystem.SetMapZoom(scale);
+
 		if (height < width)
 		{
 			double d = Math.max(mbr.Ymax - mbr.Ymin, mbr.Xmax - mbr.Xmin);
-		
+
 			if (d != 0.0)
 				scale = (float) ((height - LINE_WIDTH * 4.0f) / d);
 		}
 		else
 		{
 			double d = Math.max(mbr.Ymax - mbr.Ymin, mbr.Xmax - mbr.Xmin);
-			
+
 			if (d != 0.0)
 				scale = (float) ((width - LINE_WIDTH * 4.0f) / d);
-		}
+		}		
 	}
 
 	public void SetHomePosition(DegPoint position)
 	{
-		Utilities.ToMercator(position, homePosition);
+		position.CopyTo(homePosition);
 	}
 
 	public void SetDronePosition(DegPoint position, double alt, double speed, double distance, double remainFlyTime, double powerLevel, double pitch, double roll, double heading)
 	{
-		Utilities.ToMercator(position, dronePosition);
+		position.CopyTo(dronePosition);
 
 		droneAlt = alt;
 		droneSpeed = speed;
@@ -168,10 +180,10 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		gimbalRoll = roll;
 		gimbalYaw = yaw;
 	}
-	
+
 	public void SetDroneUserPosition(DegPoint position)
 	{
-		Utilities.ToMercator(position, droneUserPosition);
+		position.CopyTo(droneUserPosition);
 
 		invalidate();
 	}
@@ -189,46 +201,72 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		Reset();
 	}
 
+	private ArrayList<MapCoord> routeLinePoints = new ArrayList<MapCoord>();
+	private Long routeLineId;
+	
 	public void SetRoute(Route route, String routeName, boolean autoScale)
 	{
 		Log.i(TAG, "SetRoute " + width + " " + height + " " + scale);
 		this.route = route;
-		routePoints.clear();
-		mbr.Reset();
 		
-		this.viewPoint = route.viewPoint.coord.ToMercator();
+		for (int i = 0; i < routePointsId.size(); i++)
+		{
+			navigationSystem.DeleteItemOnMap(routePointsId.get(i));
+		}
+		
+		if (routeLinePoints.size() > 0)
+			navigationSystem.DeleteItemOnMap(routeLineId);
+		
+		routePointsId.clear();
+		routeLinePoints.clear();
+		
+		mbr.Reset();
+
+		
+		route.viewPoint.coord.CopyTo(viewPoint);
 		this.routeName = routeName;
 		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
-		
+
 		for (int i = 0; i < wayPoints.size(); i++)
 		{
-			MrcPoint mrcPoint = wayPoints.get(i).coord.ToMercator();
-			mbr.Adjust(mrcPoint.Lon, mrcPoint.Lat);
-			routePoints.add(mrcPoint);
+			mbr.Adjust(wayPoints.get(i).coord.Lon, wayPoints.get(i).coord.Lat);
+			MapCoord wpCoord = new MapCoord();
+			wpCoord.lat = wayPoints.get(i).coord.Lat;
+			wpCoord.lon = wayPoints.get(i).coord.Lon;
+			routePointsId.add(navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/Pin.png", wpCoord, 0.18f, 0.9f, true));
+			routeLinePoints.add(wpCoord);
 		}
+					
+		routeLineId = navigationSystem.CreateLineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));
 
 		if (autoScale)
 		{
 			mapCenter.Lat = mbr.GetCenterY();
 			mapCenter.Lon = mbr.GetCenterX();
-			DegPoint defPoint = mapCenter.ToDegrees();
-			this.SetDronePosition(defPoint, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-			this.SetHomePosition(defPoint);
-			this.SetDroneUserPosition(defPoint);
+
+			this.SetDronePosition(mapCenter, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+			this.SetHomePosition(mapCenter);
+			this.SetDroneUserPosition(mapCenter);
 
 			if (width == 0 || height == 0)
-				return;		
+				return;
 
 			Reset();
 		}
-		
+
+		scale = navigationSystem.GetMapZoom() / gestureScale;
+
+		mapCoord.lon = mapCenter.Lon;
+		mapCoord.lat = mapCenter.Lat;
+		navigationSystem.SetMapCenter(mapCoord);
+
+
 		invalidate();
 	}
 
-	private MrcPoint mapCenter = new MrcPoint();
+	private DegPoint mapCenter = new DegPoint();
 	private NumberFormat formatter = new DecimalFormat("#.#");
-	private ScreenPoint p = new ScreenPoint();
-	private ScreenPoint p1 = new ScreenPoint();
+	private MapCoord mapCoord = new MapCoord();
 
 	@Override
 	protected void onDraw(Canvas canvas)
@@ -238,93 +276,14 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 		if (width == 0 || height == 0)
 			return;
-
-		scale *= gestureScale;
-
-		scrCenter.Add(scrollOffset);
-
+		
+		//mapCoord.lon = mapCenter.Lon;
+		//mapCoord.lat = mapCenter.Lat;
+		//navigationSystem.SetMapCenter(mapCoord);
+		
 		canvas.setDensity(DisplayMetrics.DENSITY_LOW);
 		canvas.drawColor(Color.TRANSPARENT);
 		paint.setStrokeWidth(LINE_WIDTH);
-
-		// Route
-		paint.setColor(Color.RED);
-		for (int i = 1; i < routePoints.size(); i++)
-		{
-			p.FromMercator(routePoints.get(i - 1), mapCenter, scrCenter, scale);
-			p1.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale);
-			canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
-		}
-
-		ArrayList<WayPoint> routeWP = route.GetWayPoints();
-		for (int i = 0; i < routePoints.size(); i++)
-		{
-			p.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale);
-			paint.setStyle(Paint.Style.FILL);
-			paint.setColor(Color.BLUE);
-			canvas.drawCircle(p.X, p.Y, LINE_WIDTH, paint);
-			paint.setStyle(Paint.Style.STROKE);
-
-			p.CopyTo(p1);
-			p1.SetY(p1.dY - 30);
-			Utilities.Rotate(p1, p, routeWP.get(i).Heading);
-			paint.setStrokeWidth(LINE_WIDTH);
-			canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
-
-			Utilities.DrawTextWithBorder(Integer.toString(i) + ": " + formatter.format(routeWP.get(i).Alt) + "m", p.X, p.Y, Color.GRAY, Color.WHITE, 1, 3, canvas, textPaint);
-		}
-
-		// Home
-		p.FromMercator(homePosition, mapCenter, scrCenter, scale);
-		paint.setColor(Color.DKGRAY);
-		paint.setStrokeWidth(LINE_WIDTH * 4.0f);
-		canvas.drawPoint(p.X, p.Y, paint);
-
-		// Drone
-		p.FromMercator(dronePosition, mapCenter, scrCenter, scale);
-		paint.setStyle(Paint.Style.FILL);
-		paint.setColor(Color.MAGENTA);
-		canvas.drawCircle(p.X, p.Y, (LINE_WIDTH * 2) - (LINE_WIDTH / 2), paint);
-		paint.setStyle(Paint.Style.STROKE);
-		
-		p.CopyTo(p1);
-		p1.SetY(p1.dY - 50);
-		Utilities.Rotate(p1, p, droneHeading);
-		paint.setColor(Color.MAGENTA);
-		paint.setStrokeWidth(LINE_WIDTH);
-		canvas.drawLine(p.X, p.Y, p1.X, p1.Y, paint);
-				
-		// User
-		p.FromMercator(droneUserPosition, mapCenter, scrCenter, scale);
-		paint.setColor(Color.GREEN);
-		paint.setStrokeWidth(LINE_WIDTH * 2.0f);
-		canvas.drawPoint(p.X, p.Y, paint);
-
-		// ViewPoint
-		if (!route.isMapping)
-		{
-		p.FromMercator(viewPoint, mapCenter, scrCenter, scale);
-		paint.setStyle(Paint.Style.FILL);
-		paint.setColor(Color.BLACK);
-		canvas.drawCircle(p.X, p.Y, (LINE_WIDTH * 2), paint);
-		paint.setStyle(Paint.Style.STROKE);
-		
-		p.FromMercator(viewPoint, mapCenter, scrCenter, scale);
-		paint.setStyle(Paint.Style.FILL);
-		paint.setColor(Color.CYAN);
-		canvas.drawCircle(p.X, p.Y, (LINE_WIDTH * 2) - (LINE_WIDTH / 2), paint);
-		paint.setStyle(Paint.Style.STROKE);
-		}
-		
-		// Selected point;
-		if (selectedPointIndex >= 0 && routePoints.size() > selectedPointIndex)
-		{
-			p.FromMercator(routePoints.get(selectedPointIndex), mapCenter, scrCenter, scale);
-			paint.setStyle(Paint.Style.FILL);
-			paint.setColor(Color.GREEN);
-			canvas.drawCircle(p.X, p.Y, LINE_WIDTH, paint);
-			paint.setStyle(Paint.Style.STROKE);
-		}
 
 		// Info
 		float lineHeight = 42.0f;
@@ -334,7 +293,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		Utilities.DrawTextWithBorder("Name: " + routeName, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Length: " + formatter.format(route.length) + "m", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
-		linePos += lineHeight;	
+		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Power level: " + formatter.format(dronePowerLevel) + "%", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Remain fly time: " + formatter.format(droneRemainFlyTime) + "min", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
@@ -352,7 +311,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		Utilities.DrawTextWithBorder("Heading: " + formatter.format(droneHeading), 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Gim pitch: " + formatter.format(gimbalPitch), 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
-		linePos += lineHeight;		
+		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("GS Type: " + missionType, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("GS State: " + missionState, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
@@ -363,61 +322,84 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		linePos += lineHeight;
 	}
 
+	private double lastX = 0;
+	private double lastY = 0;
+	private int lastPointerID = 0;
+	private boolean panningStarted = false;
+	private boolean tap = false;
+	private long userLineID = 0;
+	private long userImageID = 0;
+	private long pinOnMapID = 0;
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (!route.isMapping)
+		// gestureDetector.onTouchEvent(event);
+		// rotateDetector.onTouchEvent(event);
+		scaleGestureDetector.onTouchEvent(event);
+
+		double prevX = lastX;
+		double prevY = lastY;
+		int pointerID = event.getPointerId(event.getActionIndex());
+
+		lastX = event.getRawX();
+		lastY = event.getRawY();
+
+		if ((scaleGestureDetector.isInProgress() || rotateDetector.isInProgress()))
 		{
-			switch (event.getAction())
+			if (panningStarted)
 			{
-				case MotionEvent.ACTION_DOWN:
-				{
-					selectedPointIndex = GetNearestPointIndex(event.getX(), event.getY());
-					break;
-				}
-				case MotionEvent.ACTION_MOVE:
-				{
-					if (isShowPress)
-					{
-						scrollOffset.Set(0.0, 0.0);
-						
-						if (selectedPointIndex >= 0)
-						{
-							p.Set(event.getX(), event.getY());
-							p.ToMercator(routePoints.get(selectedPointIndex), mapCenter, scrCenter, scale);
-
-							if (wayPointPositionChanged != null)
-								wayPointPositionChanged.onWayPointPositionChanged(selectedPointIndex, routePoints.get(selectedPointIndex));					
-							
-							return true;
-						}
-
-						if (selectedPointIndex == -2)
-						{
-							p.Set(event.getX(), event.getY());
-							p.ToMercator(viewPoint, mapCenter, scrCenter, scale);
-							
-							if (wayPointPositionChanged != null)
-								wayPointPositionChanged.onWayPointPositionChanged(selectedPointIndex, viewPoint);					
-							
-							return true;							
-						}
-					}
-					break;
-				}
-				case MotionEvent.ACTION_UP:
-				{				
-					isShowPress = false;
-					scrollOffset.Set(0.0, 0.0);
-					break;
-				}
+				tap = panningStarted = false;
+				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_CANCEL);
 			}
+			return true;
 		}
 
-		gestureDetector.onTouchEvent(event);
-		scaleGestureDetector.onTouchEvent(event);
-		// test
-		return true;
+		if (!panningStarted && event.getAction() == MotionEvent.ACTION_DOWN)
+		{
+			lastPointerID = pointerID;
+			tap = panningStarted = true;
+			navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_DOWN);
+			return true;
+		}
+
+		if (pointerID != lastPointerID || !panningStarted)
+			return false;
+
+		switch (event.getAction())
+		{
+			case MotionEvent.ACTION_MOVE:
+				if (event.getX() == prevX && event.getY() == prevY)
+					return false;
+
+				tap = false;
+				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_MOVE);
+				return true;
+
+			case MotionEvent.ACTION_UP:
+				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_UP);
+				lastClickGeoPosition = navigationSystem.GetPositionOnMap(new Point((int) event.getX(), (int) event.getY()));
+				if (tap)
+					UpdatePinPosition();
+				tap = panningStarted = false;
+				return true;
+
+			case MotionEvent.ACTION_CANCEL:
+				tap = panningStarted = false;
+				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_CANCEL);
+				return true;
+		}
+
+		return false;
+	}
+
+	private void UpdatePinPosition()
+	{
+		if (pinOnMapID == 0)
+		{
+			pinOnMapID = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/pin.png", new NavmiiControl.MapCoord(0.0, 0.0), 0.18f, 0.9f, false);
+		}
+		navigationSystem.SetMarkerPosition(pinOnMapID, lastClickGeoPosition);
 	}
 
 	public void clearCanvas()
@@ -435,117 +417,24 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 		return height;
 	}
 
-	@Override
-	public boolean onDown(MotionEvent e)
-	{
-		// Log.e(TAG, "onDown");
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e)
-	{
-		
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e)
-	{
-		scrollOffset.Set(0.0, 0.0);
-		if (!route.isMapping)
-		{
-			if (selectedPointIndex < 0)
-				return false;
-		}
-		else
-			selectedPointIndex = -1;
-		
-		if (wayPointSelected != null)
-			wayPointSelected.onWayPointSelected(selectedPointIndex);
-	
-		invalidate();
-
-		return false;
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
-	{
-		scrollOffset.Set(-distanceX, -distanceY);
-
-		invalidate();
-
-		return true;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e)
-	{
-		isShowPress = true;
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
-	{
-		return true;
-	}
-
-	@Override
-	public void computeScroll()
-	{
-
-	}
-
-	@Override
-	public boolean onScale(ScaleGestureDetector detector)
-	{
-		gestureScale = detector.getScaleFactor();
-
-		postInvalidate();
-
-		return true;
-	}
-
-	@Override
-	public boolean onScaleBegin(ScaleGestureDetector detector)
-	{
-		gestureScale = 1.0f;
-
-		return true;
-	}
-
-	@Override
-	public void onScaleEnd(ScaleGestureDetector detector)
-	{
-		gestureScale = 1.0f;
-	}
-
-
 	protected int GetNearestPointIndex(float x, float y)
 	{
 		int result = -1;
-		double d = 0.0;
-		double minValue = Double.MAX_VALUE;
-		ScreenPoint p = new ScreenPoint(x, y);
-
-		for (int i = 0; i < routePoints.size(); i++)
-		{
-			p1.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale);
-			d = p.DistanceTo(p1);
-			if (d < 50 && d < minValue)
-			{
-				result = i;
-				minValue = d;
-			}
-		}
-
-		p1.FromMercator(viewPoint, mapCenter, scrCenter, scale);
-		d = p.DistanceTo(p1);
-		if (d < 50 && d < minValue)
-			result = -2;
-		
-		Log.e(TAG, "Index " + result + " x " + x + " y " + y + " distance " + minValue + " px");
-
+		/*
+		 * double d = 0.0; double minValue = Double.MAX_VALUE; ScreenPoint p =
+		 * new ScreenPoint(x, y);
+		 * 
+		 * for (int i = 0; i < routePoints.size(); i++) {
+		 * p1.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale); d =
+		 * p.DistanceTo(p1); if (d < 50 && d < minValue) { result = i; minValue
+		 * = d; } }
+		 * 
+		 * p1.FromMercator(viewPoint, mapCenter, scrCenter, scale); d =
+		 * p.DistanceTo(p1); if (d < 50 && d < minValue) result = -2;
+		 * 
+		 * Log.e(TAG, "Index " + result + " x " + x + " y " + y + " distance " +
+		 * minValue + " px");
+		 */
 		return result;
 	}
 
@@ -590,7 +479,7 @@ public class RouteView extends View implements OnGestureListener, OnScaleGesture
 
 	public void RemoveWayPoint(int wayPointIndex)
 	{
-		routePoints.remove(wayPointIndex);
+		//routePoints.remove(wayPointIndex);
 		route.GetWayPoints().remove(wayPointIndex);
 		invalidate();
 	}
