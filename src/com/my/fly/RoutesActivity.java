@@ -140,7 +140,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
 		navigationSystem = new NavigationSystem(this);	
-		navigationSystem.onCreate(mapView, resourcePath);	
+		
+		navigationSystem.onCreate(mapView, resourcePath);
+		
+		navigationSystem.SetItemsOnMapEventListener(this);
+		navigationSystem.SetControlEventListener(this);
+		navigationSystem.SetMapControlEventListener(this);
+
 		routeView.SetNavigationSystem(navigationSystem, resourcePath);
 		
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -726,8 +732,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected int selectedWayPointId = -1;
 
 
-	public void OnWayPointSelected(int wayPointId)
+	public void WayPointSelected(final Long markerId)
 	{
+		int wayPointId = routeView.GetWayPointNumberByMarkerId(markerId);
+
 		Log.e(TAG, "onWayPointSelected");
 
 		if (route.wayPoints.size() == 0)
@@ -748,7 +756,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 					if (isMapping)
 						route.mappingAltitude = wayPoint.Alt;
 					else
-						routeView.SetWayPoint(selectedWayPointId, wayPoint);
+						routeView.SetWayPoint(markerId, wayPoint);
 					
 					SaveRoute(currentRouteName);					
 				}
@@ -909,10 +917,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public void onUserMarkerClicked(long arg0)
+	public void onUserMarkerClicked(long markerId)
 	{
-		// TODO Auto-generated method stub
-		
+		WayPointSelected(markerId);
+		routeView.SelectWayPointByMarkerId(markerId);
 	}
 
 	@Override

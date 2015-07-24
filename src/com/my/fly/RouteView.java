@@ -7,6 +7,10 @@ import geolife.android.navigationsystem.NavmiiControl.MapCoord;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.dji.wrapper.DJIWrapper;
 import com.dji.wrapper.Route;
@@ -33,6 +37,18 @@ import android.widget.Scroller;
 
 public class RouteView extends View
 {
+	private class MarkerInfo 
+	{
+		public Integer wayPointNumber;
+		public WayPoint wayPoint;
+		
+		public MarkerInfo(int number, WayPoint wayPoint)
+		{
+			this.wayPointNumber = number;
+			this.wayPoint = wayPoint;
+		}
+	};
+	
 	public int width = 0;
 	public int height = 0;
 	public static final String TAG = "RouteView";
@@ -41,7 +57,6 @@ public class RouteView extends View
 	private Context context = null;
 	private Paint paint;
 	private Paint textPaint;
-	private ArrayList<Long> routePointsId = new ArrayList<Long>();
 	
 	private Route route = new Route();
 	private static final float LINE_WIDTH = 10.0f;
@@ -56,7 +71,8 @@ public class RouteView extends View
 	private Long droneMarkerId = (long)0;
 	private Long homeMarkerId = (long)0;
 	private Long viewPointMarkerId = (long)0;
-	
+	private HashMap<Long, MarkerInfo> wayPointMarkers = new HashMap<Long, MarkerInfo>();
+		
 	private double droneSpeed = 0.0;
 	private double droneAlt = 0.0;
 	private double droneDistance = 0.0;
@@ -225,20 +241,20 @@ public class RouteView extends View
 		Log.i(TAG, "SetRoute " + width + " " + height + " " + scale);
 		this.route = route;
 		
-		for (int i = 0; i < routePointsId.size(); i++)
-		{
-			navigationSystem.DeleteItemOnMap(routePointsId.get(i));
-		}
+		for (Map.Entry<Long, MarkerInfo> entry: wayPointMarkers.entrySet()) 
+		{ 
+			Long key = entry.getKey(); 
+			navigationSystem.DeleteItemOnMap(key);
+		} 
 		
 		if (routeLinePoints.size() > 0)
 			navigationSystem.DeleteItemOnMap(routeLineId);
 		
-		routePointsId.clear();
 		routeLinePoints.clear();
+		wayPointMarkers.clear();
 		
 		mbr.Reset();
-
-		
+	
 		route.viewPoint.coord.CopyTo(viewPoint);
 		
 		if (viewPointMarkerId == NavmiiControl.INVALID_USER_ITEM_ID)
@@ -251,12 +267,12 @@ public class RouteView extends View
 
 		for (int i = 0; i < wayPoints.size(); i++)
 		{
-			mbr.Adjust(wayPoints.get(i).coord.Lon, wayPoints.get(i).coord.Lat);
-			MapCoord wpCoord = new MapCoord();
-			wpCoord.lat = wayPoints.get(i).coord.Lat;
-			wpCoord.lon = wayPoints.get(i).coord.Lon;
-			routePointsId.add(navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, -wayPoints.get(i).Heading, 0.5f, 0.5f, true));
-
+			WayPoint wayPoint = wayPoints.get(i);		
+			MapCoord wpCoord = wayPoint.coord.ToMapCoord();		
+			long markerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, -wayPoint.Heading, 0.5f, 0.5f, true);
+			
+			mbr.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
+			wayPointMarkers.put(markerId, new MarkerInfo(i, wayPoint));
 			routeLinePoints.add(wpCoord);
 		}
 										
@@ -283,10 +299,41 @@ public class RouteView extends View
 		mapCoord.lat = mapCenter.Lat;
 		navigationSystem.SetMapCenter(mapCoord);
 
-
 		invalidate();
 	}
 
+	public int GetWayPointNumberByMarkerId(long markerId)
+	{
+		if (wayPointMarkers.size() == 0)
+			return -1;
+		
+		return wayPointMarkers.get(markerId).wayPointNumber;
+	}
+	
+	private Long prevSelectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
+	private Long ChangeMarkerIcon(Long markerId, String iconaName)
+	{
+		MarkerInfo info = wayPointMarkers.get(markerId);		
+		navigationSystem.DeleteItemOnMap(markerId);
+		wayPointMarkers.remove(markerId);
+		
+		prevSelectedMarkerId = navigationSystem.CreateDirectedMarkerOnMap(iconaName, info.wayPoint.coord.ToMapCoord(), -info.wayPoint.Heading, 0.5f, 0.5f, true); 
+		wayPointMarkers.put(prevSelectedMarkerId, info);		
+
+		return prevSelectedMarkerId; 
+	}
+	
+	public void SelectWayPointByMarkerId(long markerId)
+	{
+		if (wayPointMarkers.size() == 0)
+			return;	
+		
+		if (prevSelectedMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
+			ChangeMarkerIcon(prevSelectedMarkerId, resourcePath + "/bmp/arrowBlue.png");
+		
+		prevSelectedMarkerId = ChangeMarkerIcon(markerId, resourcePath + "/bmp/arrowGreen.png"); 
+	}
+	
 	private DegPoint mapCenter = new DegPoint();
 	private NumberFormat formatter = new DecimalFormat("#.#");
 	private MapCoord mapCoord = new MapCoord();
@@ -402,8 +449,6 @@ public class RouteView extends View
 			case MotionEvent.ACTION_UP:
 				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_UP);
 				lastClickGeoPosition = navigationSystem.GetPositionOnMap(new Point((int) event.getX(), (int) event.getY()));
-				if (tap)
-					UpdatePinPosition();
 				tap = panningStarted = false;
 				return true;
 
@@ -414,15 +459,6 @@ public class RouteView extends View
 		}
 
 		return false;
-	}
-
-	private void UpdatePinPosition()
-	{
-		if (pinOnMapID == 0)
-		{
-			pinOnMapID = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/pin.png", new NavmiiControl.MapCoord(0.0, 0.0), 0.18f, 0.9f, false);
-		}
-		navigationSystem.SetMarkerPosition(pinOnMapID, lastClickGeoPosition);
 	}
 
 	public void clearCanvas()
@@ -440,31 +476,9 @@ public class RouteView extends View
 		return height;
 	}
 
-	protected int GetNearestPointIndex(float x, float y)
+	public void SetWayPoint(Long markerId, WayPoint wayPoint)
 	{
-		int result = -1;
-		/*
-		 * double d = 0.0; double minValue = Double.MAX_VALUE; ScreenPoint p =
-		 * new ScreenPoint(x, y);
-		 * 
-		 * for (int i = 0; i < routePoints.size(); i++) {
-		 * p1.FromMercator(routePoints.get(i), mapCenter, scrCenter, scale); d =
-		 * p.DistanceTo(p1); if (d < 50 && d < minValue) { result = i; minValue
-		 * = d; } }
-		 * 
-		 * p1.FromMercator(viewPoint, mapCenter, scrCenter, scale); d =
-		 * p.DistanceTo(p1); if (d < 50 && d < minValue) result = -2;
-		 * 
-		 * Log.e(TAG, "Index " + result + " x " + x + " y " + y + " distance " +
-		 * minValue + " px");
-		 */
-		return result;
-	}
-
-	public void SetWayPoint(int wayPointId, WayPoint wayPoint)
-	{
-		route.GetWayPoints().set(wayPointId, wayPoint);
-		invalidate();
+		navigationSystem.SetMarkerHeading(markerId, -wayPoint.Heading);
 	}
 
 	public void SetMissionFlightStatus(String type, int targetWayPointIndex, String currentState)
@@ -500,10 +514,7 @@ public class RouteView extends View
 
 	}
 
-	public void RemoveWayPoint(int wayPointIndex)
+	public void RemoveWayPoint(int markerId)
 	{
-		//routePoints.remove(wayPointIndex);
-		route.GetWayPoints().remove(wayPointIndex);
-		invalidate();
 	}
 }

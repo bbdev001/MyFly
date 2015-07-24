@@ -31,6 +31,17 @@ public class GeoPoint
 		point.lon = Lon;
 	}
 	
+
+	public MapCoord ToMapCoord()
+	{
+		MapCoord mapCoord = new MapCoord();
+		
+		mapCoord.lon = Lon;
+		mapCoord.lat = Lat;
+		
+		return mapCoord; 
+	}
+	
 	public GeoPoint Clone()
 	{
 		return new GeoPoint(Lat, Lon);
