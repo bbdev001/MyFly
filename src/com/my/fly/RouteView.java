@@ -42,6 +42,7 @@ public class RouteView extends View
 	private Paint paint;
 	private Paint textPaint;
 	private ArrayList<Long> routePointsId = new ArrayList<Long>();
+	
 	private Route route = new Route();
 	private static final float LINE_WIDTH = 10.0f;
 	private Mbr mbr = new Mbr();
@@ -49,11 +50,13 @@ public class RouteView extends View
 	private ScaleGestureDetector scaleGestureDetector = null;
 	private RotationDetector rotateDetector = null;
 	private String routeName = "";
-	private DegPoint homePosition = new DegPoint();
-	private DegPoint dronePosition = new DegPoint();
-	private DegPoint droneUserPosition = new DegPoint();
-	private DegPoint viewPoint = new DegPoint();
-
+	private MapCoord homePosition = new MapCoord();
+	private MapCoord dronePosition = new MapCoord();
+	private MapCoord viewPoint = new MapCoord();
+	private Long droneMarkerId = (long)0;
+	private Long homeMarkerId = (long)0;
+	private Long viewPointMarkerId = (long)0;
+	
 	private double droneSpeed = 0.0;
 	private double droneAlt = 0.0;
 	private double droneDistance = 0.0;
@@ -157,6 +160,11 @@ public class RouteView extends View
 	public void SetHomePosition(DegPoint position)
 	{
 		position.CopyTo(homePosition);
+
+		if (homeMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
+			navigationSystem.SetMarkerPosition(homeMarkerId, homePosition);
+		else
+			homeMarkerId = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/Flag_Finish.png", homePosition, 0.5f, 0.5f, false);
 	}
 
 	public void SetDronePosition(DegPoint position, double alt, double speed, double distance, double remainFlyTime, double powerLevel, double pitch, double roll, double heading)
@@ -171,6 +179,14 @@ public class RouteView extends View
 		droneRoll = roll;
 		droneHeading = heading;
 
+		if (droneMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
+		{
+			navigationSystem.SetMarkerPosition(droneMarkerId, dronePosition);
+			navigationSystem.SetMarkerHeading(droneMarkerId, (float)-heading);		
+		}
+		else
+			droneMarkerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowMagenta.png", dronePosition, (float)-heading, 0.5f, 0.5f, false);
+			
 		invalidate();
 	}
 
@@ -183,9 +199,9 @@ public class RouteView extends View
 
 	public void SetDroneUserPosition(DegPoint position)
 	{
-		position.CopyTo(droneUserPosition);
+		//position.CopyTo(droneUserPosition);
 
-		invalidate();
+		//invalidate();
 	}
 
 	// override onSizeChanged
@@ -224,6 +240,12 @@ public class RouteView extends View
 
 		
 		route.viewPoint.coord.CopyTo(viewPoint);
+		
+		if (viewPointMarkerId == NavmiiControl.INVALID_USER_ITEM_ID)
+			viewPointMarkerId = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/waypoint_1.png", viewPoint, 0.5f, 0.5f, true);
+		else
+			navigationSystem.SetMarkerPosition(viewPointMarkerId, viewPoint);
+		
 		this.routeName = routeName;
 		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
 
@@ -233,10 +255,11 @@ public class RouteView extends View
 			MapCoord wpCoord = new MapCoord();
 			wpCoord.lat = wayPoints.get(i).coord.Lat;
 			wpCoord.lon = wayPoints.get(i).coord.Lon;
-			routePointsId.add(navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/Pin.png", wpCoord, 0.18f, 0.9f, true));
+			routePointsId.add(navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, -wayPoints.get(i).Heading, 0.5f, 0.5f, true));
+
 			routeLinePoints.add(wpCoord);
 		}
-					
+										
 		routeLineId = navigationSystem.CreateLineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));
 
 		if (autoScale)

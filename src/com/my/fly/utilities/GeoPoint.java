@@ -1,5 +1,7 @@
 package com.my.fly.utilities;
 
+import geolife.android.navigationsystem.NavmiiControl.MapCoord;
+
 public class GeoPoint
 {
 	public double Lat;
@@ -21,6 +23,12 @@ public class GeoPoint
 	{
 		point.Lat = Lat;
 		point.Lon = Lon;
+	}
+
+	public void CopyTo(MapCoord point)
+	{
+		point.lat = Lat;
+		point.lon = Lon;
 	}
 	
 	public GeoPoint Clone()
