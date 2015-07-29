@@ -27,7 +27,18 @@ public class Mbr
 		Ymin = Double.MAX_VALUE;
 		Ymax = Double.MIN_VALUE;		
 	}
-	
+
+	public double GetWidth()
+	{
+		return  Xmax - Xmin;
+	}
+
+	public double GetHeight()
+	{
+		return  Ymax - Ymin;
+	}
+
+
 	public double GetCenterX()
 	{
 		return (Xmin + Xmax) / 2.0;

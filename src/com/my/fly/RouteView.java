@@ -151,28 +151,6 @@ public class RouteView extends View
 		wayPointPositionChanged = listener;
 	}
 
-	public void Reset()
-	{
-		scale = 1.0f;
-		gestureScale = 1.0f;
-		navigationSystem.SetMapZoom(scale);
-
-		if (height < width)
-		{
-			double d = Math.max(mbr.Ymax - mbr.Ymin, mbr.Xmax - mbr.Xmin);
-
-			if (d != 0.0)
-				scale = (float) ((height - LINE_WIDTH * 4.0f) / d);
-		}
-		else
-		{
-			double d = Math.max(mbr.Ymax - mbr.Ymin, mbr.Xmax - mbr.Xmin);
-
-			if (d != 0.0)
-				scale = (float) ((width - LINE_WIDTH * 4.0f) / d);
-		}		
-	}
-
 	public void SetHomePosition(DegPoint position)
 	{
 		position.CopyTo(homePosition);
@@ -229,16 +207,14 @@ public class RouteView extends View
 
 		width = w;
 		height = h;
-
-		Reset();
 	}
 
 	private ArrayList<MapCoord> routeLinePoints = new ArrayList<MapCoord>();
 	private Long routeLineId;
+	private Mbr scrMbr = new Mbr();
 	
 	public void SetRoute(Route route, String routeName, boolean autoScale)
 	{
-		Log.i(TAG, "SetRoute " + width + " " + height + " " + scale);
 		this.route = route;
 		
 		for (Map.Entry<Long, MarkerInfo> entry: wayPointMarkers.entrySet()) 
@@ -290,11 +266,32 @@ public class RouteView extends View
 			if (width == 0 || height == 0)
 				return;
 
-			Reset();
+			scale = navigationSystem.GetMapZoom();		
+			
+			Point p = new Point();
+			p.set(0, 0);
+			MapCoord p1 = navigationSystem.GetPositionOnMap(p);
+			
+			p.set(width - 96, height - 96);
+			MapCoord p2 = navigationSystem.GetPositionOnMap(p);
+			
+			Log.i("RouteView", "T " + p1.lat + " " + p1.lon);
+			scrMbr.Reset();
+			scrMbr.Adjust(p1.lon, p1.lat);
+			scrMbr.Adjust(p2.lon, p2.lat);
+					
+
+            float bestZoomBoost = Math.max((float)(mbr.GetWidth() / scrMbr.GetWidth()), (float)(mbr.GetHeight() / scrMbr.GetHeight()));
+
+            if (bestZoomBoost >= 0.0f)
+                scale *= bestZoomBoost;
+            
+            Log.i("RouteView", "T " + bestZoomBoost);			
 		}
+		else
+			scale = 1.0f;
 
-		scale = navigationSystem.GetMapZoom() / gestureScale;
-
+		navigationSystem.SetMapZoom(scale);
 		mapCoord.lon = mapCenter.Lon;
 		mapCoord.lat = mapCenter.Lat;
 		navigationSystem.SetMapCenter(mapCoord);

@@ -509,9 +509,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		currentRouteName = curRouteName;
 		
 		route.LoadFromCSV(BASE_PATH, currentRouteName);
-			
-		routeView.SetRoute(route, curRouteName, true);
-		
+					
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		BuildRouteForType(false);
 	}
