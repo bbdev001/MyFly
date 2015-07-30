@@ -46,6 +46,7 @@ import dji.sdk.widget.DjiGLSurfaceView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -71,7 +72,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, NavmiiControl.ReverseLookupCallback, NavmiiControl.ItemsOnMapEventListener, NavmiiControl.ControlEventListener, NavmiiControl.MapControlEventListener
+public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, NavmiiControl.ReverseLookupCallback, NavmiiControl.ControlEventListener, NavmiiControl.MapControlEventListener
 {
 	private DJIWrapper djiWrapper = new DJIWrapper();
 	private static final String TAG = "RoutesActivity";
@@ -143,7 +144,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		navigationSystem.onCreate(mapView, resourcePath);
 		
-		navigationSystem.SetItemsOnMapEventListener(this);
 		navigationSystem.SetControlEventListener(this);
 		navigationSystem.SetMapControlEventListener(this);
 
@@ -720,13 +720,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		navigationSystem.onConfigurationChanged(newConfig);
 	}
 	
-	// ControlEventListener
-	@Override
-	public void OnControlInitialized()
-	{
-
-	}
-		
+	
 	protected int selectedWayPointId = -1;
 
 
@@ -875,46 +869,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 
 	@Override
-	public void OnMapCenterChanged(MapCoord arg0)
-	{
-	}
-
-	@Override
-	public void OnPositionChanged(MapCoord arg0)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void OnRotationChanged(float arg0)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void OnZoomChanged(float arg0)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void OnRouteCalculationFinished(int arg0)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void OnRouteCalculationStarted()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void onUserMarkerClicked(long markerId)
 	{
 		WayPointSelected(markerId);
@@ -930,6 +884,89 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	@Override
 	public void onReverseLookupItemAdded(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onDoubleTapOnMap(Point arg0)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onLongPressOnMap(Point arg0)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onMapCenterChanged(MapCoord arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPositionChanged(MapCoord arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRotationChanged(float arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onSingleTapOnMap(Point arg0)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onUserMarkerMoved(long markerId, MapCoord newPosition)
+	{
+		int number = routeView.GetWayPointNumberByMarkerId(markerId);
+				
+		DegPoint degPoint = route.GetWayPoints().get(number).coord;
+		degPoint.Lon = newPosition.lon;
+		degPoint.Lat = newPosition.lat;
+		
+		routeView.RebuildRouteLine(route);	
+		routeView.SelectWayPointByMarkerId(markerId);
+	}
+
+	@Override
+	public void onZoomChanged(float arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onControlInitialized()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRouteCalculationFinished(int arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRouteCalculationStarted()
 	{
 		// TODO Auto-generated method stub
 		

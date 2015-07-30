@@ -176,10 +176,10 @@ public class RouteView extends View
 		if (droneMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
 		{
 			navigationSystem.SetMarkerPosition(droneMarkerId, dronePosition);
-			navigationSystem.SetMarkerHeading(droneMarkerId, (float)-heading);		
+			navigationSystem.SetMarkerHeading(droneMarkerId, (float)heading);		
 		}
 		else
-			droneMarkerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowMagenta.png", dronePosition, (float)-heading, 0.5f, 0.5f, false);
+			droneMarkerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowMagenta.png", dronePosition, (float)heading, 0.5f, 0.5f, false);
 			
 		invalidate();
 	}
@@ -226,9 +226,7 @@ public class RouteView extends View
 		if (routeLinePoints.size() > 0)
 			navigationSystem.DeleteItemOnMap(routeLineId);
 		
-		routeLinePoints.clear();
-		wayPointMarkers.clear();
-		
+	
 		mbr.Reset();
 	
 		route.viewPoint.coord.CopyTo(viewPoint);
@@ -241,19 +239,20 @@ public class RouteView extends View
 		this.routeName = routeName;
 		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
 
+		wayPointMarkers.clear();
+
 		for (int i = 0; i < wayPoints.size(); i++)
 		{
 			WayPoint wayPoint = wayPoints.get(i);		
 			MapCoord wpCoord = wayPoint.coord.ToMapCoord();		
-			long markerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, -wayPoint.Heading, 0.5f, 0.5f, true);
+			long markerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, wayPoint.Heading, 0.5f, 0.5f, true);
 			
 			mbr.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
 			wayPointMarkers.put(markerId, new MarkerInfo(i, wayPoint));
-			routeLinePoints.add(wpCoord);
 		}
-										
-		routeLineId = navigationSystem.CreateLineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));
 
+		RebuildRouteLine(route);
+		
 		if (autoScale)
 		{
 			mapCenter.Lat = mbr.GetCenterY();
@@ -299,6 +298,25 @@ public class RouteView extends View
 		invalidate();
 	}
 
+	public void RebuildRouteLine(Route route)
+	{
+		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
+
+		if (routeLinePoints.size() > 0)
+			navigationSystem.DeleteItemOnMap(routeLineId);
+		
+		routeLinePoints.clear();
+
+		for (int i = 0; i < wayPoints.size(); i++)
+		{
+			WayPoint wayPoint = wayPoints.get(i);		
+			MapCoord wpCoord = wayPoint.coord.ToMapCoord();		
+			routeLinePoints.add(wpCoord);
+		}
+
+		routeLineId = navigationSystem.CreateLineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));	
+	}
+	
 	public int GetWayPointNumberByMarkerId(long markerId)
 	{
 		if (wayPointMarkers.size() == 0)
@@ -307,28 +325,27 @@ public class RouteView extends View
 		return wayPointMarkers.get(markerId).wayPointNumber;
 	}
 	
-	private Long prevSelectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
-	private Long ChangeMarkerIcon(Long markerId, String iconaName)
-	{
-		MarkerInfo info = wayPointMarkers.get(markerId);		
-		navigationSystem.DeleteItemOnMap(markerId);
-		wayPointMarkers.remove(markerId);
-		
-		prevSelectedMarkerId = navigationSystem.CreateDirectedMarkerOnMap(iconaName, info.wayPoint.coord.ToMapCoord(), -info.wayPoint.Heading, 0.5f, 0.5f, true); 
-		wayPointMarkers.put(prevSelectedMarkerId, info);		
-
-		return prevSelectedMarkerId; 
-	}
-	
+	protected Long prevSelectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
+	protected Long selectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
 	public void SelectWayPointByMarkerId(long markerId)
 	{
-		if (wayPointMarkers.size() == 0)
-			return;	
+		MarkerInfo info = wayPointMarkers.get(markerId);
 		
-		if (prevSelectedMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
-			ChangeMarkerIcon(prevSelectedMarkerId, resourcePath + "/bmp/arrowBlue.png");
+		if (prevSelectedMarkerId != markerId)
+		{
+			prevSelectedMarkerId = markerId;
+			navigationSystem.DeleteItemOnMap(selectedMarkerId);
+			selectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
+		}
 		
-		prevSelectedMarkerId = ChangeMarkerIcon(markerId, resourcePath + "/bmp/arrowGreen.png"); 
+		if (selectedMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
+		{
+			navigationSystem.SetMarkerPosition(selectedMarkerId, info.wayPoint.coord.ToMapCoord());
+			navigationSystem.SetMarkerHeading(selectedMarkerId, info.wayPoint.Heading);
+		}
+		else
+			selectedMarkerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowGreen.png", info.wayPoint.coord.ToMapCoord(), info.wayPoint.Heading, 0.5f, 0.5f, true);
+		
 	}
 	
 	private DegPoint mapCenter = new DegPoint();
@@ -398,66 +415,6 @@ public class RouteView extends View
 	private long userImageID = 0;
 	private long pinOnMapID = 0;
 	
-	@Override
-	public boolean onTouchEvent(MotionEvent event)
-	{
-		// gestureDetector.onTouchEvent(event);
-		// rotateDetector.onTouchEvent(event);
-		scaleGestureDetector.onTouchEvent(event);
-
-		double prevX = lastX;
-		double prevY = lastY;
-		int pointerID = event.getPointerId(event.getActionIndex());
-
-		lastX = event.getRawX();
-		lastY = event.getRawY();
-
-		if ((scaleGestureDetector.isInProgress() || rotateDetector.isInProgress()))
-		{
-			if (panningStarted)
-			{
-				tap = panningStarted = false;
-				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_CANCEL);
-			}
-			return true;
-		}
-
-		if (!panningStarted && event.getAction() == MotionEvent.ACTION_DOWN)
-		{
-			lastPointerID = pointerID;
-			tap = panningStarted = true;
-			navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_DOWN);
-			return true;
-		}
-
-		if (pointerID != lastPointerID || !panningStarted)
-			return false;
-
-		switch (event.getAction())
-		{
-			case MotionEvent.ACTION_MOVE:
-				if (event.getX() == prevX && event.getY() == prevY)
-					return false;
-
-				tap = false;
-				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_MOVE);
-				return true;
-
-			case MotionEvent.ACTION_UP:
-				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_UP);
-				lastClickGeoPosition = navigationSystem.GetPositionOnMap(new Point((int) event.getX(), (int) event.getY()));
-				tap = panningStarted = false;
-				return true;
-
-			case MotionEvent.ACTION_CANCEL:
-				tap = panningStarted = false;
-				navigationSystem.OnMapTouch(event.getX(), event.getY(), event.getEventTime(), NavmiiControl.TOUCH_CANCEL);
-				return true;
-		}
-
-		return false;
-	}
-
 	public void clearCanvas()
 	{
 		invalidate();
