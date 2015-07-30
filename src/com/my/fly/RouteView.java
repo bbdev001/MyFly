@@ -215,6 +215,8 @@ public class RouteView extends View
 	
 	public void SetRoute(Route route, String routeName, boolean autoScale)
 	{
+		Log.i("RouteView", "Select route");
+	
 		this.route = route;
 		
 		for (Map.Entry<Long, MarkerInfo> entry: wayPointMarkers.entrySet()) 
@@ -225,8 +227,7 @@ public class RouteView extends View
 		
 		if (routeLinePoints.size() > 0)
 			navigationSystem.DeleteItemOnMap(routeLineId);
-		
-	
+						
 		mbr.Reset();
 	
 		route.viewPoint.coord.CopyTo(viewPoint);
@@ -273,8 +274,7 @@ public class RouteView extends View
 			
 			p.set(width - 96, height - 96);
 			MapCoord p2 = navigationSystem.GetPositionOnMap(p);
-			
-			Log.i("RouteView", "T " + p1.lat + " " + p1.lon);
+				
 			scrMbr.Reset();
 			scrMbr.Adjust(p1.lon, p1.lat);
 			scrMbr.Adjust(p2.lon, p2.lat);
@@ -284,8 +284,6 @@ public class RouteView extends View
 
             if (bestZoomBoost >= 0.0f)
                 scale *= bestZoomBoost;
-            
-            Log.i("RouteView", "T " + bestZoomBoost);			
 		}
 		else
 			scale = 1.0f;
@@ -325,27 +323,8 @@ public class RouteView extends View
 		return wayPointMarkers.get(markerId).wayPointNumber;
 	}
 	
-	protected Long prevSelectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
-	protected Long selectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
 	public void SelectWayPointByMarkerId(long markerId)
 	{
-		MarkerInfo info = wayPointMarkers.get(markerId);
-		
-		if (prevSelectedMarkerId != markerId)
-		{
-			prevSelectedMarkerId = markerId;
-			navigationSystem.DeleteItemOnMap(selectedMarkerId);
-			selectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
-		}
-		
-		if (selectedMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
-		{
-			navigationSystem.SetMarkerPosition(selectedMarkerId, info.wayPoint.coord.ToMapCoord());
-			navigationSystem.SetMarkerHeading(selectedMarkerId, info.wayPoint.Heading);
-		}
-		else
-			selectedMarkerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowGreen.png", info.wayPoint.coord.ToMapCoord(), info.wayPoint.Heading, 0.5f, 0.5f, true);
-		
 	}
 	
 	private DegPoint mapCenter = new DegPoint();
@@ -432,7 +411,7 @@ public class RouteView extends View
 
 	public void SetWayPoint(Long markerId, WayPoint wayPoint)
 	{
-		navigationSystem.SetMarkerHeading(markerId, -wayPoint.Heading);
+		navigationSystem.SetMarkerHeading(markerId, wayPoint.Heading);
 	}
 
 	public void SetMissionFlightStatus(String type, int targetWayPointIndex, String currentState)

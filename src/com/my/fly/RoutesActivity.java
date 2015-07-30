@@ -871,8 +871,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public void onUserMarkerClicked(long markerId)
 	{
+		routeView.SelectWayPointByMarkerId(markerId);	
 		WayPointSelected(markerId);
-		routeView.SelectWayPointByMarkerId(markerId);
 	}
 
 	@Override
