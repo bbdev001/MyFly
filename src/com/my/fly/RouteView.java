@@ -312,7 +312,12 @@ public class RouteView extends View
 			routeLinePoints.add(wpCoord);
 		}
 
-		routeLineId = navigationSystem.CreateLineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));	
+		routeLineId = navigationSystem.CreatePolylineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));	
+	}
+	
+	public void ChangeRoutePointPosition(int index, MapCoord point)
+	{
+		navigationSystem.SetPolylinePoint(routeLineId, index, point);
 	}
 	
 	public int GetWayPointNumberByMarkerId(long markerId)
@@ -323,8 +328,15 @@ public class RouteView extends View
 		return wayPointMarkers.get(markerId).wayPointNumber;
 	}
 	
+	protected long prevSelectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
 	public void SelectWayPointByMarkerId(long markerId)
 	{
+		if (prevSelectedMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
+			navigationSystem.SetMarkerImage(prevSelectedMarkerId, resourcePath + "/bmp/arrowBlue.png");
+					
+		navigationSystem.SetMarkerImage(markerId, resourcePath + "/bmp/arrowGreen.png");
+		
+		prevSelectedMarkerId = markerId;
 	}
 	
 	private DegPoint mapCenter = new DegPoint();
@@ -384,15 +396,6 @@ public class RouteView extends View
 		Utilities.DrawTextWithBorder("Reached WP: " + missionReachedWP, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 	}
-
-	private double lastX = 0;
-	private double lastY = 0;
-	private int lastPointerID = 0;
-	private boolean panningStarted = false;
-	private boolean tap = false;
-	private long userLineID = 0;
-	private long userImageID = 0;
-	private long pinOnMapID = 0;
 	
 	public void clearCanvas()
 	{

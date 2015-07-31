@@ -160,8 +160,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString("Can't init sdk");
-		
-		LoadRoutesList();
 	}
 
 	@Override
@@ -516,7 +514,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	protected void SaveRoute(String curRouteName)
 	{
-		BuildRouteForType(isMapping);	
 		route.SaveToCSV(BASE_PATH, currentRouteName);
 	}
 
@@ -744,13 +741,16 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				Log.e(TAG, "WPEditor.OnClosed");
 
 				if (!isCancel)
-				{				
-					if (isMapping)
-						route.mappingAltitude = wayPoint.Alt;
-					else
+				{					
+					if (!isMapping)
+					{
 						routeView.SetWayPoint(markerId, wayPoint);
-					
-					SaveRoute(currentRouteName);					
+						routeView.SelectWayPointByMarkerId(markerId);
+					}
+					else
+						route.mappingAltitude = wayPoint.Alt;
+						
+					SaveRoute(currentRouteName);						
 				}
 			}
 		},
@@ -938,10 +938,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				
 		DegPoint degPoint = route.GetWayPoints().get(number).coord;
 		degPoint.Lon = newPosition.lon;
-		degPoint.Lat = newPosition.lat;
+		degPoint.Lat = newPosition.lat;	
 		
-		routeView.RebuildRouteLine(route);	
+		routeView.ChangeRoutePointPosition(number, newPosition);
 		routeView.SelectWayPointByMarkerId(markerId);
+		
+		route.RecalculateLength();
+		routeView.invalidate();
 	}
 
 	@Override
@@ -954,8 +957,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public void onControlInitialized()
 	{
-		// TODO Auto-generated method stub
-		
+		LoadRoutesList();		
 	}
 
 	@Override
@@ -970,5 +972,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void onUserMarkerStopMoving(long arg0)
+	{
+		SaveRoute(currentRouteName);	
 	}
 }
