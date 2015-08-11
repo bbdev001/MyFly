@@ -1,6 +1,5 @@
 package com.my.fly;
 
-import geolife.android.navigationsystem.NavigationSystem;
 import geolife.android.navigationsystem.NavmiiControl;
 import geolife.android.navigationsystem.NavmiiControl.MapCoord;
 
@@ -325,18 +324,28 @@ public class RouteView extends View
 		if (wayPointMarkers.size() == 0)
 			return -1;
 		
-		return wayPointMarkers.get(markerId).wayPointNumber;
+		
+		MarkerInfo info = wayPointMarkers.get(markerId);
+		if (info == null)
+			return -1;
+			
+		return info.wayPointNumber;
 	}
 	
 	protected long prevSelectedMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
-	public void SelectWayPointByMarkerId(long markerId)
+	public boolean SelectWayPointByMarkerId(long markerId)
 	{
+		if (!wayPointMarkers.containsKey(markerId))
+			return false;
+			
 		if (prevSelectedMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
-			navigationSystem.SetMarkerImage(prevSelectedMarkerId, resourcePath + "/bmp/arrowBlue.png");
+			navigationSystem.SetMarkerImage(prevSelectedMarkerId, resourcePath + "/bmp/arrowBlue.png", 0.5f, 0.5f);
 					
-		navigationSystem.SetMarkerImage(markerId, resourcePath + "/bmp/arrowGreen.png");
+		navigationSystem.SetMarkerImage(markerId, resourcePath + "/bmp/arrowGreen.png", 0.5f, 0.5f);
 		
 		prevSelectedMarkerId = markerId;
+		
+		return true;
 	}
 	
 	private DegPoint mapCenter = new DegPoint();
@@ -438,6 +447,15 @@ public class RouteView extends View
 		invalidate();
 	}
 
+	public void RefreshMarkers()
+	{
+		for (Map.Entry<Long, MarkerInfo> entry: wayPointMarkers.entrySet()) 
+		{ 
+			Long key = entry.getKey(); 
+			navigationSystem.SetMarkerHeading(key, entry.getValue().wayPoint.Heading);
+		} 
+	}
+	
 	public void SetMode(int mode)
 	{
 		// TODO Auto-generated method stub

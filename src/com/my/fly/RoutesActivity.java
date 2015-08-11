@@ -1,8 +1,10 @@
 package com.my.fly;
 
 import geolife.android.navigationsystem.NavmiiControl;
-import geolife.android.navigationsystem.NavigationSystem;
+import geolife.android.navigationsystem.NavmiiControl.Direction;
+import geolife.android.navigationsystem.NavmiiControl.DirectionType;
 import geolife.android.navigationsystem.NavmiiControl.MapCoord;
+import geolife.android.navigationsystem.NavmiiControl.RouteCalculationStatus;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -72,7 +74,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, NavmiiControl.ReverseLookupCallback, NavmiiControl.ControlEventListener, NavmiiControl.MapControlEventListener
+public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, NavmiiControl.ReverseLookupCallback, NavmiiControl.ControlEventListener, NavmiiControl.MapControlEventListener, NavmiiControl.UserItemsOnMapEventListener, NavmiiControl.OnRouteEventListener
 {
 	private DJIWrapper djiWrapper = new DJIWrapper();
 	private static final String TAG = "RoutesActivity";
@@ -140,12 +142,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		goHome.setEnabled(true);
 
 		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
-		navigationSystem = new NavigationSystem(this);	
+		navigationSystem = NavmiiControl.Create(this);
 		
 		navigationSystem.onCreate(mapView, resourcePath);
 		
 		navigationSystem.SetControlEventListener(this);
 		navigationSystem.SetMapControlEventListener(this);
+		navigationSystem.SetItemsOnMapEventListener(this);
+		navigationSystem.SetOnRouteEventListener(this);
 
 		routeView.SetNavigationSystem(navigationSystem, resourcePath);
 		
@@ -159,7 +163,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
-			AppendString("Can't init sdk");
+			AppendString("Can't init DJI sdk");
 	}
 
 	@Override
@@ -503,7 +507,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	private Route route = new Route();
 	protected void LoadRoute(String curRouteName)
-	{
+	{	
 		currentRouteName = curRouteName;
 		
 		route.LoadFromCSV(BASE_PATH, currentRouteName);
@@ -871,8 +875,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public void onUserMarkerClicked(long markerId)
 	{
-		routeView.SelectWayPointByMarkerId(markerId);	
-		WayPointSelected(markerId);
+		if (routeView.SelectWayPointByMarkerId(markerId))	
+			WayPointSelected(markerId);
 	}
 
 	@Override
@@ -883,10 +887,42 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public void onReverseLookupItemAdded(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7)
+	public void onControlInitialized()
+	{
+		LoadRoutesList();		
+	}
+
+	@Override
+	public void onUserMarkerUnpressed(long markerId)
+	{
+		SaveRoute(currentRouteName);	
+	}
+
+	@Override
+	public void onDirectionListCreated(Direction[] arg0)
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void onDirectionUpdated(float arg0, DirectionType arg1, DirectionType arg2, long arg3, float arg4)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUserMarkerLongPress(long arg0)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUserMarkerPressed(long markerId)
+	{
+		routeView.SelectWayPointByMarkerId(markerId);		
 	}
 
 	@Override
@@ -932,22 +968,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public void onUserMarkerMoved(long markerId, MapCoord newPosition)
-	{
-		int number = routeView.GetWayPointNumberByMarkerId(markerId);
-				
-		DegPoint degPoint = route.GetWayPoints().get(number).coord;
-		degPoint.Lon = newPosition.lon;
-		degPoint.Lat = newPosition.lat;	
-		
-		routeView.ChangeRoutePointPosition(number, newPosition);
-		routeView.SelectWayPointByMarkerId(markerId);
-		
-		route.RecalculateLength();
-		routeView.invalidate();
-	}
-
-	@Override
 	public void onZoomChanged(float arg0)
 	{
 		// TODO Auto-generated method stub
@@ -955,13 +975,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public void onControlInitialized()
-	{
-		LoadRoutesList();		
-	}
-
-	@Override
-	public void onRouteCalculationFinished(int arg0)
+	public void onRouteCalculationFinished(RouteCalculationStatus arg0)
 	{
 		// TODO Auto-generated method stub
 		
@@ -975,8 +989,34 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public void onUserMarkerStopMoving(long arg0)
+	public void onReverseLookupItemAdded(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7)
 	{
-		SaveRoute(currentRouteName);	
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUserMarkerMoved(long markerId, MapCoord newPosition)
+	{
+		int number = routeView.GetWayPointNumberByMarkerId(markerId);
+		
+		if (number >= 0)
+		{
+			DegPoint degPoint = route.GetWayPoints().get(number).coord;
+			degPoint.Lon = newPosition.lon;
+			degPoint.Lat = newPosition.lat;	
+		
+			routeView.ChangeRoutePointPosition(number, newPosition);
+		
+			route.RecalculateLength();
+			routeView.invalidate();
+		}
+		else
+		{
+			route.viewPoint.coord.Lon = newPosition.lon;
+			route.viewPoint.coord.Lat = newPosition.lat;
+			route.SetHeadingsToViewPoint();
+			routeView.RefreshMarkers();
+		}
 	}
 }
