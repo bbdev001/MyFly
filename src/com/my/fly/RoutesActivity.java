@@ -989,13 +989,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public void onReverseLookupItemAdded(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void onUserMarkerMoved(long markerId, MapCoord newPosition)
 	{
 		int number = routeView.GetWayPointNumberByMarkerId(markerId);
@@ -1018,5 +1011,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			route.SetHeadingsToViewPoint();
 			routeView.RefreshMarkers();
 		}
+	}
+
+	@Override
+	public void onReverseLookupItemAdded(String addressLine1, String addressLine2, String country, String county, String city, String adminHierarchy, String roadName, String roadNumber)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
