@@ -13,22 +13,12 @@ import dji.sdk.api.GroundStation.DJIGroundStationTask;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationFlightMode;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationGoHomeResult;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationHoverResult;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOneKeyFlyResult;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationResult;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationResumeResult;
-import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationTakeOffResult;
 import dji.sdk.api.GroundStation.DJIPhantomGroundStation;
 import dji.sdk.interfaces.DJIGroundStationExecuteCallBack;
 import dji.sdk.interfaces.DJIGroundStationExecutionPushInfoCallBack;
 import dji.sdk.interfaces.DJIGroundStationFlyingInfoCallBack;
-import dji.sdk.interfaces.DJIGroundStationGoHomeCallBack;
-import dji.sdk.interfaces.DJIGroundStationHoverCallBack;
 import dji.sdk.interfaces.DJIGroundStationMissionPushInfoCallBack;
-import dji.sdk.interfaces.DJIGroundStationOneKeyFlyCallBack;
-import dji.sdk.interfaces.DJIGroundStationResumeCallBack;
-import dji.sdk.interfaces.DJIGroundStationTakeOffCallBack;
 
 public class DJIGroundStation
 {
@@ -112,18 +102,18 @@ public class DJIGroundStation
 			@Override
 			public void onResult(GroundStationResult result)
 			{
-				if (result == GroundStationResult.GS_Result_Successed)
+				if (result == GroundStationResult.GS_Result_Success)
 				{
 					String message = "Ground station opened";
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, message));
 
-					object.oneKeyFly(new DJIGroundStationOneKeyFlyCallBack()
+					object.oneKeyFly(new DJIGroundStationExecuteCallBack()
 					{
 						@Override
-						public void onResult(GroundStationOneKeyFlyResult result)
+						public void onResult(GroundStationResult result)
 						{
 							String message;
-							if (result == GroundStationOneKeyFlyResult.GS_One_Key_Fly_Successed)
+							if (result == GroundStationResult.GS_Result_Success)
 							{
 								message = "oneKeyFly success";
 								DoHover();
@@ -154,14 +144,14 @@ public class DJIGroundStation
 			public void onResult(GroundStationResult result)
 			{
 				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Upload WP " + result.toString()));
-				if (result == GroundStationResult.GS_Result_Successed)
+				if (result == GroundStationResult.GS_Result_Success)
 				{
-					object.startGroundStationTask(new DJIGroundStationTakeOffCallBack()
+					object.startGroundStationTask(new DJIGroundStationExecuteCallBack()
 					{
 						@Override
-						public void onResult(GroundStationTakeOffResult result)
+						public void onResult(GroundStationResult result)
 						{
-							if (result == GroundStationTakeOffResult.GS_Takeoff_Successed)
+							if (result == GroundStationResult.GS_Result_Success)
 								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_STARTED, ""));
 							else
 								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS take off error " + result));
@@ -189,7 +179,7 @@ public class DJIGroundStation
 					@Override
 					public void onResult(GroundStationResult result)
 					{
-						if (result == GroundStationResult.GS_Result_Successed)
+						if (result == GroundStationResult.GS_Result_Success)
 						{
 							uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS open " + result));
 							GoOnRoute();
@@ -209,7 +199,7 @@ public class DJIGroundStation
 			@Override
 			public void onResult(GroundStationResult result)
 			{
-				if (result == GroundStationResult.GS_Result_Successed)
+				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_ENDED, ""));
 				else
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS closing error " + result));
@@ -219,12 +209,12 @@ public class DJIGroundStation
 	
 	public void PauseTask()
 	{
-		object.pauseGroundStationTask(new DJIGroundStationHoverCallBack()
+		object.pauseGroundStationTask(new DJIGroundStationExecuteCallBack()
 		{
 			@Override
-			public void onResult(GroundStationHoverResult result)
+			public void onResult(GroundStationResult result)
 			{
-				if (result == GroundStationHoverResult.GS_Hover_Successed)
+				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_PAUSED, ""));
 				else
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS pause error " + result));
@@ -234,12 +224,12 @@ public class DJIGroundStation
 
 	public void ResumeTask()
 	{
-		object.continueGroundStationTask(new DJIGroundStationResumeCallBack()
+		object.continueGroundStationTask(new DJIGroundStationExecuteCallBack()
 		{
 			@Override
-			public void onResult(GroundStationResumeResult result)
+			public void onResult(GroundStationResult result)
 			{
-				if (result == GroundStationResumeResult.GS_Resume_Successed)
+				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_RESUMED, ""));
 				else
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS resume error " + result));
@@ -249,12 +239,12 @@ public class DJIGroundStation
 
 	public void GoHome()
 	{
-		object.goHome(new DJIGroundStationGoHomeCallBack()
+		object.goHome(new DJIGroundStationExecuteCallBack()
 		{
 			@Override
-			public void onResult(GroundStationGoHomeResult result)
+			public void onResult(GroundStationResult result)
 			{
-				if (result == GroundStationGoHomeResult.GS_GoHome_Successed)
+				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_GO_HOME, ""));
 				else
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS go home error " + result));
@@ -279,12 +269,12 @@ public class DJIGroundStation
 				{
 					if (flightMode == GroundStationFlightMode.GS_Mode_Pause_1 || flightMode == GroundStationFlightMode.GS_Mode_Pause_2 || flightMode == GroundStationFlightMode.GS_Mode_Gps_Atti)
 					{
-						object.pauseGroundStationTask(new DJIGroundStationHoverCallBack()
+						object.pauseGroundStationTask(new DJIGroundStationExecuteCallBack()
 						{
 							@Override
-							public void onResult(GroundStationHoverResult result)
+							public void onResult(GroundStationResult result)
 							{
-								if (result == GroundStationHoverResult.GS_Hover_Successed)
+								if (result == GroundStationResult.GS_Result_Success)
 									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Hover done"));
 								else
 									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));

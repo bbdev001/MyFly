@@ -90,7 +90,11 @@ public class RouteView extends View
 	private int selectedPointIndex = -1;
 	private NavmiiControl navigationSystem = null;
 	private String resourcePath = "";
-
+	private float droneZLevel = 1.0f;
+	private float selectedWpZLevel = 0.9f;
+	private float wpZLevel = 0.8f;
+	private float routeLineZLevel = 0.7f;
+	
 	protected boolean isShowPress = false;
 
 	public interface OnWayPointSelected
@@ -175,11 +179,13 @@ public class RouteView extends View
 		if (droneMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
 		{
 			navigationSystem.SetMarkerPosition(droneMarkerId, dronePosition);
-			navigationSystem.SetMarkerHeading(droneMarkerId, (float)heading);		
+			navigationSystem.SetMarkerHeading(droneMarkerId, (float)heading);	
 		}
 		else
 			droneMarkerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowMagenta.png", dronePosition, (float)heading, 0.5f, 0.5f, false);
-			
+		
+		navigationSystem.SetItemOnMapZLevel(droneMarkerId, droneZLevel);
+
 		invalidate();
 	}
 
@@ -246,6 +252,7 @@ public class RouteView extends View
 			WayPoint wayPoint = wayPoints.get(i);		
 			MapCoord wpCoord = wayPoint.coord.ToMapCoord();		
 			long markerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, wayPoint.Heading, 0.5f, 0.5f, true);
+			navigationSystem.SetItemOnMapZLevel(markerId, wpZLevel);
 			
 			mbr.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
 			wayPointMarkers.put(markerId, new MarkerInfo(i, wayPoint));
@@ -311,7 +318,8 @@ public class RouteView extends View
 			routeLinePoints.add(wpCoord);
 		}
 
-		routeLineId = navigationSystem.CreatePolylineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));	
+		routeLineId = navigationSystem.CreatePolylineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));
+		navigationSystem.SetItemOnMapZLevel(routeLineId, routeLineZLevel);	
 	}
 	
 	public void ChangeRoutePointPosition(int index, MapCoord point)
@@ -323,7 +331,6 @@ public class RouteView extends View
 	{
 		if (wayPointMarkers.size() == 0)
 			return -1;
-		
 		
 		MarkerInfo info = wayPointMarkers.get(markerId);
 		if (info == null)
@@ -339,9 +346,13 @@ public class RouteView extends View
 			return false;
 			
 		if (prevSelectedMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
+		{
 			navigationSystem.SetMarkerImage(prevSelectedMarkerId, resourcePath + "/bmp/arrowBlue.png", 0.5f, 0.5f);
+			navigationSystem.SetItemOnMapZLevel(prevSelectedMarkerId, wpZLevel);
+		}
 					
 		navigationSystem.SetMarkerImage(markerId, resourcePath + "/bmp/arrowGreen.png", 0.5f, 0.5f);
+		navigationSystem.SetItemOnMapZLevel(markerId, selectedWpZLevel);
 		
 		prevSelectedMarkerId = markerId;
 		

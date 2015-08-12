@@ -180,7 +180,7 @@ public class Joystik
 			@Override
 			public void onResult(GroundStationResult result)
 			{
-				if (result != GroundStationResult.GS_Result_Successed)
+				if (result != GroundStationResult.GS_Result_Success)
 				{
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));
 					Log.e("Joystik", result.toString());
