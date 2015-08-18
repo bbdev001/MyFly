@@ -17,17 +17,19 @@ public class DJIMcu
 	private Context context = null;
 	private DJIMainControllerSystemState mcuState = null;
 	private DJIDroneType droneType = null;
+	private dji.sdk.api.MainController.DJIMainController object = null;
 	
 	public DJIMcu(DJIDroneType droneType, Context context, Handler handler)
 	{
 		this.context = context;
 		uiHandler = handler;
 		this.droneType = droneType;
+		object = DJIDrone.getDjiMainController();
 	}
 
 	public void Connect(int updateInterval)
 	{
-		DJIDrone.getDjiMC().setMcuErrorCallBack(new DJIMcuErrorCallBack()
+		object.setMcuErrorCallBack(new DJIMcuErrorCallBack()
 		{
 			@Override
 			public void onError(DJIMcErrorType error)
@@ -37,7 +39,7 @@ public class DJIMcu
 			}
 		});
 		
-		DJIDrone.getDjiMC().setMcuUpdateStateCallBack(new DJIMcuUpdateStateCallBack()
+		object.setMcuUpdateStateCallBack(new DJIMcuUpdateStateCallBack()
 		{
 			@Override
 			public void onResult(DJIMainControllerSystemState state)
@@ -52,9 +54,9 @@ public class DJIMcu
 
 	public void Disconnect()
 	{
-		DJIDrone.getDjiMC().stopUpdateTimer();	
-		DJIDrone.getDjiMC().setMcuUpdateStateCallBack(null);
-		DJIDrone.getDjiMC().setMcuErrorCallBack(null);
+		object.stopUpdateTimer();	
+		object.setMcuUpdateStateCallBack(null);
+		object.setMcuErrorCallBack(null);
 	}
 	
 	public boolean IsFlying()
@@ -67,12 +69,12 @@ public class DJIMcu
 
 	public void StartUpdateTimer(int interval)
 	{
-		DJIDrone.getDjiMC().startUpdateTimer(interval);
+		object.startUpdateTimer(interval);
 	}
 
 	public void StopUpdateTimer()
 	{
-		DJIDrone.getDjiMC().stopUpdateTimer();
+		object.stopUpdateTimer();
 	}
 
 	private String GetErrorDescriptionByErrorCode(DJIMcErrorType errCode)
@@ -143,3 +145,4 @@ public class DJIMcu
 		return result;
 	}
 }
+

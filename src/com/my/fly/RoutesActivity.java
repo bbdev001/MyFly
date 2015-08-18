@@ -32,6 +32,8 @@ import com.my.fly.utilities.MrcPoint;
 import com.my.fly.utilities.Utilities;
 import com.my.fly.utilities.WayPoint;
 
+import dji.midware.data.manager.P3.ServiceManager;
+import dji.midware.usb.P3.UsbAccessoryService;
 import dji.sdk.api.DJIDroneTypeDef.DJIDroneType;
 import dji.sdk.api.Battery.DJIBatteryProperty;
 import dji.sdk.api.Gimbal.DJIGimbalAttitude;
@@ -103,7 +105,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private Button errorMsgSize = null;
 	private String currentRouteName = "";
 	private DjiGLSurfaceView djiSurfaceView;
-	private DJIDroneType droneType = DJIDroneType.DJIDrone_Inspire1;
+	private DJIDroneType droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
 	private NavmiiControl navigationSystem;
 	private String resourcePath = "";
 	
@@ -116,7 +118,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
+        
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		Log.e(TAG, BASE_PATH);
@@ -287,7 +289,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				float[] distance = new float[3];
 				Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, distance);
 				
-				if (droneType == DJIDroneType.DJIDrone_Inspire1)
+				if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 					routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, Utilities.ConvertYawToHeading(status.yaw / 10.0));
 				else
 					routeView.SetDronePosition(lastPosition, status.altitude, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch, status.roll, Utilities.ConvertYawToHeading(status.yaw));
@@ -307,7 +309,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				break;
 			case DJIWrapper.GROUNDSTATION_FLYING_STATUS:
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
-				if (droneType == DJIDroneType.DJIDrone_Vision)
+				if (droneType == DJIDroneType.DJIDrone_Vision || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 					routeView.SetMissionFlightStatus(DJIWrapper.GetFlightMode(flyingInfo.flightMode), flyingInfo.targetWaypointIndex, "");
 				break;
 			case DJIWrapper.GROUNDSTATION_MISSION_STATUS:
@@ -790,7 +792,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case R.id.dronePhantom:
 			{
 				if (checked)
-					droneType = DJIDroneType.DJIDrone_Vision;
+					droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
 
 				break;
 			}

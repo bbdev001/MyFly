@@ -99,7 +99,8 @@ public class MainActivity extends Activity implements OnTouchListener, LocationL
 		errorMessages = (TextView) findViewById(R.id.errorMessages);
 
 		AppendString("Connecting to drone");
-		djiWrapper.InitSDK(DJIDroneType.DJIDrone_Inspire1, getApplicationContext(), this);
+		if (!djiWrapper.InitSDK(DJIDroneType.DJIDrone_Phantom3_Professional, getApplicationContext(), this))
+			AppendString("Can't connect to the drone");
 	}
 
 	@Override

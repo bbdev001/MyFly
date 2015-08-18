@@ -102,7 +102,7 @@ public class DJICamera
 			}
 		});
 
-		object.setCameraPhotoQuality(CameraPhotoQualityType.Camera_Photo_Quality_Normal , new DJIExecuteResultCallback()
+		/*object.setCameraPhotoQuality(CameraPhotoQualityType.Camera_Photo_Quality_Normal , new DJIExecuteResultCallback()
 		{
 			@Override 
 			public void onResult(DJIError result)
@@ -122,7 +122,7 @@ public class DJICamera
 			}
 		});
 		
-		/*object.setCameraPhotoSizeAndRatio(CameraPhotoSizeType.Camera_Photo_Size_4384x2922, CameraPhotoRatioType.Camera_Photo_Ratio_4_3, new DJIExecuteResultCallback()
+		object.setCameraPhotoSizeAndRatio(CameraPhotoSizeType.Camera_Photo_Size_4384x2922, CameraPhotoRatioType.Camera_Photo_Ratio_4_3, new DJIExecuteResultCallback()
 		{
 			@Override 
 			public void onResult(DJIError result)

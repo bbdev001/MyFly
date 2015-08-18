@@ -63,7 +63,7 @@ public class DJIWrapper
 		this.context = context;
 		uiHandler = new Handler(handlerCallback);
 		
-		if (!DJIDrone.initWithType(context, droneType/*DJIDroneType.DJIDrone_Vision*/))
+		if (!DJIDrone.initWithType(context, droneType))
 		{
 			//uiHandler.sendMessage(uiHandler.obtainMessage(ERROR_MESSAGE, "Can't init drone " + droneType.toString()));
 			return false;
@@ -94,7 +94,7 @@ public class DJIWrapper
 			if (cameraSurface != null)
 				GetCamera().Connect(cameraSurface, 250);
 
-			if (droneType == DJIDroneType.DJIDrone_Inspire1)
+			if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 				GetRemoteController().Connect(250);
 			
 			GetMcu().Connect(250);
@@ -106,7 +106,7 @@ public class DJIWrapper
 	
 	public void  DisconnectDroneDevices()
 	{
-		if (droneType == DJIDroneType.DJIDrone_Inspire1)
+		if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 			GetRemoteController().Disconnect();
 		
 		GetCamera().Disconnect();
@@ -185,7 +185,7 @@ public class DJIWrapper
 	
 	public void Destroy()
 	{
-		if (droneType == DJIDroneType.DJIDrone_Inspire1)
+		if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 			remoteController.Disconnect();
 		
 		camera.Disconnect();

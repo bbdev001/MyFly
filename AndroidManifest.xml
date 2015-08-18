@@ -24,7 +24,11 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.usb.accessory" android:required="false" />
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
 
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -51,9 +55,16 @@
             android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+    
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
+                android:resource="@xml/accessory_filter" />
         </activity>
         <activity
             android:name=".MainActivity"

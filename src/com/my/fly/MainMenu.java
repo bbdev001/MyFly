@@ -1,7 +1,11 @@
 package com.my.fly;
 
+import dji.midware.data.manager.P3.ServiceManager;
+import dji.midware.usb.P3.DJIUsbAccessoryReceiver;
+import dji.midware.usb.P3.UsbAccessoryService;
 import android.app.Activity;
 import android.content.Intent;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,13 +18,22 @@ import android.view.View;
 
 public class MainMenu extends Activity
 {
-
+	private static boolean isStarted = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		
+        
 		super.onCreate(savedInstanceState);
+		
+		if (!isStarted)
+		{
+			isStarted = true;
+			ServiceManager.getInstance();
+			UsbAccessoryService.registerAoaReceiver(this);
+		}
+        
 		setContentView(R.layout.activity_main_menu);
 
 		ListView listView = (ListView) findViewById(R.id.droneTypes);
@@ -36,7 +49,7 @@ public class MainMenu extends Activity
 			public void onItemClick(AdapterView<?> arg0, View v, int index, long arg3)
 			{
 				Intent intent = null;
-
+                
 				switch (index)
 				{
 					case 0:
@@ -50,6 +63,18 @@ public class MainMenu extends Activity
 
 				intent.putExtra("DroneType", index);
 				startActivity(intent);
+				
+				Intent aoaIntent = getIntent();
+				if (aoaIntent != null)
+				{
+					String action = aoaIntent.getAction();
+					if (action == UsbManager.ACTION_USB_ACCESSORY_ATTACHED || action == Intent.ACTION_MAIN)
+					{
+						Intent attachedIntent = new Intent();
+						attachedIntent.setAction(DJIUsbAccessoryReceiver.ACTION_USB_ACCESSORY_ATTACHED);
+						sendBroadcast(attachedIntent);
+					}
+				}
 			}
 		});
 	}
