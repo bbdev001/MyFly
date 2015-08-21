@@ -290,7 +290,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, distance);
 				
 				if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
-					routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, Utilities.ConvertYawToHeading(status.yaw / 10.0));
+				{
+					//routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, Utilities.ConvertYawToHeading(status.yaw / 10.0));
+					routeView.SetDronePosition(lastPosition, status.altitude / 10.0, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch / 10.0, status.roll / 10.0, status.yaw / 10.0);
+				}
 				else
 					routeView.SetDronePosition(lastPosition, status.altitude, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch, status.roll, Utilities.ConvertYawToHeading(status.yaw));
 				

@@ -12,6 +12,8 @@ import com.my.fly.utilities.Utilities;
 import com.my.fly.utilities.WayPoint;
 
 import dji.sdk.api.GroundStation.DJIGroundStationTask;
+import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationMovingMode;
+import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationPathMode;
 import dji.sdk.api.GroundStation.DJIGroundStationWaypoint;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOnWayPointAction;
 
@@ -26,12 +28,13 @@ public class TaskBuilder
 		{
 			WayPoint wp = route.wayPoints.get(i);
 			DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wp.coord.Lat, wp.coord.Lon);
+			gsWayPoint.action.actionRepeat = 1;
 			gsWayPoint.altitude = (float) wp.Alt;
 			gsWayPoint.heading = useViewPoint ? (short)Utilities.ConvertHeadingToYaw(wp.Heading) : 0;
 			gsWayPoint.speed = (float) wp.Speed;
 			gsWayPoint.maxReachTime = 0;//Does not work
 			gsWayPoint.stayTime = 0;//Does not work, uses action
-			gsWayPoint.turnMode = 0;
+			gsWayPoint.turnMode = 1;
 			gsWayPoint.hasAction = true;
 
 			if (useViewPoint)
@@ -41,10 +44,13 @@ public class TaskBuilder
 			}
 			
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
-			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wp.HoverTime * 5);
             		
 			gsTask.addWaypoint(gsWayPoint);
 		}
+		
+		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
+		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
+        gsTask.wayPointCount = gsTask.getAllWaypoint().size();		
 	}
 	
 	public static void BuildMyHomeRoute(DJIGroundStationTask gsTask, DegPoint lastPosition, DegPoint userPosition)
@@ -65,7 +71,7 @@ public class TaskBuilder
 		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 0;
-		gsWayPoint.turnMode = 0;
+		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -76,7 +82,7 @@ public class TaskBuilder
 		gsWayPoint.speed = speed;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 0;
-		gsWayPoint.turnMode = 0;
+		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -87,9 +93,13 @@ public class TaskBuilder
 		gsWayPoint.speed = 2.0f;
 		gsWayPoint.maxReachTime = 0;
 		gsWayPoint.stayTime = 0;
-		gsWayPoint.turnMode = 0;
+		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
+		
+		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
+		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
+        gsTask.wayPointCount = gsTask.getAllWaypoint().size();		
 	}
 	
 	public static double GetViewRadius(int fov, double altitude)
@@ -151,6 +161,10 @@ public class TaskBuilder
 			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
 		else
 			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
+			
+		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
+		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
+        gsTask.wayPointCount = gsTask.getAllWaypoint().size();
 	}
 	
 	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
@@ -245,3 +259,4 @@ public class TaskBuilder
 		}	
 	}	
 }
+
