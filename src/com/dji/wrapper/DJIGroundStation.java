@@ -168,12 +168,12 @@ public class DJIGroundStation
 	public void StartTask(DJIGroundStationTask task)
 	{
 		gsTask = task;
-		object.closeGroundStation(new DJIGroundStationExecuteCallBack()
-		{
-			@Override
-			public void onResult(GroundStationResult result)
-			{
-				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));
+		//object.closeGroundStation(new DJIGroundStationExecuteCallBack()
+		//{
+			//@Override
+			//public void onResult(GroundStationResult result)
+			//{
+				//uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));
 				object.openGroundStation(new DJIGroundStationExecuteCallBack()
 				{
 					@Override
@@ -188,8 +188,8 @@ public class DJIGroundStation
 							uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS does not open " + result));
 					}
 				});
-			}
-		});		
+			//}
+		//});		
 	}
 
 	public void StopTask()
