@@ -12,6 +12,7 @@ import com.my.fly.utilities.Utilities;
 import com.my.fly.utilities.WayPoint;
 
 import dji.sdk.api.GroundStation.DJIGroundStationTask;
+import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationFinishAction;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationMovingMode;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.DJIGroundStationPathMode;
 import dji.sdk.api.GroundStation.DJIGroundStationWaypoint;
@@ -32,8 +33,8 @@ public class TaskBuilder
 			gsWayPoint.altitude = (float) wp.Alt;
 			gsWayPoint.heading = useViewPoint ? (short)Utilities.ConvertHeadingToYaw(wp.Heading) : 0;
 			gsWayPoint.speed = 5.0f;//(float) wp.Speed;
-			//gsWayPoint.maxReachTime = 0;//Does not work
-			gsWayPoint.stayTime = 1;//Does not work, uses action
+			gsWayPoint.dampingDistance = 1.0f;
+			gsWayPoint.actionTimeout = 5;
 			gsWayPoint.turnMode = 1;
 			gsWayPoint.hasAction = true;
 
@@ -48,6 +49,7 @@ public class TaskBuilder
 			gsTask.addWaypoint(gsWayPoint);
 		}
 		
+		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
         gsTask.wayPointCount = gsTask.getAllWaypoint().size();		
