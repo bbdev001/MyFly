@@ -31,9 +31,9 @@ public class TaskBuilder
 			gsWayPoint.action.actionRepeat = 1;
 			gsWayPoint.altitude = (float) wp.Alt;
 			gsWayPoint.heading = useViewPoint ? (short)Utilities.ConvertHeadingToYaw(wp.Heading) : 0;
-			gsWayPoint.speed = (float) wp.Speed;
-			gsWayPoint.maxReachTime = 0;//Does not work
-			gsWayPoint.stayTime = 0;//Does not work, uses action
+			gsWayPoint.speed = 5.0f;//(float) wp.Speed;
+			//gsWayPoint.maxReachTime = 0;//Does not work
+			gsWayPoint.stayTime = 1;//Does not work, uses action
 			gsWayPoint.turnMode = 1;
 			gsWayPoint.hasAction = true;
 
