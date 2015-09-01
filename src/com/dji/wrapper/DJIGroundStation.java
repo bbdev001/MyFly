@@ -250,7 +250,7 @@ public class DJIGroundStation
 
 	private boolean takingOff = false;
 	private boolean takeOffDone = false;
-	private float takeOffAlt = 3.0f;
+	private float takeOffAlt = 5.0f;
 
 	public void DoHover()
 	{
@@ -274,31 +274,38 @@ public class DJIGroundStation
 							{
 								if (result == GroundStationResult.GS_Result_Success)
 								{
+									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Hover done"));
 									takeOffDone = true;
-									if (flyingInfo.altitude < takeOffAlt)
-										gsWrapper.GetJoystik().Top();
-									else
-										gsWrapper.GetJoystik().Bottom();
 								}
 								else
 								{
 									takingOff = false;
-									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));
+									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Hover error" + result.toString()));
 								}
 							}
 						});
 					}
 
-					DJIWrapper.Sleep(10);
+					if (takeOffDone)
+					{
+						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Adjust alt " + flyingInfo.altitude + " " + takeOffAlt));
+						if (flyingInfo.altitude < takeOffAlt)
+							gsWrapper.GetJoystik().Top();
+						else
+							gsWrapper.GetJoystik().Bottom();
+					}
+					else
+						DJIWrapper.Sleep(10);
 				}
 
 				if (takeOffDone)
 				{
 					gsWrapper.GetJoystik().StopLeftJoystik();
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE, takingOff));
-					takeOffDone = false;
-					takingOff = false;
 				}
+
+				takeOffDone = false;
+				takingOff = false;
 			}
 		}.start();
 	}

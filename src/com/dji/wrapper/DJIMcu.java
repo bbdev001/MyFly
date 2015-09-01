@@ -139,7 +139,7 @@ public class DJIMcu
 		}
 		else if (errCode == DJIMcErrorType.Mc_Unknown_Error)
 		{
-			result = context.getString(R.string.MCU_UNKOWN_ERROR);
+			//result = context.getString(R.string.MCU_UNKOWN_ERROR);
 		}
 
 		return result;

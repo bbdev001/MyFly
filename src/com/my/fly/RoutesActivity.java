@@ -308,6 +308,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
 				break;
 			case DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE:
+				AppendString("Take off done");
 				djiWrapper.GetGroundStation().StartTask(gsTask);
 				break;
 			case DJIWrapper.GROUNDSTATION_MISSION_STATUS:

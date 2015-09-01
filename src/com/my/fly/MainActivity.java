@@ -121,7 +121,7 @@ public class MainActivity extends Activity implements OnTouchListener, LocationL
 				break;
 			case DJIWrapper.GROUNDSTATION_FLYING_STATUS:
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
-				AppendString("GS_FLYING_STATE " + flyingInfo.flightMode.toString());
+				//AppendString("GS_FLYING_STATE " + flyingInfo.flightMode.toString());
 				break;
 			default:
 				break;
