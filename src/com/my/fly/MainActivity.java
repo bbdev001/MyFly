@@ -220,9 +220,7 @@ public class MainActivity extends Activity implements OnTouchListener, LocationL
 	public void OnTakeOff(View v)
 	{
 		if (!djiWrapper.GetMcu().IsFlying())
-			djiWrapper.GetGroundStation().TakeOff();
-		else
-			djiWrapper.GetGroundStation().DoHover();
+			djiWrapper.GetGroundStation().TakeOff(5.0f);
 	}
 
 	@Override

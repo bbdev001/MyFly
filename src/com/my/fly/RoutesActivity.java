@@ -306,8 +306,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				break;
 			case DJIWrapper.GROUNDSTATION_FLYING_STATUS:
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
-				if (droneType == DJIDroneType.DJIDrone_Vision || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
-					routeView.SetMissionFlightStatus(DJIWrapper.GetFlightMode(flyingInfo.flightMode), flyingInfo.targetWaypointIndex, "");
+				break;
+			case DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE:
+				djiWrapper.GetGroundStation().StartTask(gsTask);
 				break;
 			case DJIWrapper.GROUNDSTATION_MISSION_STATUS:
 			{
@@ -560,7 +561,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (!routeStarted)
 		{
 			AppendString("Start task");
-			djiWrapper.GetGroundStation().StartTask(gsTask);
+			if (djiWrapper.GetMcu().IsFlying())
+				djiWrapper.GetGroundStation().StartTask(gsTask);
+			else
+				djiWrapper.GetGroundStation().TakeOff(7.0f);
 		}
 		else if (routePaused)
 		{
@@ -720,7 +724,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		navigationSystem.onConfigurationChanged(newConfig);
 	}
 	
-	
+
 	protected int selectedWayPointId = -1;
 
 
