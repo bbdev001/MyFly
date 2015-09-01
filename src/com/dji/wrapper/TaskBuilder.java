@@ -32,17 +32,14 @@ public class TaskBuilder
 			gsWayPoint.action.actionRepeat = 1;
 			gsWayPoint.altitude = (float) wp.Alt;
 			gsWayPoint.heading = useViewPoint ? (short)Utilities.ConvertHeadingToYaw(wp.Heading) : 0;
-			gsWayPoint.speed = 5.0f;//(float) wp.Speed;
+			gsWayPoint.speed = (float) wp.Speed;
 			gsWayPoint.dampingDistance = 1.0f;
 			gsWayPoint.actionTimeout = 5;
 			gsWayPoint.turnMode = 1;
 			gsWayPoint.hasAction = true;
 
 			if (useViewPoint)
-			{
-				//gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)Utilities.ConvertHeadingToYaw(wp.Heading));				
 				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);// 0 - -89
-			}
 			
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
             		
@@ -68,38 +65,42 @@ public class TaskBuilder
 		
 		//Move top
 		DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(lastPosition.Lat, lastPosition.Lon);
+		gsWayPoint.action.actionRepeat = 0;
 		gsWayPoint.altitude = 45.0f;
 		gsWayPoint.heading = 0;
 		gsWayPoint.speed = speed;
-		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 0;
+		gsWayPoint.dampingDistance = 1.0f;
+		gsWayPoint.actionTimeout = 1;
 		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
 		//Move to home
 		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat - 10.0, userPosition.Lon - 10.0);
+		gsWayPoint.action.actionRepeat = 0;
 		gsWayPoint.altitude = 45.0f;
 		gsWayPoint.heading = 0;
 		gsWayPoint.speed = speed;
-		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 0;
+		gsWayPoint.dampingDistance = 1.0f;
+		gsWayPoint.actionTimeout = 1;
 		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
 		//Move down
 		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
+		gsWayPoint.action.actionRepeat = 0;
 		gsWayPoint.altitude = 3.0f;
 		gsWayPoint.heading = 0;
 		gsWayPoint.speed = 2.0f;
-		gsWayPoint.maxReachTime = 0;
-		gsWayPoint.stayTime = 0;
+		gsWayPoint.dampingDistance = 1.0f;
+		gsWayPoint.actionTimeout = 1;
 		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 		
-		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
+		gsTask.finishAction = DJIGroundStationFinishAction.None;		
+		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingTowardNextWaypoint;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
         gsTask.wayPointCount = gsTask.getAllWaypoint().size();		
 	}
@@ -163,10 +164,28 @@ public class TaskBuilder
 			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
 		else
 			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
-			
+		
+		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
         gsTask.wayPointCount = gsTask.getAllWaypoint().size();
+	}
+	
+	protected static DJIGroundStationWaypoint CreateMappingWayPoint(WayPoint wayPoint, int camAngle)
+	{
+				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon);
+				gsWayPoint.action.actionRepeat = 1;
+				gsWayPoint.altitude = wayPoint.Alt;
+				gsWayPoint.heading = (short)Utilities.ConvertHeadingToYaw(wayPoint.Heading);
+				gsWayPoint.speed = wayPoint.Speed;
+				gsWayPoint.dampingDistance = 1.0f;
+				gsWayPoint.actionTimeout = 5;
+				gsWayPoint.turnMode = 0;
+				gsWayPoint.hasAction = true;
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, (camAngle > 0 ? -camAngle : camAngle));
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
+
+		return gsWayPoint;
 	}
 	
 	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
@@ -192,19 +211,7 @@ public class TaskBuilder
 				wayPoint.HoverTime = 1;
 				route.mappingWayPoints.add(wayPoint);
 				
-				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon);
-				gsWayPoint.altitude = wayPoint.Alt;
-				gsWayPoint.heading = (short)Utilities.ConvertHeadingToYaw(wayPoint.Heading);
-				gsWayPoint.speed = wayPoint.Speed;
-				gsWayPoint.maxReachTime = 0;
-				gsWayPoint.stayTime = (short)(wayPoint.HoverTime);
-				gsWayPoint.turnMode = 0;
-				gsWayPoint.hasAction = true;
-				//gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)Utilities.ConvertHeadingToYaw(wayPoint.Heading));
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, camAngle);
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
-				//gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
-				gsTask.addWaypoint(gsWayPoint);
+				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
 				
 				cur.Lon += Utilities.MetersToDeg(stepH);
 			}
@@ -238,19 +245,7 @@ public class TaskBuilder
 				wayPoint.HoverTime = 1;
 				route.mappingWayPoints.add(wayPoint);
 				
-				DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon);
-				gsWayPoint.altitude = wayPoint.Alt;
-				gsWayPoint.heading = (short)Utilities.ConvertHeadingToYaw(wayPoint.Heading);
-				gsWayPoint.speed = wayPoint.Speed;
-				gsWayPoint.maxReachTime = 0;
-				gsWayPoint.stayTime = (short)(wayPoint.HoverTime * 10);
-				gsWayPoint.turnMode = 0;
-				gsWayPoint.hasAction = true;
-				//gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Craft_Yaw, (int)Utilities.ConvertHeadingToYaw(wayPoint.Heading));
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, (camAngle > 0 ? -camAngle : camAngle));
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
-				//gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Stay, wayPoint.HoverTime * 10);		
-				gsTask.addWaypoint(gsWayPoint);
+				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
 				
 				cur.Lat -= Utilities.MetersToDeg(stepV);
 			}

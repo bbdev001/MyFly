@@ -37,12 +37,13 @@ public class DJIGroundStation
 	private DJIDroneType droneType = null;
 	private DJIGroundStationFlyingInfo flyingInfo = new DJIGroundStationFlyingInfo();
 	private DJIGroundStation gsWrapper = null;
+
 	public DJIGroundStation(DJIDroneType droneType, Context context, Handler handler)
 	{
 		this.context = context;
 		this.uiHandler = handler;
 		this.droneType = droneType;
-		
+
 		gsWrapper = this;
 		object = DJIDrone.getDjiGroundStation();
 		vibro = (Vibrator) this.context.getSystemService(Context.VIBRATOR_SERVICE);
@@ -52,11 +53,11 @@ public class DJIGroundStation
 	public void Connect(int interval)
 	{
 		if (droneType == DJIDroneType.DJIDrone_Inspire1)
-		{	
-			//((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setHorizontalControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
-			//((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setYawControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
-		}		
-	
+		{
+			// ((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setHorizontalControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
+			// ((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setYawControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
+		}
+
 		object.setGroundStationFlyingInfoCallBack(new DJIGroundStationFlyingInfoCallBack()
 		{
 			@Override
@@ -96,8 +97,8 @@ public class DJIGroundStation
 
 	public void TakeOff(float takeOffAlt)
 	{
-		this.takeOffAlt = takeOffAlt;
-		
+		this.takeOffAlt = takeOffAlt < 5.0f ? 5.0f: takeOffAlt;
+
 		Log.e("Ground station", "Take off");
 		object.openGroundStation(new DJIGroundStationExecuteCallBack()
 		{
@@ -166,23 +167,23 @@ public class DJIGroundStation
 		});
 
 	}
-	
+
 	public void StartTask(DJIGroundStationTask task)
 	{
 		gsTask = task;
 		DJIDrone.getDjiGroundStation().openGroundStation(new DJIGroundStationExecuteCallBack()
 		{
-				@Override
-				public void onResult(GroundStationResult result)
+			@Override
+			public void onResult(GroundStationResult result)
+			{
+				if (result == GroundStationResult.GS_Result_Success)
 				{
-					if (result == GroundStationResult.GS_Result_Success)
-					{
-						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS open " + result));
-						GoOnRoute();
-					}
-					else
-						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS does not open " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS open " + result));
+					GoOnRoute();
 				}
+				else
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS does not open " + result));
+			}
 		});
 
 	}
@@ -199,9 +200,9 @@ public class DJIGroundStation
 				else
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS closing error " + result));
 			}
-		});	
+		});
 	}
-	
+
 	public void PauseTask()
 	{
 		object.pauseGroundStationTask(new DJIGroundStationExecuteCallBack()
@@ -246,10 +247,11 @@ public class DJIGroundStation
 			}
 		});
 	}
-	
+
 	private boolean takingOff = false;
+	private boolean takeOffDone = false;
 	private float takeOffAlt = 3.0f;
-	
+
 	public void DoHover()
 	{
 		if (takingOff)
@@ -261,11 +263,8 @@ public class DJIGroundStation
 			@Override
 			public void run()
 			{
-				while (takingOff && Math.abs(takeOffAlt - flyingInfo.altitude) > 1.5f)
+				while (takingOff && Math.abs(takeOffAlt - flyingInfo.altitude) > 1.0f)
 				{
-					if (flyingInfo.altitude < 1.5f)
-						break;
-					
 					if (flyingInfo.flightMode == GroundStationFlightMode.GS_Mode_Pause_1 || flyingInfo.flightMode == GroundStationFlightMode.GS_Mode_Pause_2 || flyingInfo.flightMode == GroundStationFlightMode.GS_Mode_Gps_Atti)
 					{
 						object.pauseGroundStationTask(new DJIGroundStationExecuteCallBack()
@@ -274,17 +273,18 @@ public class DJIGroundStation
 							public void onResult(GroundStationResult result)
 							{
 								if (result == GroundStationResult.GS_Result_Success)
-								{																
+								{
+									takeOffDone = true;
 									if (flyingInfo.altitude < takeOffAlt)
 										gsWrapper.GetJoystik().Top();
 									else
 										gsWrapper.GetJoystik().Bottom();
 								}
 								else
-								{								
+								{
 									takingOff = false;
-									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));									
-								}									
+									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, result.toString()));
+								}
 							}
 						});
 					}
@@ -292,11 +292,12 @@ public class DJIGroundStation
 					DJIWrapper.Sleep(10);
 				}
 
-				if (takingOff)
-				{	
+				if (takeOffDone)
+				{
 					gsWrapper.GetJoystik().StopLeftJoystik();
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE, takingOff));
-					takingOff = false;	
+					takeOffDone = false;
+					takingOff = false;
 				}
 			}
 		}.start();
