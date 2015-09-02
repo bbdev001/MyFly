@@ -34,16 +34,16 @@ public class DJIWrapper
 	public static final int CAMERA_FILE_INFO = 17;
 	public static final int GIMBAL_STATUS = 18;
 	public static final int GROUNDSTATION_TAKE_OFF_DONE = 19;
-		
-    public static final int NAVI_MODE_ATTITUDE = 0;
-    public static final int NAVI_MODE_WAYPOINT = 1;
-    public static final int EXECUTION_STATUS_UPLOAD_FINISH = 0;
-    public static final int EXECUTION_STATUS_FINISH = 1;
-    public static final int EXECUTION_STATUS_REACH_POINT = 2;
-    public static final int CAMERA_FOV = 90;
-    
+
+	public static final int NAVI_MODE_ATTITUDE = 0;
+	public static final int NAVI_MODE_WAYPOINT = 1;
+	public static final int EXECUTION_STATUS_UPLOAD_FINISH = 0;
+	public static final int EXECUTION_STATUS_FINISH = 1;
+	public static final int EXECUTION_STATUS_REACH_POINT = 2;
+	public static final int CAMERA_FOV = 90;
+
 	private static final String TAG = "DjiWrapper";
-	
+
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Inspire1;
 	private com.dji.wrapper.DJICamera camera = null;
 	private com.dji.wrapper.DJIMcu mcu = null;
@@ -55,39 +55,46 @@ public class DJIWrapper
 	private Handler uiHandler = null;
 
 	public boolean IsInited = false;
-	
+
 	public boolean InitSDK(DJIDroneType droneType, Context context, Handler.Callback handlerCallback)
 	{
 		Log.i(TAG, "Init SDK");
-		
-		this.droneType = droneType;
-		this.context = context;
-		uiHandler = new Handler(handlerCallback);
-		
-		if (!DJIDrone.initWithType(context, droneType))
-		{
-			//uiHandler.sendMessage(uiHandler.obtainMessage(ERROR_MESSAGE, "Can't init drone " + droneType.toString()));
-			return false;
-		}
-		
-		if (!DJIDrone.connectToDrone())
-		{
-			//uiHandler.sendMessage(uiHandler.obtainMessage(ERROR_MESSAGE, "Can't connect to drone " + droneType.toString()));
-			return false;
-		}
 
-		CheckPermission(context);
-		
-		camera = new DJICamera(droneType, context, uiHandler);		
-		mcu = new DJIMcu(droneType, context, uiHandler);
-		groundStation = new DJIGroundStation(droneType, context, uiHandler);
-		battery = new DJIBattery(droneType, context, uiHandler);
-		gimbal = new DJIGimbal(droneType, context, uiHandler);
-		remoteController = new DJIRemoteController(droneType, context, uiHandler);
-		
+		boolean crashed = false;
+		do
+		{
+			try
+			{
+				this.droneType = droneType;
+				this.context = context;
+				uiHandler = new Handler(handlerCallback);
+
+				if (!DJIDrone.initWithType(context, droneType))
+					return false;
+
+				if (!DJIDrone.connectToDrone())
+					return false;
+
+				CheckPermission(context);
+
+				camera = new DJICamera(droneType, context, uiHandler);
+				mcu = new DJIMcu(droneType, context, uiHandler);
+				groundStation = new DJIGroundStation(droneType, context, uiHandler);
+				battery = new DJIBattery(droneType, context, uiHandler);
+				gimbal = new DJIGimbal(droneType, context, uiHandler);
+				remoteController = new DJIRemoteController(droneType, context, uiHandler);
+			}
+			catch (Exception e)
+			{
+				Log.e(TAG, e.toString());
+				crashed = true;
+			}
+		}
+		while (crashed);
+
 		return true;
 	}
-	
+
 	public void ConnectDroneDevices(DjiGLSurfaceView cameraSurface)
 	{
 		if (IsInited)
@@ -97,34 +104,34 @@ public class DJIWrapper
 
 			if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 				GetRemoteController().Connect(250);
-			
+
 			GetMcu().Connect(250);
 			GetGroundStation().Connect(250);
 			GetGimbal().Connect(250);
 			GetBattery().Connect(2000);
 		}
 	}
-	
-	public void  DisconnectDroneDevices()
+
+	public void DisconnectDroneDevices()
 	{
 		if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 			GetRemoteController().Disconnect();
-		
+
 		GetCamera().Disconnect();
 		GetMcu().Disconnect();
 		GetGroundStation().Disconnect();
 		GetGimbal().Disconnect();
 		GetBattery().Disconnect();
 	}
-	
+
 	public int GetPermissionErrorResult = 0;
-	public String GetPermissionErrorResultMessage = ""; 
-	
+	public String GetPermissionErrorResultMessage = "";
+
 	protected void CheckPermission(Context appContext)
 	{
 		IsInited = false;
 		context = appContext;
-		
+
 		Thread t = new Thread()
 		{
 			public void run()
@@ -150,8 +157,8 @@ public class DJIWrapper
 				}
 			}
 		};
-		
-		t.start();	
+
+		t.start();
 	}
 
 	public DJICamera GetCamera()
@@ -178,24 +185,24 @@ public class DJIWrapper
 	{
 		return battery;
 	}
-	
+
 	public DJIRemoteController GetRemoteController()
 	{
 		return remoteController;
 	}
-	
+
 	public void Destroy()
 	{
 		if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
 			remoteController.Disconnect();
-		
+
 		camera.Disconnect();
 		mcu.Disconnect();
-		groundStation.Disconnect();	
+		groundStation.Disconnect();
 		battery.Disconnect();
-				
+
 		DJIDrone.disconnectToDrone();
-		
+
 		Log.i(TAG, "Destroy");
 	}
 
@@ -210,103 +217,103 @@ public class DJIWrapper
 			e.printStackTrace();
 		}
 	}
-	
+
 	private String GetPermissionErrorText(int code)
 	{
 		String result = "";
 
 		switch (code)
 		{
-		case 0:
-			result = "Obtain Permission Successfully";
-			break;
-		case -1:
-			result = "Cannot connect to Internet";
-			break;
-		case -2:
-			result = "The Meta data is invalid";
-			break;
-		case -3:
-			result = "JDK do not support AES 256";
-			break;
-		case -4:
-			result = "Failed to obtain Device ID";
-			break;
-		case -5:
-			result = "Failed to encrypt AES 256";
-			break;
-		case -6:
-			result = "Failed to parse the permission data";
-			break;
-		case -7:
-			result = "App key is forbidden";
-			break;
-		case -8:
-			result = "The active device numbers are up to maximal.";
-			break;
-		case -9:
-			result = "Parse request URL error";
-			break;
-		case -10:
-			result = "Unknown error";
-			break;
+			case 0:
+				result = "Obtain Permission Successfully";
+				break;
+			case -1:
+				result = "Cannot connect to Internet";
+				break;
+			case -2:
+				result = "The Meta data is invalid";
+				break;
+			case -3:
+				result = "JDK do not support AES 256";
+				break;
+			case -4:
+				result = "Failed to obtain Device ID";
+				break;
+			case -5:
+				result = "Failed to encrypt AES 256";
+				break;
+			case -6:
+				result = "Failed to parse the permission data";
+				break;
+			case -7:
+				result = "App key is forbidden";
+				break;
+			case -8:
+				result = "The active device numbers are up to maximal.";
+				break;
+			case -9:
+				result = "Parse request URL error";
+				break;
+			case -10:
+				result = "Unknown error";
+				break;
 		}
 
 		return result;
 	}
-	
+
 	public static String GetMissionExecutionState(int state)
 	{
 		String result = "";
 		GroundStationWayPointExecutionState execState = GroundStationWayPointExecutionState.find(state);
-		switch(execState)
+		switch (execState)
 		{
 			case Way_Point_Execution_Init:
 				result = "Init";
-			break;
+				break;
 			case Way_Point_Execution_Moving:
 				result = "Moving";
-			break;
+				break;
 			case Way_Point_Execution_Rotating:
 				result = "Rotating";
-			break;
+				break;
 			case Way_Point_Execution_Inaction:
 				result = "Incation";
-			break;
+				break;
 			case Way_Point_Execution_Reach_Pre_Action:
 				result = "Pre action";
-			break;
+				break;
 			case Way_Point_Execution_Reach_Post_Action:
 				result = "Post action";
-			break;
+				break;
 		}
-				
+
 		return result;
 	}
 
 	public static String GetMissionType(GroundStationStatusPushType missionType)
 	{
 		String result = "";
-		
-		switch(missionType)
+
+		switch (missionType)
 		{
 			case Navi_Mode_Attitude:
 				result = "Attitude";
-			break;
+				break;
 			case Navi_Mode_Waypoint:
 				result = "Way point";
-			break;
+				break;
 			case Navi_Mode_Hotpoint:
 				result = "Hot point";
-			break;
+				break;
 			case Navi_Mode_FollowMe:
 				result = "Follow me";
-			break;
+				break;
 		}
-		
+
 		return result;
 	}
-	
+
 	public static String GetFlightMode(DJIGroundStationTypeDef.GroundStationFlightMode mode)
 	{
 		String result = "";
@@ -394,7 +401,7 @@ public class DJIWrapper
 				result = "Way point";
 				break;
 		}
-		
+
 		return result;
 	}
 }

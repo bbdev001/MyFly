@@ -37,6 +37,7 @@ public class DJIGroundStation
 	private DJIDroneType droneType = null;
 	private DJIGroundStationFlyingInfo flyingInfo = new DJIGroundStationFlyingInfo();
 	private DJIGroundStation gsWrapper = null;
+	private boolean isAltAdjustmentNeeded = false;
 
 	public DJIGroundStation(DJIDroneType droneType, Context context, Handler handler)
 	{
@@ -52,18 +53,17 @@ public class DJIGroundStation
 
 	public void Connect(int interval)
 	{
-		if (droneType == DJIDroneType.DJIDrone_Inspire1)
-		{
-			// ((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setHorizontalControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
-			// ((dji.sdk.api.GroundStation.DJIInspireGroundStation)object).setYawControlCoordinateSystem(DJIGroundStationTypeDef.DJINavigationFlightControlCoordinateSystem.Navigation_Flight_Control_Coordinate_System_Ground);
-		}
-
 		object.setGroundStationFlyingInfoCallBack(new DJIGroundStationFlyingInfoCallBack()
 		{
 			@Override
 			public void onResult(DJIGroundStationFlyingInfo flyingInfoParam)
 			{
 				flyingInfo = flyingInfoParam;
+				flyingInfo.altitude /= 10.0f;
+
+				if (isAltAdjustmentNeeded)
+					AdjustAlt();
+
 				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_FLYING_STATUS, flyingInfo));
 			}
 		});
@@ -97,7 +97,7 @@ public class DJIGroundStation
 
 	public void TakeOff(float takeOffAlt)
 	{
-		this.takeOffAlt = takeOffAlt < 5.0f ? 5.0f: takeOffAlt;
+		this.takeOffAlt = takeOffAlt < 5.0f ? 5.0f : takeOffAlt;
 
 		Log.e("Ground station", "Take off");
 		object.openGroundStation(new DJIGroundStationExecuteCallBack()
@@ -119,7 +119,7 @@ public class DJIGroundStation
 							if (result == GroundStationResult.GS_Result_Success)
 							{
 								message = "oneKeyFly success";
-								DoHover();
+								isAltAdjustmentNeeded = true;
 							}
 							else
 								message = "oneKeyFly error " + result;
@@ -248,66 +248,23 @@ public class DJIGroundStation
 		});
 	}
 
-	private boolean takingOff = false;
-	private boolean takeOffDone = false;
 	private float takeOffAlt = 5.0f;
 
-	public void DoHover()
+	public void AdjustAlt()
 	{
-		if (takingOff)
-			return;
+		//uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Adjust alt " + flyingInfo.altitude + " " + takeOffAlt));
+		if (flyingInfo.altitude > takeOffAlt && flyingInfo.altitude > 1.5)
+			gsWrapper.GetJoystik().Bottom();
+		else if (flyingInfo.altitude < takeOffAlt)
+			gsWrapper.GetJoystik().Top();
 
-		takingOff = true;
-		new Thread()
+		float altDelta = flyingInfo.altitude - takeOffAlt;
+		if (altDelta >= 0.0f && altDelta <= 1.0f)
 		{
-			@Override
-			public void run()
-			{
-				while (takingOff && Math.abs(takeOffAlt - flyingInfo.altitude) > 1.0f)
-				{
-					if (flyingInfo.flightMode == GroundStationFlightMode.GS_Mode_Pause_1 || flyingInfo.flightMode == GroundStationFlightMode.GS_Mode_Pause_2 || flyingInfo.flightMode == GroundStationFlightMode.GS_Mode_Gps_Atti)
-					{
-						object.pauseGroundStationTask(new DJIGroundStationExecuteCallBack()
-						{
-							@Override
-							public void onResult(GroundStationResult result)
-							{
-								if (result == GroundStationResult.GS_Result_Success)
-								{
-									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Hover done"));
-									takeOffDone = true;
-								}
-								else
-								{
-									takingOff = false;
-									uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Hover error" + result.toString()));
-								}
-							}
-						});
-					}
-
-					if (takeOffDone)
-					{
-						uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Adjust alt " + flyingInfo.altitude + " " + takeOffAlt));
-						if (flyingInfo.altitude < takeOffAlt)
-							gsWrapper.GetJoystik().Top();
-						else
-							gsWrapper.GetJoystik().Bottom();
-					}
-					else
-						DJIWrapper.Sleep(10);
-				}
-
-				if (takeOffDone)
-				{
-					gsWrapper.GetJoystik().StopLeftJoystik();
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE, takingOff));
-				}
-
-				takeOffDone = false;
-				takingOff = false;
-			}
-		}.start();
+			isAltAdjustmentNeeded = false;
+			gsWrapper.GetJoystik().StopLeftJoystik();
+			uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE, "Take off done"));
+		}
 	}
 
 	public void StartUpdateTimer(int interval)
