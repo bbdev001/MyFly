@@ -92,6 +92,7 @@ public class DJIWrapper
 		}
 		while (crashed);
 
+		Log.i(TAG, "Init SDK done");
 		return true;
 	}
 

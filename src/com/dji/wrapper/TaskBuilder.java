@@ -20,6 +20,14 @@ import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOnWayPoint
 
 public class TaskBuilder
 {
+	protected static int GetTurnMode(float angle1, float angle2) 
+	{
+		float normalizedAngle = angle2 - angle1;
+		if (normalizedAngle < 0)
+			normalizedAngle = 360.0f + normalizedAngle;
+		
+		return normalizedAngle > 180.0 ? 0 : 1;// 1 - anti-clockwise turning; 0 - clockwise turning.
+	}
 	public static void BuildSequientialRoute(DJIGroundStationTask gsTask, Route route, boolean useViewPoint)
 	{
 		gsTask.RemoveAllWaypoint();
@@ -37,10 +45,9 @@ public class TaskBuilder
 			gsWayPoint.actionTimeout = 5;
 
 			if (i > 0)
-				gsWayPoint.turnMode = Math.abs(wp.Heading - route.wayPoints.get(i - 1).Heading) > 180.0 ? 0 : 1;
+				gsWayPoint.turnMode = GetTurnMode(wp.Heading, route.wayPoints.get(i - 1).Heading);
 			else
-				gsWayPoint.turnMode = 1; // 1 - anti-clockwise turning; 0 -
-											// clockwise turning.
+				gsWayPoint.turnMode = 1;
 
 			gsWayPoint.hasAction = true;
 
