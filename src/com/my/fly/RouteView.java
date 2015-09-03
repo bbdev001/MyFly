@@ -218,7 +218,7 @@ public class RouteView extends View
 	private Long routeLineId;
 	private Mbr scrMbr = new Mbr();
 	
-	public void SetRoute(Route route, String routeName, boolean autoScale)
+	public void SetRoute(Route route, boolean autoScale)
 	{
 		Log.i("RouteView", "Select route");
 	
@@ -242,7 +242,7 @@ public class RouteView extends View
 		else
 			navigationSystem.SetMarkerPosition(viewPointMarkerId, viewPoint);
 		
-		this.routeName = routeName;
+		this.routeName = route.name;
 		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
 
 		wayPointMarkers.clear();

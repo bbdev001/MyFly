@@ -37,6 +37,8 @@ public class Route
 		
 		mbr.Reset();
 		
+		this.name = name;
+		
 		try
 		{
 			File file = new File(basePath + "/" + name + ".csv");
@@ -96,6 +98,8 @@ public class Route
 	public boolean SaveToCSV(String basePath, String name)
 	{
 		BufferedWriter bw = null;
+		
+		this.name = name;
 		try
 		{
 			File file = new File(basePath + "/" + name + ".csv");

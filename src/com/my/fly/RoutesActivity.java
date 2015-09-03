@@ -744,16 +744,20 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				Log.e(TAG, "WPEditor.OnClosed");
 
 				if (!isCancel)
-				{					
+				{
 					if (!isMapping)
 					{
 						routeView.SetWayPoint(markerId, wayPoint);
 						routeView.SelectWayPointByMarkerId(markerId);
+						BuildTask(isMapping);
 					}
 					else
+					{
 						route.mappingAltitude = wayPoint.Alt;
+						BuildTask(isMapping);
+						routeView.SetRoute(route, true);
+					}
 					
-					BuildTask(isMapping);
 					SaveRoute(currentRouteName);						
 				}
 			}
@@ -815,22 +819,20 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (isMapping)
 			TaskBuilder.BuildMappingRoute(gsTask, route);
 		else
-			TaskBuilder.BuildSequientialRoute(gsTask, route, true);	
+			TaskBuilder.BuildSequientialRoute(gsTask, route, true);
+		
+		route.RecalculateLength();
 	}
 	
 	private void BuildRouteForType(boolean isMapping)
 	{
 		Log.i(TAG, "ChangeRouteType");
 		this.isMapping = isMapping;
-		String routeName = currentRouteName;
+		//String routeName = currentRouteName;
 		
 		BuildTask(isMapping);
-		
-		if (isMapping)
-			routeName += " mapping";
-		
-		route.RecalculateLength();
-		routeView.SetRoute(route, routeName, true);
+	
+		routeView.SetRoute(route, true);
 	}
 
 	public void OnWayPointPositionChanged(int wayPointId, DegPoint newCoord)
@@ -850,7 +852,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		}
 		
 		TaskBuilder.BuildSequientialRoute(gsTask, route, true);
-		routeView.SetRoute(route, currentRouteName, false);		
+		routeView.SetRoute(route, false);		
 	}
 
 

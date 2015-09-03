@@ -40,9 +40,9 @@ public class TaskBuilder
 			gsWayPoint.action.actionRepeat = 1;
 			gsWayPoint.altitude = (float) wp.Alt;
 			gsWayPoint.heading = useViewPoint ? (short) Utilities.ConvertHeadingToYaw(wp.Heading) : 0;
-			gsWayPoint.speed = (float) wp.Speed;
-			gsWayPoint.dampingDistance = 1.0f;
-			gsWayPoint.actionTimeout = 5;
+			gsWayPoint.speed = 15.0f;//(float) wp.Speed;
+			gsWayPoint.dampingDistance = 2.0f;
+			gsWayPoint.actionTimeout = 3;
 
 			if (i < (route.wayPoints.size() - 1))
 				gsWayPoint.turnMode = GetTurnMode(route.wayPoints.get(i + 1).Heading, wp.Heading);
@@ -59,7 +59,7 @@ public class TaskBuilder
 			gsTask.addWaypoint(gsWayPoint);
 		}
 
-		gsTask.finishAction = DJIGroundStationFinishAction.None;
+		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
@@ -178,7 +178,7 @@ public class TaskBuilder
 		else
 			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
 
-		gsTask.finishAction = DJIGroundStationFinishAction.None;
+		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
