@@ -23,32 +23,6 @@
             android:baselineAligned="false"
             android:orientation="vertical" >
 
-            <RadioGroup
-                android:id="@+id/droneType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingRight="8dp" >
-
-                <RadioButton
-                    android:id="@+id/dronePhantom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:onClick="OnDroneChanged"
-                    android:text="Ph"
-                    android:textSize="11dp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/droneInspire"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:onClick="OnDroneChanged"
-                    android:text="Insp 1"
-                    android:textSize="11dp"
-                    android:textStyle="bold" />
-            </RadioGroup>
-
             <ListView
                 android:id="@+id/routes"
                 android:layout_width="fill_parent"

@@ -135,7 +135,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		errorMessages = (TextView) findViewById(R.id.errorMessages);
 		errorMsgSize = (Button) findViewById(R.id.errorMsgSize);
 		djiSurfaceView = (DjiGLSurfaceView) findViewById(R.id.djiSurfaceView);
-		((RadioButton) findViewById(R.id.droneInspire)).setChecked(true);
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		
 		errorMsgSize.setText("-");
@@ -183,11 +182,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				AppendString(djiWrapper.GetPermissionErrorResultMessage);
 				
 				//DownloadRoutes();
-	
-				navigationSystem.SetMapViewMode3D(false);	
-				navigationSystem.SetMapRotation(0.0f);
-				navigationSystem.SetSnapToGps(false);	
-			
+				
 				djiWrapper.ConnectDroneDevices(djiSurfaceView);
 				break;
 			}
@@ -791,34 +786,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		djiWrapper.GetCamera().TakePhoto();
 	}
 	
-	public void OnDroneChanged(View view)
-	{
-		boolean checked = ((RadioButton) view).isChecked();
-
-		switch (view.getId())
-		{
-			case R.id.dronePhantom:
-			{
-				if (checked)
-					droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
-
-				break;
-			}
-
-			case R.id.droneInspire:
-			{
-				if (checked)
-					droneType = DJIDroneType.DJIDrone_Inspire1;
-
-				break;
-			}
-		}
-		
-		djiWrapper.Destroy();
-		AppendString("Connecting to drone");
-		djiWrapper.InitSDK(droneType, getApplicationContext(), this);
-	}
-	
 	public void OnRouteTypeChanged(View view)
 	{
 		boolean checked = ((RadioButton) view).isChecked();
@@ -904,6 +871,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public void onControlInitialized()
 	{
+		navigationSystem.SetMapViewMode3D(false);	
+		navigationSystem.SetMapRotation(0.0f);
+		navigationSystem.SetSnapToGps(false);				
+	
 		LoadRoutesList();		
 	}
 
