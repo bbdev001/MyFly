@@ -42,7 +42,6 @@ public class TaskBuilder
 			gsWayPoint.heading = useViewPoint ? (short) Utilities.ConvertHeadingToYaw(wp.Heading) : 0;
 			gsWayPoint.speed = 15.0f;//(float) wp.Speed;
 			gsWayPoint.dampingDistance = 2.0f;
-			gsWayPoint.actionTimeout = 3;
 
 			if (i < (route.wayPoints.size() - 1))
 				gsWayPoint.turnMode = GetTurnMode(route.wayPoints.get(i + 1).Heading, wp.Heading);
@@ -82,9 +81,6 @@ public class TaskBuilder
 		gsWayPoint.altitude = 45.0f;
 		gsWayPoint.heading = 0;
 		gsWayPoint.speed = speed;
-		gsWayPoint.dampingDistance = 1.0f;
-		gsWayPoint.actionTimeout = 0;
-		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -94,9 +90,6 @@ public class TaskBuilder
 		gsWayPoint.altitude = 45.0f;
 		gsWayPoint.heading = 0;
 		gsWayPoint.speed = speed;
-		gsWayPoint.dampingDistance = 1.0f;
-		gsWayPoint.actionTimeout = 0;
-		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -106,9 +99,6 @@ public class TaskBuilder
 		gsWayPoint.altitude = 2.5f;
 		gsWayPoint.heading = 0;
 		gsWayPoint.speed = 2.0f;
-		gsWayPoint.dampingDistance = 1.0f;
-		gsWayPoint.actionTimeout = 0;
-		gsWayPoint.turnMode = 1;
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
@@ -192,7 +182,6 @@ public class TaskBuilder
 		gsWayPoint.heading = (short) Utilities.ConvertHeadingToYaw(wayPoint.Heading);
 		gsWayPoint.speed = wayPoint.Speed;
 		gsWayPoint.dampingDistance = 1.0f;
-		gsWayPoint.actionTimeout = 5;
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = true;
 		gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, (camAngle > 0 ? -camAngle : camAngle));
