@@ -735,10 +735,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		Log.e(TAG, "onWayPointSelected");
 
-		if (route.wayPoints.size() == 0)
+		if (route.GetWayPoints().size() == 0)
 			return;
 
-		final WayPoint wayPoint = wayPointId >= 0 ? route.wayPoints.get(wayPointId) : route.mappingWayPoints.get(0);
+		final WayPoint wayPoint = wayPointId >= 0 ? route.GetWayPoints().get(wayPointId) : route.GetWayPoints().get(0);
 		
 		selectedWayPointId = wayPointId;
 
@@ -757,7 +757,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 					}
 					else
 						route.mappingAltitude = wayPoint.Alt;
-						
+					
+					BuildTask(isMapping);
 					SaveRoute(currentRouteName);						
 				}
 			}
@@ -767,9 +768,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			@Override
 			public void OnDeleted(int wayPointIndex)
 			{
-				route.wayPoints.remove(wayPointIndex);
-				routeView.RemoveWayPoint(wayPointIndex);
-				selectedWayPointId = -1;
+				if (!isMapping)
+				{
+					route.GetWayPoints().remove(wayPointIndex);
+					routeView.RemoveWayPoint(wayPointIndex);
+					selectedWayPointId = -1;
+					
+					BuildTask(isMapping);
+				}
 				
 				//SaveRoute(currentRouteName);
 			}
@@ -837,19 +843,24 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		}
 	}
 
+	private void BuildTask(boolean isMapping)
+	{
+		if (isMapping)
+			TaskBuilder.BuildMappingRoute(gsTask, route);
+		else
+			TaskBuilder.BuildSequientialRoute(gsTask, route, true);	
+	}
+	
 	private void BuildRouteForType(boolean isMapping)
 	{
 		Log.i(TAG, "ChangeRouteType");
 		this.isMapping = isMapping;
 		String routeName = currentRouteName;
 		
+		BuildTask(isMapping);
+		
 		if (isMapping)
-		{
-			TaskBuilder.BuildMappingRoute(gsTask, route);
 			routeName += " mapping";
-		}
-		else
-			TaskBuilder.BuildSequientialRoute(gsTask, route, true);
 		
 		route.RecalculateLength();
 		routeView.SetRoute(route, routeName, true);

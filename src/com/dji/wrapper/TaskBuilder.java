@@ -44,17 +44,15 @@ public class TaskBuilder
 			gsWayPoint.dampingDistance = 1.0f;
 			gsWayPoint.actionTimeout = 5;
 
-			if (i > 0)
-				gsWayPoint.turnMode = GetTurnMode(wp.Heading, route.wayPoints.get(i - 1).Heading);
+			if (i < (route.wayPoints.size() - 1))
+				gsWayPoint.turnMode = GetTurnMode(route.wayPoints.get(i + 1).Heading, wp.Heading);
 			else
-				gsWayPoint.turnMode = 1;
+				gsWayPoint.turnMode = GetTurnMode(wp.Heading, route.wayPoints.get(i - 1).Heading);
 
 			gsWayPoint.hasAction = true;
 
 			if (useViewPoint)
-				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);// 0
-																												// -
-																												// -89
+				gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, wp.CamAngle);// 0 - -89
 
 			gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 

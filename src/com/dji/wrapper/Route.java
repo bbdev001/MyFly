@@ -18,8 +18,8 @@ import com.my.fly.utilities.WayPoint;
 
 public class Route
 {
-	public ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
-	public ArrayList<WayPoint> mappingWayPoints = new ArrayList<WayPoint>();
+	protected ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
+	protected ArrayList<WayPoint> mappingWayPoints = new ArrayList<WayPoint>();
 	public String name = "";
 	public float mappingAltitude = 0.0f;
 	public boolean isMapping = false;
