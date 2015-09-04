@@ -39,9 +39,10 @@ public class TaskBuilder
 			DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wp.coord.Lat, wp.coord.Lon);
 			gsWayPoint.action.actionRepeat = 1;
 			gsWayPoint.altitude = (float) wp.Alt;
-			gsWayPoint.heading = useViewPoint ? (short) Utilities.ConvertHeadingToYaw(wp.Heading) : 0;
-			gsWayPoint.speed = 15.0f;//(float) wp.Speed;
-			gsWayPoint.dampingDistance = 2.0f;
+			gsWayPoint.heading = (short) Utilities.ConvertHeadingToYaw(wp.Heading);
+			gsWayPoint.speed = 10.0f;//(float) wp.Speed;
+			gsWayPoint.dampingDistance = 1.5f;
+			gsWayPoint.actionTimeout = 5;
 
 			if (i < (route.wayPoints.size() - 1))
 				gsWayPoint.turnMode = GetTurnMode(route.wayPoints.get(i + 1).Heading, wp.Heading);
@@ -58,7 +59,7 @@ public class TaskBuilder
 			gsTask.addWaypoint(gsWayPoint);
 		}
 
-		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
+		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
@@ -103,7 +104,7 @@ public class TaskBuilder
 		gsTask.addWaypoint(gsWayPoint);
 
 		gsTask.finishAction = DJIGroundStationFinishAction.None;
-		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingTowardNextWaypoint;
+		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
 	}
@@ -168,7 +169,7 @@ public class TaskBuilder
 		else
 			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
 
-		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
+		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
@@ -184,6 +185,7 @@ public class TaskBuilder
 		gsWayPoint.dampingDistance = 1.0f;
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = true;
+		gsWayPoint.actionTimeout = 5;
 		gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, (camAngle > 0 ? -camAngle : camAngle));
 		gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 
