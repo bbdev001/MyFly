@@ -20,6 +20,9 @@ public class Route
 {
 	protected ArrayList<WayPoint> wayPoints = new ArrayList<WayPoint>();
 	protected ArrayList<WayPoint> mappingWayPoints = new ArrayList<WayPoint>();
+	protected double droneBaseSpeed = 3.0;
+	protected double takingPhotoTime = 3.0;
+	protected double estimatedFlightTime = 0.0f;//Minutes
 	public String name = "";
 	public float mappingAltitude = 0.0f;
 	public boolean isMapping = false;
@@ -177,7 +180,9 @@ public class Route
 				Location.distanceBetween(p1.coord.Lat, p1.coord.Lon, p2.coord.Lat, p2.coord.Lon, results);
 				length += results[0];
 			}
-		}		
+		}
+		
+		estimatedFlightTime = (length / droneBaseSpeed + (double)points.size() * takingPhotoTime) / 60.0; 
 	}
 
 	protected int GetCamAngle(WayPoint p1, WayPoint p2)
@@ -202,5 +207,10 @@ public class Route
 			//Log.e("angle", "wp" + i + " " + wp.Heading);
 			wp.CamAngle = GetCamAngle(wp, viewPoint);
 		}
+	}
+	
+	public double GetEstimatedFlightTime()
+	{
+		return estimatedFlightTime;
 	}
 }

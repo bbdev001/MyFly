@@ -381,13 +381,15 @@ public class RouteView extends View
 		paint.setStrokeWidth(LINE_WIDTH);
 
 		// Info
-		float lineHeight = 42.0f;
+		float lineHeight = 40.0f;
 		float linePos = 0.0f;
 
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Name: " + routeName, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Length: " + formatter.format(route.length) + "m", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
+		linePos += lineHeight;
+		Utilities.DrawTextWithBorder("Est flt time: " + formatter.format(route.GetEstimatedFlightTime()) + "min", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Power level: " + formatter.format(dronePowerLevel) + "%", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;

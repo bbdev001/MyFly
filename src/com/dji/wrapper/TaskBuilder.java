@@ -20,6 +20,8 @@ import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOnWayPoint
 
 public class TaskBuilder
 {
+	protected static double baseDiagonalLength = Math.sqrt(9.0 * 9.0 + 16.0 * 16.0);////Image is 16/9. Image base diagonal
+	
 	protected static int GetTurnMode(float angle1, float angle2) 
 	{
 		float normalizedAngle = angle2 - angle1;
@@ -42,7 +44,7 @@ public class TaskBuilder
 			gsWayPoint.heading = (short) Utilities.ConvertHeadingToYaw(wp.Heading);
 			gsWayPoint.speed = 10.0f;//(float) wp.Speed;
 			gsWayPoint.dampingDistance = 1.5f;
-			gsWayPoint.actionTimeout = 5;
+			gsWayPoint.actionTimeout = 999;
 
 			if (i < (route.wayPoints.size() - 1))
 				gsWayPoint.turnMode = GetTurnMode(route.wayPoints.get(i + 1).Heading, wp.Heading);
@@ -59,7 +61,7 @@ public class TaskBuilder
 			gsTask.addWaypoint(gsWayPoint);
 		}
 
-		gsTask.finishAction = DJIGroundStationFinishAction.None;
+		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
@@ -150,24 +152,19 @@ public class TaskBuilder
 		Location.distanceBetween(mbr.Ymin, mbr.Xmin, mbr.Ymax, mbr.Xmin, distance);
 		double heightInMeters = distance[0];
 
-		double stepH = viewRadius * 2.0;
-		double stepV = viewRadius * 2.0;
-		double width = Math.ceil(widthInMeters / stepV);
-		double height = Math.ceil(heightInMeters / stepH);
+		double stepInMeters = 9.0 * ((viewRadius * 2.0) / baseDiagonalLength);
+		double stepsX = Math.ceil((widthInMeters / stepInMeters) + 0.5);
+		double stepsY = Math.ceil((heightInMeters / stepInMeters) + 0.5);
 		int speed = viewRadius > 10 ? 10 : 2;
-
-		MrcPoint cur = new DegPoint(mbr.GetCenterY(), mbr.GetCenterX()).ToMercator();
-
-		if (width > 1 || height > 1)
-		{
-			cur.Lon -= Utilities.MetersToDeg(widthInMeters / 2.0);
-			cur.Lat += Utilities.MetersToDeg(heightInMeters / 2.0);
-		}
-
-		if (width > height)
-			HorizontalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
+		MrcPoint leftTopMrc = new DegPoint(mbr.Ymax, mbr.Xmin).ToMercator();
+		MrcPoint rightBottomMrc = new DegPoint(mbr.Ymin, mbr.Xmax).ToMercator();
+		double stepXMrc = (rightBottomMrc.Lon - leftTopMrc.Lon) / stepsX;
+		double stepYMrc = (leftTopMrc.Lat - rightBottomMrc.Lat) / stepsY;
+		
+		if (stepsX > stepsY)
+			HorizontalMapping(gsTask, route, leftTopMrc, stepsX, stepsY, speed, mappingAlt, -89, stepXMrc, stepYMrc);
 		else
-			VerticalMapping(gsTask, route, cur, width, height, speed, mappingAlt, -89, stepH, stepV);
+			VerticalMapping(gsTask, route, leftTopMrc, stepsX, stepsY, speed, mappingAlt, -89, stepXMrc, stepYMrc);
 
 		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
@@ -185,7 +182,7 @@ public class TaskBuilder
 		gsWayPoint.dampingDistance = 1.0f;
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = true;
-		gsWayPoint.actionTimeout = 5;
+		gsWayPoint.actionTimeout = 999;
 		gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Gimbal_Pitch, (camAngle > 0 ? -camAngle : camAngle));
 		gsWayPoint.addAction(GroundStationOnWayPointAction.Way_Point_Action_Simple_Shot, 1);
 
@@ -196,11 +193,11 @@ public class TaskBuilder
 	{
 		int heading = 270;
 
-		for (int j = 0; j < height; j++)
+		for (int j = 0; j <= height; j++)
 		{
 			heading = 90;
 
-			for (int i = 0; i < width; i++)
+			for (int i = 0; i <= width; i++)
 			{
 				MrcPoint coord = new MrcPoint(cur.Lat, cur.Lon);
 
@@ -214,12 +211,12 @@ public class TaskBuilder
 
 				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
 
-				cur.Lon += Utilities.MetersToDeg(stepH);
+				cur.Lon += stepH;
 			}
 
-			cur.Lat -= Utilities.MetersToDeg(stepV);
+			cur.Lat -= stepV;
 			stepH *= -1.0;
-			cur.Lon += Utilities.MetersToDeg(stepH);
+			cur.Lon += stepH;
 		}
 	}
 
@@ -227,11 +224,11 @@ public class TaskBuilder
 	{
 		int heading = 180;
 
-		for (int j = 0; j < width; j++)
+		for (int j = 0; j <= width; j++)
 		{
 			heading = 0;
 
-			for (int i = 0; i < height; i++)
+			for (int i = 0; i <= height; i++)
 			{
 				MrcPoint coord = new MrcPoint(cur.Lat, cur.Lon);
 
@@ -245,12 +242,12 @@ public class TaskBuilder
 
 				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
 
-				cur.Lat -= Utilities.MetersToDeg(stepV);
+				cur.Lat -= stepV;
 			}
 
-			cur.Lon += Utilities.MetersToDeg(stepH);
+			cur.Lon += stepH;
 			stepV *= -1.0;
-			cur.Lat -= Utilities.MetersToDeg(stepV);
+			cur.Lat -= stepV;
 		}
 	}
 }
