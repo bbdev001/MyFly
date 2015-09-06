@@ -6,6 +6,28 @@ import android.graphics.Paint;
 
 public class Utilities
 {
+	public static DegPoint EarthToMap(DegPoint o, DegPoint p)
+	{
+		DegPoint res = new DegPoint();
+			
+		res.Lon = Math.round(((p.Lon - o.Lon) * ((double)Math.cos(DegToRad(o.Lat)))));
+		res.Lat = p.Lat - o.Lat;
+			
+		return res;
+	}
+
+
+	public static DegPoint MapToEarth(DegPoint o, DegPoint p)
+	{
+		DegPoint res = new DegPoint();
+
+		double fCos = Math.cos(DegToRad(o.Lat));
+		res.Lon = Math.round(p.Lon / fCos + o.Lon);
+		res.Lat = p.Lat + o.Lat;
+			
+		return res;
+	}
+	
 	protected static double y2lat(double a)
 	{
 		return RadToDeg(2.0 * Math.atan(Math.exp(DegToRad(a))) - Math.PI / 2.0);

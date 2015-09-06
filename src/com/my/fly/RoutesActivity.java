@@ -103,7 +103,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private int scrollViewMessagesDefSize = 0;
 	private double lastAltitude = 3.0;
 	private Button errorMsgSize = null;
-	private String currentRouteName = "";
 	private DjiGLSurfaceView djiSurfaceView;
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
 	private NavmiiControl navigationSystem;
@@ -501,20 +500,22 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		return t.responseStrings;
 	}
 
-	private Route route = new Route();
+	private Route route = new Route("");
 	protected void LoadRoute(String curRouteName)
 	{	
-		currentRouteName = curRouteName;
+		if (curRouteName.isEmpty())
+			return;
 		
-		route.LoadFromCSV(BASE_PATH, currentRouteName);
+		route.LoadFromCSV(BASE_PATH, curRouteName);
 					
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		BuildRouteForType(false);
 	}
 
-	protected void SaveRoute(String curRouteName)
+	protected void SaveRoute()
 	{
-		route.SaveToCSV(BASE_PATH, currentRouteName);
+		if (!route.name.isEmpty())
+			route.SaveToCSV(BASE_PATH, route.name);
 	}
 
 	@Override
@@ -737,7 +738,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		selectedWayPointId = wayPointId;
 
-		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoint, isMapping, new WPEditor.OnDialogClosedListener()
+		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoint, isMapping,
+		new WPEditor.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel)
 			{
@@ -758,7 +760,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 						routeView.SetRoute(route, true);
 					}
 					
-					SaveRoute(currentRouteName);						
+					SaveRoute();						
 				}
 			}
 		},
@@ -776,7 +778,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 					BuildTask(isMapping);
 				}
 				
-				//SaveRoute(currentRouteName);
+				//SaveRoute(route.name);
 			}
 		});
 
@@ -883,7 +885,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public void onUserMarkerUnpressed(long markerId)
 	{
-		SaveRoute(currentRouteName);	
+		SaveRoute();	
 	}
 
 	@Override
@@ -1006,5 +1008,63 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void OnAddRoute(View v)
+	{
+		final InputBox dialog = new InputBox(this, "Enter route name", "Route name", "My route",
+		new InputBox.OnDialogClosedListener()
+		{
+			public void OnClosed(boolean isCancel, String result)
+			{
+				Log.e(TAG, "InputBox.OnClosed");
+
+				if (!isCancel)
+				{
+					SaveRoute();
+					
+					route = new Route(result);
+					BuildRouteForType(false);
+					
+					SaveRoute();
+					
+					LoadRoutesList();
+				}
+			}
+		});
+		
+		dialog.show();
+	}
+	
+	public void OnDelRoute(View v)
+	{
+		//DeleteRoute();
+		
+		LoadRoutesList();
+		route = new Route("");
+		BuildRouteForType(false);
+	}
+	
+	public void OnEditRoute(View v)
+	{
+		final InputBox dialog = new InputBox(this, "Enter new route name", "Route name", route.name,
+		new InputBox.OnDialogClosedListener()
+		{
+			public void OnClosed(boolean isCancel, String result)
+			{
+				Log.e(TAG, "InputBox.OnClosed");
+
+				if (!isCancel)
+				{
+					// DeleteRoute();
+					
+					route.name = result;
+					routeView.invalidate();
+					//SaveRoute();
+				}
+			}
+		});
+		
+		dialog.show();	
 	}
 }

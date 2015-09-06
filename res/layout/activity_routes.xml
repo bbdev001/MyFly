@@ -17,17 +17,59 @@
 
         <LinearLayout
             android:id="@+id/linearLayoutLeft1"
-            android:layout_weight="0.75"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_weight="0.75"
             android:baselineAligned="false"
             android:orientation="vertical" >
 
-            <ListView
-                android:id="@+id/routes"
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
-            </ListView>
+                android:layout_height="fill_parent"
+                android:layout_weight="0.15"
+                android:orientation="vertical" >
+
+                <ListView
+                    android:id="@+id/routes"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" >
+                </ListView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.85"
+                android:orientation="horizontal" >
+
+                <Button
+                    android:id="@+id/routeAdd"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:onClick="OnAddRoute"
+                    android:padding="0dp"
+                    android:text="+" />
+
+                <Button
+                    android:id="@+id/routeDel"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:onClick="OnDelRoute"
+                    android:padding="0dp"
+                    android:text="-" />
+
+                <Button
+                    android:id="@+id/routeEdit"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:onClick="OnEditRoute"
+                    android:padding="0dp"
+                    android:text="Edit" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -108,21 +150,23 @@
             android:layout_height="fill_parent"
             android:layout_weight="0.25"
             android:orientation="vertical" >
-        <com.my.fly.RouteView
-            android:id="@+id/routeView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="0.15"
-            android:background="@android:color/transparent"
-            android:textColor="#ffffff" />
-        <Space
-            android:id="@+id/stubView1"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="0.85" />        
+
+            <com.my.fly.RouteView
+                android:id="@+id/routeView"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.15"
+                android:background="@android:color/transparent"
+                android:textColor="#ffffff" />
+
+            <Space
+                android:id="@+id/stubView1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.85" />
         </LinearLayout>
     </LinearLayout>
-        
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="125dp"

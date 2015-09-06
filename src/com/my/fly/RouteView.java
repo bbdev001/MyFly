@@ -57,13 +57,12 @@ public class RouteView extends View
 	private Paint paint;
 	private Paint textPaint;
 	
-	private Route route = new Route();
+	private Route route = new Route("");
 	private static final float LINE_WIDTH = 10.0f;
 	private Mbr mbr = new Mbr();
 	private NavmiiControl.MapCoord lastClickGeoPosition = new NavmiiControl.MapCoord();
 	private ScaleGestureDetector scaleGestureDetector = null;
 	private RotationDetector rotateDetector = null;
-	private String routeName = "";
 	private MapCoord homePosition = new MapCoord();
 	private MapCoord dronePosition = new MapCoord();
 	private MapCoord viewPoint = new MapCoord();
@@ -242,7 +241,6 @@ public class RouteView extends View
 		else
 			navigationSystem.SetMarkerPosition(viewPointMarkerId, viewPoint);
 		
-		this.routeName = route.name;
 		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
 
 		wayPointMarkers.clear();
@@ -385,7 +383,7 @@ public class RouteView extends View
 		float linePos = 0.0f;
 
 		linePos += lineHeight;
-		Utilities.DrawTextWithBorder("Name: " + routeName, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
+		Utilities.DrawTextWithBorder("Name: " + route.name, 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;
 		Utilities.DrawTextWithBorder("Length: " + formatter.format(route.length) + "m", 10.0f, linePos, Color.BLACK, Color.WHITE, 1, 3, canvas, textPaint);
 		linePos += lineHeight;

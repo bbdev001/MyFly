@@ -101,7 +101,7 @@ public class WPEditor extends Dialog implements View.OnClickListener
 			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.context);
 
 			alertDialog.setTitle("Confirm Delete...");
-			alertDialog.setMessage("Are you sure you want delete this?");
+			alertDialog.setMessage("Are you sure you want to delete this?");
 			alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener()
 			{
 				public void onClick(DialogInterface dialog, int which)

@@ -3,6 +3,7 @@ package com.dji.wrapper;
 import java.util.ArrayList;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.my.fly.utilities.DegPoint;
 import com.my.fly.utilities.GeoPoint;
@@ -153,18 +154,16 @@ public class TaskBuilder
 		double heightInMeters = distance[0];
 
 		double stepInMeters = 9.0 * ((viewRadius * 2.0) / baseDiagonalLength);
-		double stepsX = Math.ceil((widthInMeters / stepInMeters) + 0.5);
-		double stepsY = Math.ceil((heightInMeters / stepInMeters) + 0.5);
+		double stepsX = Math.round(widthInMeters / stepInMeters);
+		double stepsY = Math.round(heightInMeters / stepInMeters);
+		double stepInDeg = Utilities.MetersToDeg(stepInMeters);
 		int speed = viewRadius > 10 ? 10 : 2;
-		MrcPoint leftTopMrc = new DegPoint(mbr.Ymax, mbr.Xmin).ToMercator();
-		MrcPoint rightBottomMrc = new DegPoint(mbr.Ymin, mbr.Xmax).ToMercator();
-		double stepXMrc = (rightBottomMrc.Lon - leftTopMrc.Lon) / stepsX;
-		double stepYMrc = (leftTopMrc.Lat - rightBottomMrc.Lat) / stepsY;
-		
+
+		DegPoint leftTop = new DegPoint(mbr.Ymax, mbr.Xmin); 
 		if (stepsX > stepsY)
-			HorizontalMapping(gsTask, route, leftTopMrc, stepsX, stepsY, speed, mappingAlt, -89, stepXMrc, stepYMrc);
+			HorizontalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDeg, stepInDeg);
 		else
-			VerticalMapping(gsTask, route, leftTopMrc, stepsX, stepsY, speed, mappingAlt, -89, stepXMrc, stepYMrc);
+			VerticalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDeg, stepInDeg);
 
 		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
@@ -189,20 +188,18 @@ public class TaskBuilder
 		return gsWayPoint;
 	}
 
-	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
+	protected static void HorizontalMapping(DJIGroundStationTask gsTask, Route route, DegPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
 	{
 		int heading = 270;
 
 		for (int j = 0; j <= height; j++)
 		{
 			heading = 90;
-
+			double f = Math.cos(Utilities.DegToRad(cur.Lat));
 			for (int i = 0; i <= width; i++)
 			{
-				MrcPoint coord = new MrcPoint(cur.Lat, cur.Lon);
-
 				WayPoint wayPoint = new WayPoint();
-				wayPoint.coord = coord.ToDegrees();
+				wayPoint.coord = new DegPoint(cur.Lat, cur.Lon);
 				wayPoint.Alt = (int) mappingAlt;
 				wayPoint.Speed = speed;
 				wayPoint.Heading = heading;
@@ -211,16 +208,16 @@ public class TaskBuilder
 
 				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
 
-				cur.Lon += stepH;
+				cur.Lon += stepH / f;
 			}
 
 			cur.Lat -= stepV;
 			stepH *= -1.0;
-			cur.Lon += stepH;
+			cur.Lon += stepH / Math.cos(Utilities.DegToRad(cur.Lat));
 		}
 	}
 
-	protected static void VerticalMapping(DJIGroundStationTask gsTask, Route route, MrcPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
+	protected static void VerticalMapping(DJIGroundStationTask gsTask, Route route, DegPoint cur, double width, double height, int speed, double mappingAlt, int camAngle, double stepH, double stepV)
 	{
 		int heading = 180;
 
@@ -230,10 +227,8 @@ public class TaskBuilder
 
 			for (int i = 0; i <= height; i++)
 			{
-				MrcPoint coord = new MrcPoint(cur.Lat, cur.Lon);
-
 				WayPoint wayPoint = new WayPoint();
-				wayPoint.coord = coord.ToDegrees();
+				wayPoint.coord = new DegPoint(cur.Lat, cur.Lon);
 				wayPoint.Alt = (int) mappingAlt;
 				wayPoint.Speed = speed;
 				wayPoint.Heading = heading;
@@ -245,7 +240,7 @@ public class TaskBuilder
 				cur.Lat -= stepV;
 			}
 
-			cur.Lon += stepH;
+			cur.Lon += stepH / Math.cos(Utilities.DegToRad(cur.Lat));
 			stepV *= -1.0;
 			cur.Lat -= stepV;
 		}

@@ -31,6 +31,11 @@ public class Route
 	public Mbr mbr = new Mbr();
 	public WayPoint viewPoint = new WayPoint();
 	
+	public Route(String name)
+	{
+		this.name = name;
+	}
+	
 	public boolean LoadFromCSV(String basePath, String name)
 	{
 		BufferedReader br = null;
@@ -103,6 +108,7 @@ public class Route
 		BufferedWriter bw = null;
 		
 		this.name = name;
+		
 		try
 		{
 			File file = new File(basePath + "/" + name + ".csv");
