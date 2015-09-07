@@ -1,5 +1,9 @@
 package com.my.fly;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+
 import geolife.android.navigationsystem.NavmiiControl;
 import geolife.android.navigationsystem.NavmiiControl.Direction;
 import geolife.android.navigationsystem.NavmiiControl.DirectionType;
@@ -48,7 +52,9 @@ import dji.sdk.api.MainController.DJIMainControllerSystemState;
 import dji.sdk.api.RemoteController.DJIRemoteControllerAttitude;
 import dji.sdk.widget.DjiGLSurfaceView;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.location.Location;
@@ -377,7 +383,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		routesListArapter.notifyDataSetChanged();
 		if (routes.size() > 0)
-			LoadRoute(routes.get(0));
+			LoadRoute(route.name.isEmpty() ? routes.get(0) : route.name);
 	}
 
 	public void DownloadRoutes()
@@ -923,9 +929,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public boolean onLongPressOnMap(Point arg0)
+	public boolean onLongPressOnMap(Point point)
 	{
-		// TODO Auto-generated method stub
+		WayPoint wayPoint = new WayPoint(routeView.TranslateScreenPointToGeoPoint(point));
+		long markerId = routeView.AddWayPoint(wayPoint, route.GetWayPoints().size());	
+		route.AddWayPoint(wayPoint);
+		
+		WayPointSelected(markerId);
+		
 		return false;
 	}
 
@@ -1035,14 +1046,29 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		dialog.show();
 	}
-	
+		
 	public void OnDelRoute(View v)
 	{
-		//DeleteRoute();
-		
-		LoadRoutesList();
-		route = new Route("");
-		BuildRouteForType(false);
+			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+			alertDialog.setTitle("Confirm Delete...");
+			alertDialog.setMessage("Are you sure you want to delete selected route?");
+			alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int which)
+				{		
+					DeleteRoute();
+					LoadRoutesList();
+					
+					dialog.dismiss();					
+				}
+			});
+
+			// Setting Negative "NO" Button
+			alertDialog.setNegativeButton("NO", null);
+
+			// Showing Alert Message
+			alertDialog.show();	
 	}
 	
 	public void OnEditRoute(View v)
@@ -1056,15 +1082,26 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 				if (!isCancel)
 				{
-					// DeleteRoute();
+					DeleteRoute();
 					
 					route.name = result;
 					routeView.invalidate();
-					//SaveRoute();
+					SaveRoute();
+					
+					LoadRoutesList();					
 				}
 			}
 		});
 		
 		dialog.show();	
+	}
+	
+	public void DeleteRoute()
+	{
+		File toDelete = new File(BASE_PATH + "/" + route.name + ".csv");
+		toDelete.delete();
+		
+		route = new Route("");
+		BuildRouteForType(false);	
 	}
 }

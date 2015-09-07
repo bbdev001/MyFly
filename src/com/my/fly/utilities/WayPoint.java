@@ -15,7 +15,15 @@ public class WayPoint
 	{
 		LoadDefaultValues();
 	}
-	
+
+	public WayPoint(DegPoint point)
+	{
+		LoadDefaultValues();
+		
+		coord.Lon = point.Lon;
+		coord.Lat = point.Lat;
+	}
+
 	public WayPoint(String value)
 	{
 		LoadDefaultValues();
@@ -40,7 +48,7 @@ public class WayPoint
 	public void LoadDefaultValues()
 	{
 		coord = new DegPoint();
-		Alt = 5;
+		Alt = 7;
 		Heading = 0;
 		HoverTime = 0;
 		Action = 0;

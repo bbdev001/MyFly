@@ -59,13 +59,13 @@ public class RouteView extends View
 	
 	private Route route = new Route("");
 	private static final float LINE_WIDTH = 10.0f;
-	private Mbr mbr = new Mbr();
 	private NavmiiControl.MapCoord lastClickGeoPosition = new NavmiiControl.MapCoord();
 	private ScaleGestureDetector scaleGestureDetector = null;
 	private RotationDetector rotateDetector = null;
 	private MapCoord homePosition = new MapCoord();
 	private MapCoord dronePosition = new MapCoord();
 	private MapCoord viewPoint = new MapCoord();
+	private DegPoint droneUserPosition = new DegPoint();
 	private Long droneMarkerId = (long)0;
 	private Long homeMarkerId = (long)0;
 	private Long viewPointMarkerId = (long)0;
@@ -93,6 +93,8 @@ public class RouteView extends View
 	private float selectedWpZLevel = 0.9f;
 	private float wpZLevel = 0.8f;
 	private float routeLineZLevel = 0.7f;
+	private Long routeLineId = NavmiiControl.INVALID_USER_ITEM_ID;
+	private Mbr scrMbr = new Mbr();
 	
 	protected boolean isShowPress = false;
 
@@ -153,6 +155,13 @@ public class RouteView extends View
 		wayPointPositionChanged = listener;
 	}
 
+	public DegPoint TranslateScreenPointToGeoPoint(Point point)
+	{
+		MapCoord mapCoord = navigationSystem.GetPositionOnMap(point);	
+		
+		return new DegPoint(mapCoord.lat, mapCoord.lon);
+	}
+	
 	public void SetHomePosition(DegPoint position)
 	{
 		position.CopyTo(homePosition);
@@ -197,9 +206,7 @@ public class RouteView extends View
 
 	public void SetDroneUserPosition(DegPoint position)
 	{
-		//position.CopyTo(droneUserPosition);
-
-		//invalidate();
+		position.CopyTo(droneUserPosition);
 	}
 
 	// override onSizeChanged
@@ -212,10 +219,19 @@ public class RouteView extends View
 		width = w;
 		height = h;
 	}
+	
+	protected long AddWayPoint(WayPoint wayPoint, int id)
+	{
+		MapCoord wpCoord = wayPoint.coord.ToMapCoord();		
+		long markerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, wayPoint.Heading, 0.5f, 0.5f, true);
 
-	private ArrayList<MapCoord> routeLinePoints = new ArrayList<MapCoord>();
-	private Long routeLineId;
-	private Mbr scrMbr = new Mbr();
+		navigationSystem.InsertPointToPolyline(routeLineId, wayPointMarkers.size(), wpCoord);
+				
+		navigationSystem.SetItemOnMapZLevel(markerId, wpZLevel);
+		wayPointMarkers.put(markerId, new MarkerInfo(id, wayPoint));
+		
+		return markerId;
+	}
 	
 	public void SetRoute(Route route, boolean autoScale)
 	{
@@ -229,40 +245,45 @@ public class RouteView extends View
 			navigationSystem.DeleteItemOnMap(key);
 		} 
 		
-		if (routeLinePoints.size() > 0)
-			navigationSystem.DeleteItemOnMap(routeLineId);
-						
-		mbr.Reset();
-	
+					
 		route.viewPoint.coord.CopyTo(viewPoint);
 		
 		if (viewPointMarkerId == NavmiiControl.INVALID_USER_ITEM_ID)
 			viewPointMarkerId = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/waypoint_1.png", viewPoint, 0.5f, 0.5f, true);
 		else
-			navigationSystem.SetMarkerPosition(viewPointMarkerId, viewPoint);
+			navigationSystem.SetMarkerPosition(viewPointMarkerId, viewPoint);			
+	
+		if (routeLineId != NavmiiControl.INVALID_USER_ITEM_ID)
+			navigationSystem.DeleteItemOnMap(routeLineId);
+			
+		routeLineId = navigationSystem.CreatePolylineOnMap(0xFF0000, 5.0f, new NavmiiControl.MapCoord[0]);
+		
+		navigationSystem.SetItemOnMapZLevel(routeLineId, routeLineZLevel);	
 		
 		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
-
 		wayPointMarkers.clear();
 
 		for (int i = 0; i < wayPoints.size(); i++)
 		{
 			WayPoint wayPoint = wayPoints.get(i);		
-			MapCoord wpCoord = wayPoint.coord.ToMapCoord();		
-			long markerId = navigationSystem.CreateDirectedMarkerOnMap(resourcePath + "/bmp/arrowBlue.png", wpCoord, wayPoint.Heading, 0.5f, 0.5f, true);
-			navigationSystem.SetItemOnMapZLevel(markerId, wpZLevel);
-			
-			mbr.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
-			wayPointMarkers.put(markerId, new MarkerInfo(i, wayPoint));
+
+			AddWayPoint(wayPoint, i);	
 		}
 
-		RebuildRouteLine(route);
-		
+	
 		if (autoScale)
 		{
-			mapCenter.Lat = mbr.GetCenterY();
-			mapCenter.Lon = mbr.GetCenterX();
-
+			if (route.mbr.IsEmpty())
+			{
+				mapCenter.Lat = droneUserPosition.Lat;
+				mapCenter.Lon = droneUserPosition.Lon;
+			}
+			else
+			{		
+				mapCenter.Lat = route.mbr.GetCenterY();
+				mapCenter.Lon = route.mbr.GetCenterX();
+			}
+		
 			this.SetDronePosition(mapCenter, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 			this.SetHomePosition(mapCenter);
 			this.SetDroneUserPosition(mapCenter);
@@ -284,13 +305,19 @@ public class RouteView extends View
 			scrMbr.Adjust(p2.lon, p2.lat);
 					
 
-            float bestZoomBoost = Math.max((float)(mbr.GetWidth() / scrMbr.GetWidth()), (float)(mbr.GetHeight() / scrMbr.GetHeight()));
+            float bestZoomBoost = Math.max((float)(route.mbr.GetWidth() / scrMbr.GetWidth()), (float)(route.mbr.GetHeight() / scrMbr.GetHeight()));
 
             if (bestZoomBoost >= 0.0f)
                 scale *= bestZoomBoost;
 		}
 		else
-			scale = 1.0f;
+		{
+			if (route.mbr.IsEmpty())
+			{
+				mapCenter.Lat = droneUserPosition.Lat;
+				mapCenter.Lon = droneUserPosition.Lon;
+			}
+		}
 
 		navigationSystem.SetMapZoom(scale);
 		mapCoord.lon = mapCenter.Lon;
@@ -298,26 +325,6 @@ public class RouteView extends View
 		navigationSystem.SetMapCenter(mapCoord);
 
 		invalidate();
-	}
-
-	public void RebuildRouteLine(Route route)
-	{
-		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
-
-		if (routeLinePoints.size() > 0)
-			navigationSystem.DeleteItemOnMap(routeLineId);
-		
-		routeLinePoints.clear();
-
-		for (int i = 0; i < wayPoints.size(); i++)
-		{
-			WayPoint wayPoint = wayPoints.get(i);		
-			MapCoord wpCoord = wayPoint.coord.ToMapCoord();		
-			routeLinePoints.add(wpCoord);
-		}
-
-		routeLineId = navigationSystem.CreatePolylineOnMap(0xFF0000, 5.0f, routeLinePoints.toArray(new NavmiiControl.MapCoord[routeLinePoints.size()]));
-		navigationSystem.SetItemOnMapZLevel(routeLineId, routeLineZLevel);	
 	}
 	
 	public void ChangeRoutePointPosition(int index, MapCoord point)

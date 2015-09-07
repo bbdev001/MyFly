@@ -47,11 +47,14 @@ public class TaskBuilder
 			gsWayPoint.dampingDistance = 1.5f;
 			gsWayPoint.actionTimeout = 999;
 
-			if (i < (route.wayPoints.size() - 1))
-				gsWayPoint.turnMode = GetTurnMode(route.wayPoints.get(i + 1).Heading, wp.Heading);
-			else
-				gsWayPoint.turnMode = GetTurnMode(wp.Heading, route.wayPoints.get(i - 1).Heading);
-
+			if (route.wayPoints.size() > 1)
+			{
+				if (i < (route.wayPoints.size() - 1))
+					gsWayPoint.turnMode = GetTurnMode(route.wayPoints.get(i + 1).Heading, wp.Heading);
+				else
+					gsWayPoint.turnMode = GetTurnMode(wp.Heading, route.wayPoints.get(i - 1).Heading);
+			}
+			
 			gsWayPoint.hasAction = true;
 
 			if (useViewPoint)

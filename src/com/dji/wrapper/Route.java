@@ -160,6 +160,12 @@ public class Route
 		return true;	
 	}
 	
+	public void AddWayPoint(WayPoint wayPoint)
+	{
+		mbr.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
+		wayPoints.add(wayPoint);
+	}
+	
 	public ArrayList<WayPoint> GetWayPoints()
 	{
 		if (isMapping)

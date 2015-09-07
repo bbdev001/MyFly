@@ -28,6 +28,11 @@ public class Mbr
 		Ymax = Double.MIN_VALUE;		
 	}
 
+	public boolean IsEmpty()
+	{
+		return Xmin == Double.MAX_VALUE;
+	}
+	
 	public double GetWidth()
 	{
 		return  Xmax - Xmin;

@@ -106,7 +106,7 @@ public class WPEditor extends Dialog implements View.OnClickListener
 			{
 				public void onClick(DialogInterface dialog, int which)
 				{
-					dismiss();
+					dialog.dismiss();
 					onWPDeleted.OnDeleted(wayPointId);
 				}
 			});
