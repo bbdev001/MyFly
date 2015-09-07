@@ -91,6 +91,12 @@ public class Route
 			if (line != null)
 				viewPoint.coord.Lon = Double.parseDouble(line);
 			
+			if (viewPoint.coord.Lon == 0 && viewPoint.coord.Lat == 0)
+			{
+				viewPoint.coord.Lon = mbr.GetCenterX();
+				viewPoint.coord.Lat = mbr.GetCenterY();
+			}
+			
 			br.close();
 		}
 		catch (IOException e)
@@ -131,7 +137,13 @@ public class Route
 			e.printStackTrace();
 			return false;
 		}
-
+		
+		if (viewPoint.coord.Lon == 0.0 && viewPoint.coord.Lat == 0.0)
+		{
+			viewPoint.coord.Lon = mbr.GetCenterX();
+			viewPoint.coord.Lat = mbr.GetCenterY();
+		}
+		
 		try
 		{
 			File file = new File(basePath + "/" + name + ".info");

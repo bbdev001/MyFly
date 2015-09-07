@@ -7,10 +7,8 @@ public class WayPoint
 	public int Heading;
 	public int HoverTime;
 	public int Action;
-	public int Speed;
 	public int CamAngle;
-	public int MaxReachTime;
-	
+
 	public WayPoint()
 	{
 		LoadDefaultValues();
@@ -36,10 +34,10 @@ public class WayPoint
 		Action = Integer.parseInt(fields[5]);
 		
 		if (fields.length > 6)
-			Speed = Integer.parseInt(fields[6]);
+			/*Speed =*/ Integer.parseInt(fields[6]);
 		
 		if (fields.length > 7)
-			MaxReachTime = Integer.parseInt(fields[7]);
+			/*MaxReachTime =*/ Integer.parseInt(fields[7]);
 		
 		if (fields.length > 8)
 			CamAngle = Integer.parseInt(fields[8]);
@@ -52,15 +50,13 @@ public class WayPoint
 		Heading = 0;
 		HoverTime = 0;
 		Action = 0;
-		Speed = 10;
-		MaxReachTime = 0;
 		CamAngle = 45;		
 	}
 	
 	@Override
 	public String toString()
 	{
-		String result = coord.Lat + "," + coord.Lon + "," + Alt + "," + Heading + "," + HoverTime + "," + Action + "," + Speed + "," + MaxReachTime + "," + CamAngle;
+		String result = coord.Lat + "," + coord.Lon + "," + Alt + "," + Heading + "," + HoverTime + "," + Action + "," + 0 + "," + 0 + "," + CamAngle;
 		
 		return result;
 	}

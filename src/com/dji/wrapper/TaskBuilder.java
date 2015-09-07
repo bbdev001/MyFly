@@ -43,7 +43,6 @@ public class TaskBuilder
 			gsWayPoint.action.actionRepeat = 1;
 			gsWayPoint.altitude = (float) wp.Alt;
 			gsWayPoint.heading = (short) Utilities.ConvertHeadingToYaw(wp.Heading);
-			gsWayPoint.speed = 10.0f;//(float) wp.Speed;
 			gsWayPoint.dampingDistance = 1.5f;
 			gsWayPoint.actionTimeout = 999;
 
@@ -176,11 +175,11 @@ public class TaskBuilder
 
 	protected static DJIGroundStationWaypoint CreateMappingWayPoint(WayPoint wayPoint, int camAngle)
 	{
+		Log.i("Coord", "Wp " + wayPoint.coord.Lat + " " + wayPoint.coord.Lon);
 		DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(wayPoint.coord.Lat, wayPoint.coord.Lon);
 		gsWayPoint.action.actionRepeat = 1;
 		gsWayPoint.altitude = wayPoint.Alt;
 		gsWayPoint.heading = (short) Utilities.ConvertHeadingToYaw(wayPoint.Heading);
-		gsWayPoint.speed = wayPoint.Speed;
 		gsWayPoint.dampingDistance = 1.0f;
 		gsWayPoint.turnMode = 0;
 		gsWayPoint.hasAction = true;
@@ -204,9 +203,7 @@ public class TaskBuilder
 				WayPoint wayPoint = new WayPoint();
 				wayPoint.coord = new DegPoint(cur.Lat, cur.Lon);
 				wayPoint.Alt = (int) mappingAlt;
-				wayPoint.Speed = speed;
 				wayPoint.Heading = heading;
-				wayPoint.HoverTime = 1;
 				route.mappingWayPoints.add(wayPoint);
 
 				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
@@ -233,9 +230,8 @@ public class TaskBuilder
 				WayPoint wayPoint = new WayPoint();
 				wayPoint.coord = new DegPoint(cur.Lat, cur.Lon);
 				wayPoint.Alt = (int) mappingAlt;
-				wayPoint.Speed = speed;
 				wayPoint.Heading = heading;
-				wayPoint.HoverTime = 1;
+				wayPoint.HoverTime = 0;
 				route.mappingWayPoints.add(wayPoint);
 
 				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));

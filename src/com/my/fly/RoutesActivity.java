@@ -106,10 +106,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private TextView errorMessages = null;
 	private boolean routeStarted = false;
 	private boolean routePaused = false;
-	private int scrollViewMessagesDefSize = 0;
-	private double lastAltitude = 3.0;
-	private Button errorMsgSize = null;
 	private DjiGLSurfaceView djiSurfaceView;
+	private RelativeLayout djiSurfaceViewLayout;
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
 	private NavmiiControl navigationSystem;
 	private String resourcePath = "";
@@ -118,7 +116,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
 	public String BASE_PATH = Environment.getExternalStorageDirectory() + "/MyFly";
 	public boolean isMapping = false;
-
+	protected int smallPreviewWidth = 0;
+	protected int smallPreviewHeight = 0;
+	protected int bigPreviewWidth = 0;
+	protected int bigPreviewHeight = 0;
+	protected boolean isPreviewSmall = true;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -137,12 +140,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		stopRoute = (ImageButton) findViewById(R.id.stopRoute);
 		goHome = (ImageButton) findViewById(R.id.goHome);
 		takePhoto = (ImageButton) findViewById(R.id.takePhoto);
-		errorMessages = (TextView) findViewById(R.id.errorMessages);
-		errorMsgSize = (Button) findViewById(R.id.errorMsgSize);
 		djiSurfaceView = (DjiGLSurfaceView) findViewById(R.id.djiSurfaceView);
+		djiSurfaceViewLayout = (RelativeLayout) findViewById(R.id.djiSurfaceViewLayout);
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		
-		errorMsgSize.setText("-");
 		pauseRoute.setEnabled(false);
 		stopRoute.setEnabled(false);
 		goHome.setEnabled(true);
@@ -167,6 +168,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
 
+		smallPreviewWidth = djiSurfaceViewLayout.getLayoutParams().width;
+		smallPreviewHeight = djiSurfaceViewLayout.getLayoutParams().height;
+		bigPreviewWidth = routeView.width;
+		bigPreviewHeight = routeView.height;
+		
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString("Can't init DJI sdk");
@@ -276,8 +282,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case DJIWrapper.MCU_STATUS:
 			{
 				DJIMainControllerSystemState status = (DJIMainControllerSystemState) msg.obj;
-
-				lastAltitude = status.altitude;
 
 				homePosition.Lat = status.homeLocationLatitude;
 				homePosition.Lon = status.homeLocationLongitude;
@@ -593,25 +597,30 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		RunGoHomeCommand();
 	}
 
-	public void OnErrorMsgSize(View v)
+	public void SetPreviewSizeSmall()
 	{
-		int width = djiSurfaceView.getLayoutParams().width;
-		int height = djiSurfaceView.getLayoutParams().height;
+		//djiSurfaceViewLayout.setLayoutParams(new RelativeLayout.LayoutParams(smallPreviewWidth, smallPreviewHeight));
+	}
 
-		if (scrollViewMessagesDefSize == height)
+	public void SetPreviewSizeBig()
+	{
+		//djiSurfaceViewLayout.setLayoutParams(new RelativeLayout.LayoutParams(bigPreviewWidth, bigPreviewHeight));
+	}
+	
+	public void VideoPreviewOnClick(View v)
+	{
+		if (isPreviewSmall)
 		{
-			height = 0;
-			errorMsgSize.setText("+");
+			isPreviewSmall = false;
+			SetPreviewSizeBig();
 		}
 		else
 		{
-			height = scrollViewMessagesDefSize;
-			errorMsgSize.setText("-");
+			isPreviewSmall = true;
+			SetPreviewSizeSmall();
 		}
-
-		djiSurfaceView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
 	}
-
+	
 	public void OnErrorMsgClear(View v)
 	{
 		prevMessage = "";

@@ -74,15 +74,6 @@ public class WPEditor extends Dialog implements View.OnClickListener
 			action.setAdapter(adapterAction);
 			action.setSelection(wayPoint.Action);
 
-			String[] dataSpeed = { "2", "4", "6", "8", "10" };
-			ArrayAdapter<String> adapterSpeed = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, dataSpeed);
-			adapterSpeed.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			speed = (Spinner) findViewById(R.id.speed);
-			speed.setAdapter(adapterSpeed);
-			pos = adapterSpeed.getPosition(Integer.toString(wayPoint.Speed));
-			if (pos > 0)
-				speed.setSelection(pos);
-
 			((Button) findViewById(R.id.btnDelete)).setOnClickListener(this);
 		}
 		
@@ -129,7 +120,6 @@ public class WPEditor extends Dialog implements View.OnClickListener
 				wayPoint.HoverTime = Integer.parseInt(hoverTime.getText().toString());
 				wayPoint.CamAngle = Integer.parseInt(camAngle.getText().toString());
 				wayPoint.Action = action.getSelectedItemPosition();
-				wayPoint.Speed = Integer.parseInt(speed.getSelectedItem().toString());
 			}
 		}
 		else if (v.getId() == R.id.btnCancel)
