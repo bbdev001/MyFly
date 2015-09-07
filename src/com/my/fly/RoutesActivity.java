@@ -784,7 +784,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 					BuildTask(isMapping);
 				}
 				
-				//SaveRoute(route.name);
+				SaveRoute();
 			}
 		});
 
@@ -935,8 +935,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		long markerId = routeView.AddWayPoint(wayPoint, route.GetWayPoints().size());	
 		route.AddWayPoint(wayPoint);
 		
-		WayPointSelected(markerId);
+		BuildTask(false);
 		
+		SaveRoute();
+			
 		return false;
 	}
 
@@ -962,9 +964,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	@Override
-	public boolean onSingleTapOnMap(Point arg0)
-	{
-		// TODO Auto-generated method stub
+	public boolean onSingleTapOnMap(Point point)
+	{	
 		return false;
 	}
 

@@ -106,8 +106,8 @@ public class WPEditor extends Dialog implements View.OnClickListener
 			{
 				public void onClick(DialogInterface dialog, int which)
 				{
-					dialog.dismiss();
 					onWPDeleted.OnDeleted(wayPointId);
+					dialog.dismiss();					
 				}
 			});
 
@@ -116,6 +116,7 @@ public class WPEditor extends Dialog implements View.OnClickListener
 
 			// Showing Alert Message
 			alertDialog.show();
+			
 			return;
 		}
 		else if (v.getId() == R.id.btnOk)
