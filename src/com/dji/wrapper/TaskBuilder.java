@@ -31,6 +31,7 @@ public class TaskBuilder
 		
 		return normalizedAngle > 180.0 ? 0 : 1;// 1 - anti-clockwise turning; 0 - clockwise turning.
 	}
+	
 	public static void BuildSequientialRoute(DJIGroundStationTask gsTask, Route route, boolean useViewPoint)
 	{
 		gsTask.RemoveAllWaypoint();
@@ -64,6 +65,8 @@ public class TaskBuilder
 			gsTask.addWaypoint(gsWayPoint);
 		}
 
+		gsTask.movingSpeed = (route.length / route.mappingWayPoints.size()) >= 10.0 ? 10.0f : 5.0f;
+		gsTask.remoteControlSpeed = 10.0f; 
 		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
@@ -108,6 +111,8 @@ public class TaskBuilder
 		gsWayPoint.hasAction = false;
 		gsTask.addWaypoint(gsWayPoint);
 
+		gsTask.movingSpeed = 10.0f;
+		gsTask.remoteControlSpeed = 10.0f;
 		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
@@ -135,13 +140,10 @@ public class TaskBuilder
 		for (int i = 0; i < route.wayPoints.size(); i++)
 		{
 			mbr.Adjust(route.wayPoints.get(i).coord.Lon, route.wayPoints.get(i).coord.Lat);
-
-			if (route.wayPoints.get(i).Alt > mappingAlt)
-				mappingAlt = route.wayPoints.get(i).Alt;
 		}
 
 		if (route.mappingAltitude == 0.0)
-			route.mappingAltitude = (float) mappingAlt;
+			route.mappingAltitude = (float) 50.0f;
 		else
 			mappingAlt = route.mappingAltitude;
 
@@ -155,18 +157,22 @@ public class TaskBuilder
 		Location.distanceBetween(mbr.Ymin, mbr.Xmin, mbr.Ymax, mbr.Xmin, distance);
 		double heightInMeters = distance[0];
 
-		double stepInMeters = 9.0 * ((viewRadius * 2.0) / baseDiagonalLength);
-		double stepsX = Math.round(widthInMeters / stepInMeters);
-		double stepsY = Math.round(heightInMeters / stepInMeters);
-		double stepInDeg = Utilities.MetersToDeg(stepInMeters);
+		double stepInMetersX = 9.0 * ((viewRadius * 2.0) / baseDiagonalLength);
+		double stepInMetersY = stepInMetersX - stepInMetersX / 4.0;
+		double stepsX = Math.round(widthInMeters / stepInMetersX);
+		double stepsY = Math.round(heightInMeters / stepInMetersY);
+		double stepInDegX = Utilities.MetersToDeg(stepInMetersX);
+		double stepInDegY = Utilities.MetersToDeg(stepInMetersY);
 		int speed = viewRadius > 10 ? 10 : 2;
 
 		DegPoint leftTop = new DegPoint(mbr.Ymax, mbr.Xmin); 
 		if (stepsX > stepsY)
-			HorizontalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDeg, stepInDeg);
+			HorizontalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDegX, stepInDegY);
 		else
-			VerticalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDeg, stepInDeg);
+			VerticalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDegX, stepInDegY);
 
+		gsTask.movingSpeed = (route.length / route.mappingWayPoints.size()) >= 10.0 ? 10.0f : 5.0f;
+		gsTask.remoteControlSpeed = 10.0f; 
 		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
