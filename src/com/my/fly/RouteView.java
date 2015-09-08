@@ -244,8 +244,7 @@ public class RouteView extends View
 			Long key = entry.getKey(); 
 			navigationSystem.DeleteItemOnMap(key);
 		} 
-		
-					
+							
 		route.viewPoint.coord.CopyTo(viewPoint);
 		
 		if (viewPointMarkerId == NavmiiControl.INVALID_USER_ITEM_ID)
@@ -484,9 +483,5 @@ public class RouteView extends View
 	{
 		// TODO Auto-generated method stub
 
-	}
-
-	public void RemoveWayPoint(int markerId)
-	{
 	}
 }

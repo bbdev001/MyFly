@@ -787,7 +787,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				if (!isMapping)
 				{
 					route.GetWayPoints().remove(wayPointIndex);
-					routeView.RemoveWayPoint(wayPointIndex);
+					routeView.SetRoute(route, false);
+					
 					selectedWayPointId = -1;
 					
 					BuildTask(isMapping);

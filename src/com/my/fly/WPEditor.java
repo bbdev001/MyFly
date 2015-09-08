@@ -83,10 +83,13 @@ public class WPEditor extends Dialog implements View.OnClickListener
 		super.show();
 	}
 
+	protected WPEditor self = this;
+	
 	@Override
 	public void onClick(View v)
 	{
 		boolean result = false;
+		
 		if (v.getId() == R.id.btnDelete)
 		{
 			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this.context);
@@ -97,8 +100,9 @@ public class WPEditor extends Dialog implements View.OnClickListener
 			{
 				public void onClick(DialogInterface dialog, int which)
 				{
-					onWPDeleted.OnDeleted(wayPointId);
-					dialog.dismiss();					
+					dialog.dismiss();
+					self.dismiss();				
+					onWPDeleted.OnDeleted(wayPointId);	
 				}
 			});
 
