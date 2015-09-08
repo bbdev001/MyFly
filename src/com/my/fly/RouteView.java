@@ -484,4 +484,15 @@ public class RouteView extends View
 		// TODO Auto-generated method stub
 
 	}
+	
+	public void SetViewPoint(DegPoint point)
+	{
+		viewPoint.lon = point.Lon;
+		viewPoint.lat = point.Lat;
+		
+		if (viewPointMarkerId == NavmiiControl.INVALID_USER_ITEM_ID)
+			viewPointMarkerId = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/waypoint_1.png", viewPoint, 0.5f, 0.5f, true);
+		else
+			navigationSystem.SetMarkerPosition(viewPointMarkerId, viewPoint);
+	}
 }

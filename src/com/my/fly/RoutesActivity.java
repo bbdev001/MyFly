@@ -942,8 +942,10 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	public boolean onLongPressOnMap(Point point)
 	{
 		WayPoint wayPoint = new WayPoint(routeView.TranslateScreenPointToGeoPoint(point));
-		long markerId = routeView.AddWayPoint(wayPoint, route.GetWayPoints().size());	
+
 		route.AddWayPoint(wayPoint);
+		routeView.AddWayPoint(wayPoint, route.GetWayPoints().size());		
+		routeView.SetViewPoint(route.viewPoint.coord);
 		
 		BuildTask(false);
 		

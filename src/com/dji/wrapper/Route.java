@@ -90,13 +90,7 @@ public class Route
 			line = br.readLine();
 			if (line != null)
 				viewPoint.coord.Lon = Double.parseDouble(line);
-			
-			if (viewPoint.coord.Lon == 0 && viewPoint.coord.Lat == 0)
-			{
-				viewPoint.coord.Lon = mbr.GetCenterX();
-				viewPoint.coord.Lat = mbr.GetCenterY();
-			}
-			
+						
 			br.close();
 		}
 		catch (IOException e)
@@ -138,12 +132,6 @@ public class Route
 			return false;
 		}
 		
-		if (viewPoint.coord.Lon == 0.0 && viewPoint.coord.Lat == 0.0)
-		{
-			viewPoint.coord.Lon = mbr.GetCenterX();
-			viewPoint.coord.Lat = mbr.GetCenterY();
-		}
-		
 		try
 		{
 			File file = new File(basePath + "/" + name + ".info");
@@ -176,6 +164,12 @@ public class Route
 	{
 		mbr.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
 		wayPoints.add(wayPoint);
+		
+		if (viewPoint.coord.Lon == 0.0 && viewPoint.coord.Lon == 0.0 && wayPoints.size() > 2)
+		{
+			viewPoint.coord.Lon = mbr.GetCenterX();
+			viewPoint.coord.Lat = mbr.GetCenterY();
+		}
 	}
 	
 	public ArrayList<WayPoint> GetWayPoints()
