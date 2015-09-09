@@ -167,17 +167,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesListArapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.mylistview_item, routes);
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
-
-		smallPreviewWidth = djiSurfaceViewLayout.getLayoutParams().width;
-		smallPreviewHeight = djiSurfaceViewLayout.getLayoutParams().height;
-		bigPreviewWidth = routeView.width;
-		bigPreviewHeight = routeView.height;
 		
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString("Can't init DJI sdk");
 	}
 
+	
 	@Override
 	public boolean handleMessage(Message msg)
 	{
@@ -599,12 +595,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	public void SetPreviewSizeSmall()
 	{
-		//djiSurfaceViewLayout.setLayoutParams(new RelativeLayout.LayoutParams(smallPreviewWidth, smallPreviewHeight));
+		if (smallPreviewWidth > 0 || smallPreviewHeight > 0)
+			djiSurfaceView.setLayoutParams(new RelativeLayout.LayoutParams(smallPreviewWidth, smallPreviewHeight));
 	}
 
 	public void SetPreviewSizeBig()
 	{
-		//djiSurfaceViewLayout.setLayoutParams(new RelativeLayout.LayoutParams(bigPreviewWidth, bigPreviewHeight));
+		if (bigPreviewWidth > 0 || bigPreviewHeight > 0)
+			djiSurfaceView.setLayoutParams(new RelativeLayout.LayoutParams(bigPreviewWidth, bigPreviewHeight));
 	}
 	
 	public void VideoPreviewOnClick(View v)
@@ -893,9 +891,15 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		navigationSystem.SetMapViewMode3D(false);	
 		navigationSystem.SetMapRotation(0.0f);
-		navigationSystem.SetSnapToGps(false);				
-	
-		LoadRoutesList();		
+		navigationSystem.SetSnapToGps(false);
+		
+		smallPreviewWidth = djiSurfaceView.getWidth();
+		smallPreviewHeight = djiSurfaceView.getHeight();
+		
+		bigPreviewWidth = mapView.getWidth();
+		bigPreviewHeight = mapView.getHeight();
+		
+		LoadRoutesList();
 	}
 
 	@Override
