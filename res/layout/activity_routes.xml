@@ -1,11 +1,9 @@
 <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.my.fly.RoutesActivity" xmlns:android="http://schemas.android.com/apk/res/android">
+	android:padding="5sp"
+    tools:context="com.my.fly.RoutesActivity" >
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -82,7 +80,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="0.15" >
-
             </FrameLayout>
 
             <LinearLayout
@@ -130,7 +127,6 @@
                     android:src="@android:drawable/ic_menu_camera" />
             </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -156,42 +152,24 @@
                 android:id="@+id/routeView"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="0.25"
+                android:layout_weight="0.15"
                 android:background="@android:color/transparent"
                 android:textColor="#ffffff" />
 
-            <SeekBar
-                android:id="@+id/seekBar1"
+            <Space
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:background="@android:color/transparent"
-                android:layout_weight="0.75" />
+                android:layout_weight="0.85" />
         </LinearLayout>
     </LinearLayout>
-        <RelativeLayout
-            android:id="@+id/djiSurfaceViewLayout"
-            android:layout_alignParentRight="true"
-        	android:layout_alignParentTop="true"
-        	android:baselineAligned="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <dji.sdk.widget.DjiGLSurfaceView
-                android:id="@+id/djiSurfaceView"
-                android:layout_width="133sp"
-                android:layout_height="75sp"
-                android:clickable="true"
-                android:onClick="VideoPreviewOnClick"
-                android:padding="0dp" />
-        </RelativeLayout>
 
     <RadioGroup
         android:id="@+id/routeType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/linearLayout2"
         android:layout_alignTop="@+id/linearLayout2"
         android:layout_marginRight="140sp"
-        android:layout_alignRight="@+id/linearLayout2"
         android:orientation="horizontal"
         android:paddingRight="8dp" >
 
@@ -213,5 +191,116 @@
             android:textSize="11dp"
             android:textStyle="bold" />
     </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <Space
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.75" />
+
+        <RelativeLayout
+            android:id="@+id/wayPointEditor"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="50sp"
+            android:layout_weight="0.25" >
+
+            <SeekBar
+                android:id="@+id/tracker"
+                android:layout_width="fill_parent"
+                android:layout_height="35sp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="100sp"
+                android:background="@android:color/transparent" />
+
+            <LinearLayout
+                android:id="@+id/wayPointFields"
+                android:layout_width="100sp"
+                android:layout_height="fill_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="80sp"
+                android:background="#1faaaaaa"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/altitudeCaption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="15sp"
+                    android:padding="2sp"
+                    android:text="Altitude (m)"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="8sp" />
+
+                <EditText
+                    android:id="@+id/altitude"
+                    android:layout_width="fill_parent"
+                    android:layout_height="17sp"
+                    android:padding="2sp"
+                    android:textSize="10sp"
+                    android:hint="Altitude (m)" >
+                </EditText>
+
+                <TextView
+                    android:id="@+id/headingCaption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="15sp"
+                    android:padding="2sp"
+                    android:text="Heading (deg 0-359)"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="8sp" />
+
+                <EditText
+                    android:id="@+id/heading"
+                    android:layout_width="fill_parent"
+                    android:layout_height="17sp"
+                    android:padding="2sp"
+                    android:textSize="10sp"
+                    android:hint="Heading (deg 0-359)" />
+
+                <TextView
+                    android:id="@+id/camAnglecaption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="15sp"
+                    android:padding="2sp"
+                    android:text="Cam angle (deg 0-89)"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="8sp" />
+
+                <EditText
+                    android:id="@+id/camAngle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="17sp"
+                    android:padding="2sp"
+                    android:textSize="10sp"
+                    android:hint="Cam angle (deg 0-89)" />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/djiSurfaceViewLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:baselineAligned="false" >
+
+        <dji.sdk.widget.DjiGLSurfaceView
+            android:id="@+id/djiSurfaceView"
+            android:layout_width="133sp"
+            android:layout_height="75sp"
+            android:clickable="true"
+            android:onClick="VideoPreviewOnClick"
+            android:padding="0dp" />
+    </RelativeLayout>
 
 </RelativeLayout>
