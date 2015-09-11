@@ -26,6 +26,7 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
@@ -117,21 +118,29 @@ public class RouteView extends View
 	protected OnWayPointPositionChanged wayPointPositionChanged = null;
 	protected OnWayPointPositionChangingDone wayPointPositionChangingDone = null;
 
+	protected int ConvertSPToPixels(int spValue)
+	{
+		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                              spValue, getResources().getDisplayMetrics());
+	}
+	
 	public RouteView(Context c, AttributeSet attrs)
 	{
 		super(c, attrs);
 		context = c;
-
+		
+		int pixelSize = ConvertSPToPixels(10);
+		
 		paint = new Paint();
 		paint.setAntiAlias(true);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeJoin(Paint.Join.ROUND);
-		paint.setTextSize(32);
+		paint.setTextSize(pixelSize);
 
 		textPaint = new Paint();
 		textPaint.setAntiAlias(true);
 		textPaint.setColor(Color.BLACK);
-		textPaint.setTextSize(32);
+		textPaint.setTextSize(pixelSize);
 
 		width = (int) this.GetWidth();
 		height = (int) this.GetHeight();
@@ -385,7 +394,7 @@ public class RouteView extends View
 		paint.setStrokeWidth(LINE_WIDTH);
 
 		// Info
-		float lineHeight = 40.0f;
+		float lineHeight = (float)ConvertSPToPixels(12);
 		float linePos = 0.0f;
 
 		linePos += lineHeight;

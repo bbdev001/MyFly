@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-	android:padding="5sp"
+    android:padding="5sp"
     tools:context="com.my.fly.RoutesActivity" >
 
     <LinearLayout
@@ -167,9 +167,7 @@
         android:id="@+id/routeType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/linearLayout2"
-        android:layout_alignTop="@+id/linearLayout2"
-        android:layout_marginRight="140sp"
+        android:layout_centerHorizontal = "true"
         android:orientation="horizontal"
         android:paddingRight="8dp" >
 
@@ -204,86 +202,101 @@
             android:layout_height="fill_parent"
             android:layout_weight="0.75" />
 
-        <RelativeLayout
-            android:id="@+id/wayPointEditor"
+        <LinearLayout
+            android:id="@+id/linearLayout6"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginBottom="50sp"
-            android:layout_weight="0.25" >
+            android:layout_weight="0.25"
+            android:baselineAligned="false"
+            android:orientation="vertical" >
 
-            <SeekBar
-                android:id="@+id/tracker"
+            <RelativeLayout
+                android:id="@+id/wayPointEditor"
                 android:layout_width="fill_parent"
-                android:layout_height="35sp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginRight="100sp"
-                android:background="@android:color/transparent" />
-
-            <LinearLayout
-                android:id="@+id/wayPointFields"
-                android:layout_width="100sp"
                 android:layout_height="fill_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="80sp"
-                android:background="#1faaaaaa"
-                android:orientation="vertical" >
+                android:layout_weight="0.15" >
 
-                <TextView
-                    android:id="@+id/altitudeCaption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="15sp"
-                    android:padding="2sp"
-                    android:text="Altitude (m)"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="8sp" />
-
-                <EditText
-                    android:id="@+id/altitude"
+                <SeekBar
+                    android:id="@+id/tracker"
                     android:layout_width="fill_parent"
-                    android:layout_height="17sp"
-                    android:padding="2sp"
-                    android:textSize="10sp"
-                    android:hint="Altitude (m)" >
-                </EditText>
+                    android:layout_height="35sp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginRight="100sp"
+                    android:background="@android:color/transparent" />
 
-                <TextView
-                    android:id="@+id/headingCaption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="15sp"
-                    android:padding="2sp"
-                    android:text="Heading (deg 0-359)"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="8sp" />
+                <LinearLayout
+                    android:id="@+id/wayPointFields"
+                    android:layout_width="100sp"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="80sp"
+                    android:background="#1faaaaaa"
+                    android:orientation="vertical" >
 
-                <EditText
-                    android:id="@+id/heading"
-                    android:layout_width="fill_parent"
-                    android:layout_height="17sp"
-                    android:padding="2sp"
-                    android:textSize="10sp"
-                    android:hint="Heading (deg 0-359)" />
+                    <TextView
+                        android:id="@+id/altitudeCaption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="15sp"
+                        android:padding="2sp"
+                        android:text="Altitude (m)"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="8sp" />
 
-                <TextView
-                    android:id="@+id/camAnglecaption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="15sp"
-                    android:padding="2sp"
-                    android:text="Cam angle (deg 0-89)"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textSize="8sp" />
+                    <EditText
+                        android:id="@+id/altitude"
+                        android:layout_width="fill_parent"
+                        android:layout_height="17sp"
+                        android:editable="false"
+                        android:hint="Altitude (m)"
+                        android:padding="2sp"
+                        android:textSize="10sp" >
+                    </EditText>
 
-                <EditText
-                    android:id="@+id/camAngle"
-                    android:layout_width="fill_parent"
-                    android:layout_height="17sp"
-                    android:padding="2sp"
-                    android:textSize="10sp"
-                    android:hint="Cam angle (deg 0-89)" />
+                    <TextView
+                        android:id="@+id/headingCaption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="15sp"
+                        android:padding="2sp"
+                        android:text="Heading (deg 0-359)"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="8sp" />
 
-            </LinearLayout>
-        </RelativeLayout>
+                    <EditText
+                        android:id="@+id/heading"
+                        android:layout_width="fill_parent"
+                        android:layout_height="17sp"
+                        android:editable="false"
+                        android:hint="Heading (deg 0-359)"
+                        android:padding="2sp"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/camAnglecaption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="15sp"
+                        android:padding="2sp"
+                        android:text="Cam angle (deg 0-89)"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="8sp" />
+
+                    <EditText
+                        android:id="@+id/camAngle"
+                        android:layout_width="fill_parent"
+                        android:layout_height="17sp"
+                        android:editable="false"
+                        android:hint="Cam angle (deg 0-89)"
+                        android:padding="2sp"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.85" />
+        </LinearLayout>
     </LinearLayout>
 
     <RelativeLayout
