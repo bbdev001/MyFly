@@ -1,5 +1,7 @@
 package com.my.fly;
 
+import com.my.fly.utilities.WayPoint;
+
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
@@ -10,6 +12,7 @@ public class WayPointEditorBuiltin
 {
 	private SeekBar tracker = null;
 	private LinearLayout wayPointFields = null;
+	private WayPoint wayPoint = null;
 	
 	public WayPointEditorBuiltin(Activity parent)
 	{
@@ -17,6 +20,11 @@ public class WayPointEditorBuiltin
 		wayPointFields = (LinearLayout) parent.findViewById(R.id.wayPointFields);
 		
 		Hide();
+	}
+	
+	public void SetWayPoint(WayPoint wayPoint)
+	{
+		this.wayPoint = wayPoint;
 	}
 	
 	public void Show()

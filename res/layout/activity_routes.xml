@@ -69,7 +69,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/linearLayoutLeft2"
+            android:id="@+id/linearLayoutRight1"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.25"
@@ -137,6 +137,7 @@
         android:orientation="horizontal" >
 
         <Space
+            android:id="@+id/spaceLeft1"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.75" />
@@ -198,12 +199,13 @@
         android:orientation="horizontal" >
 
         <Space
+            android:id="@+id/spaceLeft2"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.75" />
 
         <LinearLayout
-            android:id="@+id/linearLayout6"
+            android:id="@+id/linearLayoutRight2"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="0.25"
@@ -222,16 +224,17 @@
                     android:layout_height="35sp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginRight="100sp"
+                    android:layout_marginRight="133sp"
                     android:background="@android:color/transparent" />
 
                 <LinearLayout
                     android:id="@+id/wayPointFields"
-                    android:layout_width="100sp"
+                    android:layout_width="133sp"
                     android:layout_height="fill_parent"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
                     android:layout_marginTop="80sp"
+                    android:padding="3sp"
                     android:background="#1faaaaaa"
                     android:orientation="vertical" >
 

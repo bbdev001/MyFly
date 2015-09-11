@@ -61,6 +61,7 @@ public class DJIWrapper
 		Log.i(TAG, "Init SDK");
 
 		boolean crashed = false;
+		
 		do
 		{
 			try
@@ -101,14 +102,14 @@ public class DJIWrapper
 		if (IsInited)
 		{
 			if (cameraSurface != null)
-				GetCamera().Connect(cameraSurface, 250);
+				GetCamera().Connect(cameraSurface, 50);
 
 			if (droneType == DJIDroneType.DJIDrone_Inspire1 || droneType == DJIDroneType.DJIDrone_Phantom3_Professional)
-				GetRemoteController().Connect(250);
+				GetRemoteController().Connect(50);
 
-			GetMcu().Connect(250);
-			GetGroundStation().Connect(250);
-			GetGimbal().Connect(250);
+			GetMcu().Connect(50);
+			GetGroundStation().Connect(50);
+			GetGimbal().Connect(50);
 			GetBattery().Connect(2000);
 		}
 	}

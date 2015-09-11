@@ -753,8 +753,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		selectedWayPointId = wayPointId;
 		
-		//wpEditorBuiltIn.Show();
-
+		wpEditorBuiltIn.Show();
+		wpEditorBuiltIn.SetWayPoint(wayPoint);
+/*
 		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoint, isMapping,
 		new WPEditor.OnDialogClosedListener()
 		{
@@ -801,6 +802,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		});
 
 		dialog.show();
+		*/
 	}
 
 	public void OnTakePhoto(View v)
@@ -879,8 +881,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public void onUserMarkerClicked(long markerId)
 	{
-		if (routeView.SelectWayPointByMarkerId(markerId))	
-			WayPointSelected(markerId);
+		//if (routeView.SelectWayPointByMarkerId(markerId))	
+		//	WayPointSelected(markerId);
 	}
 
 	@Override
@@ -936,7 +938,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public void onUserMarkerPressed(long markerId)
 	{
-		routeView.SelectWayPointByMarkerId(markerId);		
+		if (routeView.SelectWayPointByMarkerId(markerId))
+			WayPointSelected(markerId);
 	}
 
 	@Override
@@ -985,7 +988,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	@Override
 	public boolean onSingleTapOnMap(Point point)
-	{	
+	{
+		wpEditorBuiltIn.Hide();
+		
 		return false;
 	}
 
@@ -1126,3 +1131,4 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		BuildRouteForType(false);	
 	}
 }
+
