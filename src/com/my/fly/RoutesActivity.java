@@ -112,8 +112,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
 	private NavmiiControl navigationSystem;
 	private String resourcePath = "";
-	private SeekBar tracker = null;
-	private LinearLayout wayPointFields = null;
 	
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
@@ -124,7 +122,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected int bigPreviewWidth = 0;
 	protected int bigPreviewHeight = 0;
 	protected boolean isPreviewSmall = true;
-	
+	protected WayPointEditorBuiltin wpEditorBuiltIn = null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -135,8 +133,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		Log.e(TAG, BASE_PATH);
 		setContentView(R.layout.activity_routes);
 
-		tracker = (SeekBar) findViewById(R.id.tracker);
-		wayPointFields = (LinearLayout) findViewById(R.id.wayPointFields);
 		routesList = (ListView) findViewById(R.id.routes);
 		routeView = (RouteView) findViewById(R.id.routeView);
 		mapView = (ViewGroup) findViewById(R.id.mapSurface);
@@ -148,9 +144,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		djiSurfaceView = (DjiGLSurfaceView) findViewById(R.id.djiSurfaceView);
 		djiSurfaceViewLayout = (RelativeLayout) findViewById(R.id.djiSurfaceViewLayout);
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
-		
-		tracker.setVisibility(View.INVISIBLE);
-		wayPointFields.setVisibility(View.INVISIBLE);
 		
 		pauseRoute.setEnabled(false);
 		stopRoute.setEnabled(false);
@@ -175,6 +168,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesListArapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.mylistview_item, routes);
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
+		
+		wpEditorBuiltIn = new WayPointEditorBuiltin(this);
 		
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
@@ -757,6 +752,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		final WayPoint wayPoint = wayPointId >= 0 ? route.GetWayPoints().get(wayPointId) : route.GetWayPoints().get(0);
 		
 		selectedWayPointId = wayPointId;
+		
+		//wpEditorBuiltIn.Show();
 
 		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoint, isMapping,
 		new WPEditor.OnDialogClosedListener()
@@ -955,7 +952,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		WayPoint wayPoint = new WayPoint(routeView.TranslateScreenPointToGeoPoint(point));
 
 		route.AddWayPoint(wayPoint);
-		routeView.AddWayPoint(wayPoint, route.GetWayPoints().size());		
+		routeView.AddWayPoint(wayPoint, route.GetWayPoints().size() - 1);		
 		routeView.SetViewPoint(route.viewPoint.coord);
 		
 		BuildTask(false);
