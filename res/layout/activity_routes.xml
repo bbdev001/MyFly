@@ -177,7 +177,7 @@
             android:layout_height="wrap_content"
             android:onClick="OnRouteTypeChanged"
             android:text="Routing"
-            android:textSize="11dp"
+            android:textSize="11sp"
             android:textStyle="bold" />
 
         <RadioButton
@@ -186,7 +186,7 @@
             android:layout_height="wrap_content"
             android:onClick="OnRouteTypeChanged"
             android:text="Mapping"
-            android:textSize="11dp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </RadioGroup>
 

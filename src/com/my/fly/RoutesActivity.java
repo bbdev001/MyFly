@@ -3,7 +3,6 @@ package com.my.fly;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-
 import geolife.android.navigationsystem.NavmiiControl;
 import geolife.android.navigationsystem.NavmiiControl.Direction;
 import geolife.android.navigationsystem.NavmiiControl.DirectionType;
@@ -75,10 +74,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -111,6 +112,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
 	private NavmiiControl navigationSystem;
 	private String resourcePath = "";
+	private SeekBar tracker = null;
+	private LinearLayout wayPointFields = null;
 	
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
@@ -132,6 +135,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		Log.e(TAG, BASE_PATH);
 		setContentView(R.layout.activity_routes);
 
+		tracker = (SeekBar) findViewById(R.id.tracker);
+		wayPointFields = (LinearLayout) findViewById(R.id.wayPointFields);
 		routesList = (ListView) findViewById(R.id.routes);
 		routeView = (RouteView) findViewById(R.id.routeView);
 		mapView = (ViewGroup) findViewById(R.id.mapSurface);
@@ -143,6 +148,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		djiSurfaceView = (DjiGLSurfaceView) findViewById(R.id.djiSurfaceView);
 		djiSurfaceViewLayout = (RelativeLayout) findViewById(R.id.djiSurfaceViewLayout);
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
+		
+		tracker.setVisibility(View.INVISIBLE);
+		wayPointFields.setVisibility(View.INVISIBLE);
 		
 		pauseRoute.setEnabled(false);
 		stopRoute.setEnabled(false);
@@ -173,7 +181,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			AppendString("Can't init DJI sdk");
 	}
 
-	
 	@Override
 	public boolean handleMessage(Message msg)
 	{
