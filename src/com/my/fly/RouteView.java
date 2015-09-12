@@ -447,9 +447,9 @@ public class RouteView extends View
 		return height;
 	}
 
-	public void SetWayPoint(Long markerId, WayPoint wayPoint)
+	public void SetWayPointHeading(Long markerId, int heading)
 	{
-		navigationSystem.SetMarkerHeading(markerId, wayPoint.Heading);
+		navigationSystem.SetMarkerHeading(markerId, heading);
 	}
 
 	public void SetMissionFlightStatus(String type, int targetWayPointIndex, String currentState)

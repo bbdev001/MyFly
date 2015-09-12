@@ -14,6 +14,32 @@ public class WayPoint
 		LoadDefaultValues();
 	}
 
+	public WayPoint(WayPoint other)
+	{
+		coord = new DegPoint();
+		
+		coord.Lon = other.coord.Lon;
+		coord.Lat = other.coord.Lat;
+		
+		Alt = other.Alt;
+		Heading = other.Heading;
+		HoverTime = other.HoverTime;
+		Action = other.Action;
+		CamAngle = other.CamAngle;
+	}
+	
+	public void CopyTo(WayPoint other)
+	{
+		other.coord.Lon = coord.Lon;
+		other.coord.Lat = coord.Lat;
+		
+		other.Alt = Alt;
+		other.Heading = Heading;
+		other.HoverTime = HoverTime;
+		other.Action = Action;
+		other.CamAngle = CamAngle;
+	}
+	
 	public WayPoint(DegPoint point)
 	{
 		LoadDefaultValues();

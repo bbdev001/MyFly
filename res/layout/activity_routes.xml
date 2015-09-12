@@ -168,7 +168,7 @@
         android:id="@+id/routeType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal = "true"
+        android:layout_centerHorizontal="true"
         android:orientation="horizontal"
         android:paddingRight="8dp" >
 
@@ -234,18 +234,21 @@
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
                     android:layout_marginTop="80sp"
-                    android:padding="3sp"
                     android:background="#1faaaaaa"
-                    android:orientation="vertical" >
+                    android:orientation="vertical"
+                    android:padding="3sp" >
 
                     <TextView
                         android:id="@+id/altitudeCaption"
                         android:layout_width="wrap_content"
                         android:layout_height="15sp"
                         android:padding="2sp"
+                        android:shadowColor="@android:color/white"
+                        android:shadowRadius="2"
                         android:text="Altitude (m)"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="8sp" />
+                        android:textColor="@android:color/black"
+                        android:textSize="6sp" />
 
                     <EditText
                         android:id="@+id/altitude"
@@ -254,6 +257,9 @@
                         android:editable="false"
                         android:hint="Altitude (m)"
                         android:padding="2sp"
+                        android:shadowColor="@android:color/white"
+                        android:shadowRadius="2"
+                        android:textColor="@android:color/black"
                         android:textSize="10sp" >
                     </EditText>
 
@@ -262,9 +268,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="15sp"
                         android:padding="2sp"
+                        android:shadowColor="@android:color/white"
+                        android:shadowRadius="2"
                         android:text="Heading (deg 0-359)"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="8sp" />
+                        android:textColor="@android:color/black"
+                        android:textSize="6sp" />
 
                     <EditText
                         android:id="@+id/heading"
@@ -273,6 +282,9 @@
                         android:editable="false"
                         android:hint="Heading (deg 0-359)"
                         android:padding="2sp"
+                        android:shadowColor="@android:color/white"
+                        android:shadowRadius="2"
+                        android:textColor="@android:color/black"
                         android:textSize="10sp" />
 
                     <TextView
@@ -280,9 +292,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="15sp"
                         android:padding="2sp"
+                        android:shadowColor="@android:color/white"
+                        android:shadowRadius="2"
                         android:text="Cam angle (deg 0-89)"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textSize="8sp" />
+                        android:textColor="@android:color/black"
+                        android:textSize="6sp" />
 
                     <EditText
                         android:id="@+id/camAngle"
@@ -291,6 +306,9 @@
                         android:editable="false"
                         android:hint="Cam angle (deg 0-89)"
                         android:padding="2sp"
+                        android:shadowColor="@android:color/white"
+                        android:shadowRadius="2"
+                        android:textColor="@android:color/black"
                         android:textSize="10sp" />
                 </LinearLayout>
             </RelativeLayout>

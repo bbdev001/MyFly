@@ -112,6 +112,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private DJIDroneType droneType = DJIDroneType.DJIDrone_Phantom3_Professional;
 	private NavmiiControl navigationSystem;
 	private String resourcePath = "";
+	private WayPointEditorBuiltin wpEditorBuiltIn = null;
 	
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
@@ -122,7 +123,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected int bigPreviewWidth = 0;
 	protected int bigPreviewHeight = 0;
 	protected boolean isPreviewSmall = true;
-	protected WayPointEditorBuiltin wpEditorBuiltIn = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -149,6 +150,61 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		stopRoute.setEnabled(false);
 		goHome.setEnabled(true);
 
+		wpEditorBuiltIn = new WayPointEditorBuiltin(this,
+				new WayPointEditorBuiltin.OnSavedListener()
+				{
+					@Override
+					public void OnSaved(WayPoint wayPoint, long markerId)
+					{
+						Log.e(TAG, "WPSaved.onSaved");
+
+						if (!isMapping)
+						{
+							routeView.SetWayPointHeading(markerId, wayPoint.Heading);
+							BuildTask(isMapping);
+						}
+						else
+						{
+							route.mappingAltitude = wayPoint.Alt;
+							BuildTask(isMapping);
+							routeView.SetRoute(route, true);
+						}
+						
+						SaveRoute();
+					}
+				},
+				new WayPointEditorBuiltin.OnDeletedListener()
+				{	
+					@Override
+					public void OnDeleted(long markerId, boolean isMapping)
+					{
+						Log.e(TAG, "WPSaved.onDeleted");
+						int wayPointId = routeView.GetWayPointNumberByMarkerId(markerId);
+						
+						if (!isMapping)
+						{
+							route.GetWayPoints().remove(wayPointId);
+							routeView.SetRoute(route, false);
+							
+							selectedWayPointId = -1;
+							
+							BuildTask(isMapping);
+						}
+						
+						SaveRoute();	
+					}
+				},
+				new WayPointEditorBuiltin.OnHeadingChangedListener()
+				{
+					@Override
+					public void OnHeadingChanged(long markerId, int heading)
+					{
+						routeView.SetWayPointHeading(markerId, heading);
+					}
+				});
+
+		wpEditorBuiltIn.Hide();
+		
 		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
 		navigationSystem = NavmiiControl.Create(this);
 		
@@ -168,9 +224,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesListArapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.mylistview_item, routes);
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
-		
-		wpEditorBuiltIn = new WayPointEditorBuiltin(this);
-		
+				
 		AppendString("Connecting to drone");
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString("Can't init DJI sdk");
@@ -753,56 +807,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		
 		selectedWayPointId = wayPointId;
 		
+		wpEditorBuiltIn.SetWayPoint(wayPoint, markerId, isMapping);
 		wpEditorBuiltIn.Show();
-		wpEditorBuiltIn.SetWayPoint(wayPoint);
-/*
-		final WPEditor dialog = new WPEditor(this, "Edit waypoint " + wayPointId, wayPointId, wayPoint, isMapping,
-		new WPEditor.OnDialogClosedListener()
-		{
-			public void OnClosed(boolean isCancel)
-			{
-				Log.e(TAG, "WPEditor.OnClosed");
-
-				if (!isCancel)
-				{
-					if (!isMapping)
-					{
-						routeView.SetWayPoint(markerId, wayPoint);
-						routeView.SelectWayPointByMarkerId(markerId);
-						BuildTask(isMapping);
-					}
-					else
-					{
-						route.mappingAltitude = wayPoint.Alt;
-						BuildTask(isMapping);
-						routeView.SetRoute(route, true);
-					}
-					
-					SaveRoute();						
-				}
-			}
-		},
-		new WPEditor.OnWPDeletedListener()
-		{
-			@Override
-			public void OnDeleted(int wayPointIndex)
-			{
-				if (!isMapping)
-				{
-					route.GetWayPoints().remove(wayPointIndex);
-					routeView.SetRoute(route, false);
-					
-					selectedWayPointId = -1;
-					
-					BuildTask(isMapping);
-				}
-				
-				SaveRoute();
-			}
-		});
-
-		dialog.show();
-		*/
 	}
 
 	public void OnTakePhoto(View v)
@@ -989,7 +995,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	@Override
 	public boolean onSingleTapOnMap(Point point)
 	{
-		wpEditorBuiltIn.Hide();
+		if (wpEditorBuiltIn != null)
+			wpEditorBuiltIn.Hide();
 		
 		return false;
 	}
