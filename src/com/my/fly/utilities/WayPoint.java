@@ -76,7 +76,7 @@ public class WayPoint
 		Heading = 0;
 		HoverTime = 0;
 		Action = 0;
-		CamAngle = 45;		
+		CamAngle = -45;		
 	}
 	
 	@Override

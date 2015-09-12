@@ -961,8 +961,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		WayPoint wayPoint = new WayPoint(routeView.TranslateScreenPointToGeoPoint(point));
 
 		route.AddWayPoint(wayPoint);
-		routeView.AddWayPoint(wayPoint, route.GetWayPoints().size() - 1);		
+		long markerId = routeView.AddWayPoint(wayPoint, route.GetWayPoints().size() - 1);
 		routeView.SetViewPoint(route.viewPoint.coord);
+		
+		if (routeView.SelectWayPointByMarkerId(markerId))
+			WayPointSelected(markerId);
 		
 		BuildTask(false);
 		
@@ -1040,6 +1043,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		}
 		else
 		{
+			wpEditorBuiltIn.Hide();
 			route.viewPoint.coord.Lon = newPosition.lon;
 			route.viewPoint.coord.Lat = newPosition.lat;
 			route.SetHeadingsToViewPoint();

@@ -5,11 +5,16 @@ import java.util.HashMap;
 import com.my.fly.utilities.WayPoint;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class WayPointEditorBuiltin 
 {
@@ -20,6 +25,11 @@ public class WayPointEditorBuiltin
 	protected EditText altitude;
 	protected EditText heading;
 	protected EditText camAngle;
+	protected TextView altLabel;
+	protected TextView headLabel;
+	protected TextView camLabel;
+	protected Button cancel;
+	protected Button delete;
 	protected int currentId = 0;
 	protected WayPoint oldValue = new WayPoint();
 	protected boolean isMapping = false;
@@ -27,7 +37,7 @@ public class WayPointEditorBuiltin
 	protected OnDeletedListener onDeleted = null;
 	protected OnHeadingChangedListener onHeadingChanged = null;
 	protected WayPointEditorBuiltin self = null;
-	
+	protected Activity parent = null;
 	public interface OnSavedListener
 	{
 		public void OnSaved(WayPoint wayPoint, long wayPointIndex);
@@ -47,6 +57,7 @@ public class WayPointEditorBuiltin
 	{
 		self = this;
 		
+		this.parent = parent;
 		this.onSaved = onSaved;
 		this.onDeleted = onDeleted;
 		this.onHeadingChanged = onHeadingChanged;
@@ -57,6 +68,49 @@ public class WayPointEditorBuiltin
 		altitude = (EditText) parent.findViewById(R.id.altitude);
 		heading = (EditText) parent.findViewById(R.id.heading);
 		camAngle = (EditText) parent.findViewById(R.id.camAngle);
+		altLabel = (TextView) parent.findViewById(R.id.altitudeCaption);
+		headLabel = (TextView) parent.findViewById(R.id.headingCaption);
+		camLabel = (TextView) parent.findViewById(R.id.camAngleCaption);
+		cancel = (Button) parent.findViewById(R.id.btnCancel);
+		delete = (Button) parent.findViewById(R.id.btnDelete);
+		
+		cancel.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				oldValue.CopyTo(wayPoint);
+				self.SetWayPoint(wayPoint, wayPointIndex, isMapping);
+				self.onSaved.OnSaved(wayPoint, wayPointIndex);
+			}
+		});
+		
+		delete.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				AlertDialog.Builder alertDialog = new AlertDialog.Builder(self.parent);
+
+				alertDialog.setTitle("Confirm Delete...");
+				alertDialog.setMessage("Are you sure you want to delete this?");
+				alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which)
+					{
+						dialog.dismiss();		
+						self.onDeleted.OnDeleted(wayPointIndex, isMapping);
+						self.Hide();
+					}
+				});
+
+				// Setting Negative "NO" Button
+				alertDialog.setNegativeButton("NO", null);
+
+				// Showing Alert Message
+				alertDialog.show();
+			}
+		});
 		
 		tracker.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
 		{
@@ -157,6 +211,9 @@ public class WayPointEditorBuiltin
 		heading.setText(Integer.toString(wayPoint.Heading));
 		camAngle.setText(Integer.toString(wayPoint.CamAngle));
 		
+		tracker.setMax(300);
+		tracker.setProgress(wayPoint.Alt);
+		currentId = R.id.altitude;
 		altitude.setFocusableInTouchMode(true);
 		altitude.requestFocus();
 	}
@@ -170,11 +227,17 @@ public class WayPointEditorBuiltin
 		{
 			heading.setVisibility(View.INVISIBLE);
 			camAngle.setVisibility(View.INVISIBLE);
+			headLabel.setVisibility(View.INVISIBLE);
+			camLabel.setVisibility(View.INVISIBLE);
+			delete.setVisibility(View.INVISIBLE);
 		}
 		else
 		{
 			heading.setVisibility(View.VISIBLE);
-			camAngle.setVisibility(View.VISIBLE);	
+			camAngle.setVisibility(View.VISIBLE);
+			headLabel.setVisibility(View.VISIBLE);
+			camLabel.setVisibility(View.VISIBLE);
+			delete.setVisibility(View.VISIBLE);
 		}
 	}
 
