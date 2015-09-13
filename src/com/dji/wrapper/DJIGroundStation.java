@@ -1,5 +1,7 @@
 package com.dji.wrapper;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import android.content.Context;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -37,7 +39,7 @@ public class DJIGroundStation
 	private DJIDroneType droneType = null;
 	private DJIGroundStationFlyingInfo flyingInfo = new DJIGroundStationFlyingInfo();
 	private DJIGroundStation gsWrapper = null;
-	private boolean isAltAdjustmentNeeded = false;
+	private AtomicBoolean isAltAdjustmentNeeded = new AtomicBoolean(false);
 
 	public DJIGroundStation(DJIDroneType droneType, Context context, Handler handler)
 	{
@@ -61,7 +63,7 @@ public class DJIGroundStation
 				flyingInfo = flyingInfoParam;
 				flyingInfo.altitude /= 10.0f;
 
-				if (isAltAdjustmentNeeded)
+				if (isAltAdjustmentNeeded.get())
 					AdjustAlt();
 
 				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_FLYING_STATUS, flyingInfo));
@@ -119,7 +121,7 @@ public class DJIGroundStation
 							if (result == GroundStationResult.GS_Result_Success)
 							{
 								message = "oneKeyFly success";
-								isAltAdjustmentNeeded = true;
+								isAltAdjustmentNeeded.set(true);
 							}
 							else
 								message = "oneKeyFly error " + result;
@@ -248,20 +250,26 @@ public class DJIGroundStation
 		});
 	}
 
-	private float takeOffAlt = 5.0f;
+	private float takeOffAlt = 6.0f;
 
-	public void AdjustAlt()
+	public void AdjustAltitudeTo(float altitude)
 	{
-		//uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Adjust alt " + flyingInfo.altitude + " " + takeOffAlt));
-		if (flyingInfo.altitude > takeOffAlt && flyingInfo.altitude > 1.5)
+		takeOffAlt = altitude;
+		isAltAdjustmentNeeded.set(true);
+	}
+	
+	protected void AdjustAlt()
+	{
+		float altDelta = flyingInfo.altitude - takeOffAlt;
+		
+		if (altDelta > 0.0 && flyingInfo.altitude > 1.5)
 			gsWrapper.GetJoystik().Bottom();
-		else if (flyingInfo.altitude < takeOffAlt)
+		else if (altDelta < takeOffAlt)
 			gsWrapper.GetJoystik().Top();
 
-		float altDelta = flyingInfo.altitude - takeOffAlt;
 		if (altDelta >= 0.0f && altDelta <= 1.0f)
 		{
-			isAltAdjustmentNeeded = false;
+			isAltAdjustmentNeeded.set(false);
 			gsWrapper.GetJoystik().StopLeftJoystik();
 			uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE, "Take off done"));
 		}

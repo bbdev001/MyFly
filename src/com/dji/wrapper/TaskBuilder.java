@@ -65,9 +65,9 @@ public class TaskBuilder
 			gsTask.addWaypoint(gsWayPoint);
 		}
 
-		gsTask.movingSpeed = (route.length / route.mappingWayPoints.size()) >= 10.0 ? 10.0f : 5.0f;
+		gsTask.movingSpeed = (route.length / route.mappingWayPoints.size()) > 30.0 ? 10.0f : 5.0f;
 		gsTask.remoteControlSpeed = 10.0f; 
-		gsTask.finishAction = DJIGroundStationFinishAction.Go_Home;
+		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
 		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
 		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
@@ -79,44 +79,6 @@ public class TaskBuilder
 
 		float[] result = new float[3];
 		Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, result);
-
-		float speed = 5.0f;
-		if (result[0] > 15.0f)
-			speed = 10.0f;
-
-		// Move top
-		DJIGroundStationWaypoint gsWayPoint = new DJIGroundStationWaypoint(lastPosition.Lat + 10.0, lastPosition.Lon + 10.0);
-		gsWayPoint.action.actionRepeat = 0;
-		gsWayPoint.altitude = 45.0f;
-		gsWayPoint.heading = 0;
-		gsWayPoint.speed = speed;
-		gsWayPoint.hasAction = false;
-		gsTask.addWaypoint(gsWayPoint);
-
-		// Move to home
-		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat - 10.0, userPosition.Lon - 10.0);
-		gsWayPoint.action.actionRepeat = 0;
-		gsWayPoint.altitude = 45.0f;
-		gsWayPoint.heading = 0;
-		gsWayPoint.speed = speed;
-		gsWayPoint.hasAction = false;
-		gsTask.addWaypoint(gsWayPoint);
-
-		// Move down
-		gsWayPoint = new DJIGroundStationWaypoint(userPosition.Lat, userPosition.Lon);
-		gsWayPoint.action.actionRepeat = 0;
-		gsWayPoint.altitude = 2.5f;
-		gsWayPoint.heading = 0;
-		gsWayPoint.speed = 2.0f;
-		gsWayPoint.hasAction = false;
-		gsTask.addWaypoint(gsWayPoint);
-
-		gsTask.movingSpeed = 10.0f;
-		gsTask.remoteControlSpeed = 10.0f;
-		gsTask.finishAction = DJIGroundStationFinishAction.None;
-		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;
-		gsTask.pathMode = DJIGroundStationPathMode.Point_To_Point;
-		gsTask.wayPointCount = gsTask.getAllWaypoint().size();
 	}
 
 	public static double GetViewRadius(int fov, double altitude)
@@ -171,7 +133,7 @@ public class TaskBuilder
 		else
 			VerticalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDegX, stepInDegY);
 
-		gsTask.movingSpeed = (route.length / route.mappingWayPoints.size()) >= 10.0 ? 10.0f : 5.0f;
+		gsTask.movingSpeed = (route.length / route.mappingWayPoints.size()) > 30.0 ? 10.0f : 5.0f;
 		gsTask.remoteControlSpeed = 10.0f; 
 		gsTask.finishAction = DJIGroundStationFinishAction.None;
 		gsTask.movingMode = DJIGroundStationMovingMode.GSHeadingUsingWaypointHeading;

@@ -617,13 +617,18 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	public void OnStartRoute(View v)
 	{
+		if (route.GetWayPoints().size() == 0)
+			return;
+		
 		if (!routeStarted)
 		{
+			int defaultAltitude = route.GetWayPoints().get(0).Alt;
+			
 			AppendString("Start task");
 			if (djiWrapper.GetMcu().IsFlying())
-				djiWrapper.GetGroundStation().StartTask(gsTask);
+				djiWrapper.GetGroundStation().AdjustAltitudeTo(defaultAltitude);
 			else
-				djiWrapper.GetGroundStation().TakeOff(7.0f);
+				djiWrapper.GetGroundStation().TakeOff(defaultAltitude);
 		}
 		else if (routePaused)
 		{
