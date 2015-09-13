@@ -30,7 +30,7 @@ public class DJICamera
 {
 	public static final String TAG = "DJICamera";
 	private DjiGLSurfaceView mDjiGLSurfaceView = null;
-	private DJIReceivedVideoDataCallBack mReceivedVideoDataCallBack = null;
+	//private DJIReceivedVideoDataCallBack mReceivedVideoDataCallBack = null;
 	// private Vibrator vibro = null;
 	private int pitchSpeed = 150;
 	private Handler uiHandler = null;

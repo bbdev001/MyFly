@@ -1,5 +1,7 @@
 package com.dji.wrapper;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.my.fly.R;
 
 import android.content.Context;
@@ -15,7 +17,7 @@ public class DJIMcu
 {
 	private Handler uiHandler = null;
 	private Context context = null;
-	private DJIMainControllerSystemState mcuState = null;
+	private AtomicReference<DJIMainControllerSystemState> mcuState = new AtomicReference<DJIMainControllerSystemState>();
 	private DJIDroneType droneType = null;
 	private dji.sdk.api.MainController.DJIMainController object = null;
 	
@@ -44,7 +46,7 @@ public class DJIMcu
 			@Override
 			public void onResult(DJIMainControllerSystemState state)
 			{
-				mcuState = state;
+				mcuState.set(state);
 				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.MCU_STATUS, state));
 			}
 		});
@@ -61,10 +63,10 @@ public class DJIMcu
 	
 	public boolean IsFlying()
 	{
-		if (mcuState == null)
+		if (mcuState.get() == null)
 			return false;
 
-		return mcuState.isFlying;
+		return mcuState.get().isFlying;
 	}
 
 	public void StartUpdateTimer(int interval)
