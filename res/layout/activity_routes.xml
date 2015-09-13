@@ -235,14 +235,14 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginTop="80sp"
                     android:background="#1faaaaaa"
-                    android:orientation="vertical"
                     android:clickable="true"
+                    android:orientation="vertical"
                     android:padding="3sp" >
 
                     <TextView
                         android:id="@+id/altitudeCaption"
                         android:layout_width="wrap_content"
-                        android:layout_height="15sp"
+                        android:layout_height="10sp"
                         android:padding="2sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
@@ -264,10 +264,14 @@
                         android:textSize="10sp" >
                     </EditText>
 
+                    <Space
+                        android:layout_width="fill_parent"
+                        android:layout_height="5sp" />
+
                     <TextView
                         android:id="@+id/headingCaption"
                         android:layout_width="wrap_content"
-                        android:layout_height="15sp"
+                        android:layout_height="10sp"
                         android:padding="2sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
@@ -288,10 +292,14 @@
                         android:textColor="@android:color/black"
                         android:textSize="10sp" />
 
+                    <Space
+                        android:layout_width="fill_parent"
+                        android:layout_height="5sp" />
+
                     <TextView
                         android:id="@+id/camAngleCaption"
                         android:layout_width="wrap_content"
-                        android:layout_height="15sp"
+                        android:layout_height="10sp"
                         android:padding="2sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
@@ -311,9 +319,11 @@
                         android:shadowRadius="2"
                         android:textColor="@android:color/black"
                         android:textSize="10sp" />
-				<Space
-            android:layout_width="fill_parent"
-            android:layout_height="5sp"/>
+
+                    <Space
+                        android:layout_width="fill_parent"
+                        android:layout_height="5sp" />
+
                     <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
