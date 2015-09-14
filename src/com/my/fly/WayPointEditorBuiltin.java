@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class WayPointEditorBuiltin 
+public class WayPointEditorBuiltin
 {
 	private SeekBar tracker = null;
 	private LinearLayout wayPointFields = null;
@@ -38,6 +38,7 @@ public class WayPointEditorBuiltin
 	protected OnHeadingChangedListener onHeadingChanged = null;
 	protected WayPointEditorBuiltin self = null;
 	protected Activity parent = null;
+
 	public interface OnSavedListener
 	{
 		public void OnSaved(WayPoint wayPoint, long wayPointIndex);
@@ -47,24 +48,24 @@ public class WayPointEditorBuiltin
 	{
 		public void OnDeleted(long wayPointIndex, boolean isMapping);
 	}
-	
+
 	public interface OnHeadingChangedListener
 	{
 		public void OnHeadingChanged(long wayPointIndex, int heading);
 	}
-	
+
 	public WayPointEditorBuiltin(Activity parent, OnSavedListener onSaved, OnDeletedListener onDeleted, OnHeadingChangedListener onHeadingChanged)
 	{
 		self = this;
-		
+
 		this.parent = parent;
 		this.onSaved = onSaved;
 		this.onDeleted = onDeleted;
 		this.onHeadingChanged = onHeadingChanged;
-		
+
 		tracker = (SeekBar) parent.findViewById(R.id.tracker);
 		wayPointFields = (LinearLayout) parent.findViewById(R.id.wayPointFields);
-		
+
 		altitude = (EditText) parent.findViewById(R.id.altitude);
 		heading = (EditText) parent.findViewById(R.id.heading);
 		camAngle = (EditText) parent.findViewById(R.id.camAngle);
@@ -73,7 +74,7 @@ public class WayPointEditorBuiltin
 		camLabel = (TextView) parent.findViewById(R.id.camAngleCaption);
 		cancel = (Button) parent.findViewById(R.id.btnCancel);
 		delete = (Button) parent.findViewById(R.id.btnDelete);
-		
+
 		cancel.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -84,7 +85,7 @@ public class WayPointEditorBuiltin
 				self.onSaved.OnSaved(wayPoint, wayPointIndex);
 			}
 		});
-		
+
 		delete.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -98,7 +99,7 @@ public class WayPointEditorBuiltin
 				{
 					public void onClick(DialogInterface dialog, int which)
 					{
-						dialog.dismiss();		
+						dialog.dismiss();
 						self.onDeleted.OnDeleted(wayPointIndex, isMapping);
 						self.Hide();
 					}
@@ -111,7 +112,7 @@ public class WayPointEditorBuiltin
 				alertDialog.show();
 			}
 		});
-		
+
 		tracker.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
 		{
 			@Override
@@ -119,19 +120,19 @@ public class WayPointEditorBuiltin
 			{
 				self.onSaved.OnSaved(wayPoint, self.wayPointIndex);
 			}
-			
+
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar)
 			{
-	
+
 			}
-			
+
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
 			{
 				if (fromUser)
 				{
-					switch(currentId)
+					switch (currentId)
 					{
 						case R.id.altitude:
 							altitude.setText(Integer.toString(progress));
@@ -139,7 +140,7 @@ public class WayPointEditorBuiltin
 							break;
 						case R.id.heading:
 							heading.setText(Integer.toString(progress));
-							wayPoint.Heading = progress; 
+							wayPoint.Heading = progress;
 							self.onHeadingChanged.OnHeadingChanged(wayPointIndex, wayPoint.Heading);
 							break;
 						case R.id.camAngle:
@@ -151,55 +152,90 @@ public class WayPointEditorBuiltin
 				}
 			}
 		});
-		
-		altitude.setOnFocusChangeListener(new View.OnFocusChangeListener()
+
+		View.OnLongClickListener onLongClickListener = new View.OnLongClickListener()
 		{
+			@Override
+			public boolean onLongClick(View v)
+			{
+				currentId = v.getId();
+				String data = ((EditText)v).getText().toString();				 
+				final InputBox dialog = new InputBox(self.parent, "Enter new route name", "Route name", data, new InputBox.OnDialogClosedListener()
+				{
+					public void OnClosed(boolean isCancel, String result)
+					{
+						if (!isCancel)
+						{
+							int intResult = Integer.parseInt(result);
+							switch (currentId)
+							{
+								case R.id.altitude:
+									wayPoint.Alt = intResult;
+									altitude.setText(result);
+									break;
+								case R.id.heading:
+									wayPoint.Heading = intResult;
+									heading.setText(result);
+									self.onHeadingChanged.OnHeadingChanged(wayPointIndex, wayPoint.Heading);
+									break;
+								case R.id.camAngle:
+									wayPoint.CamAngle = -intResult;
+									camAngle.setText(result);
+									break;
+							}
+							
+						}
+					}
+				});
+
+				dialog.show();
+				return false;
+			}
+		};
+
+		View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener()
+		{
+			
 			@Override
 			public void onFocusChange(View v, boolean hasFocus)
 			{
-				if (hasFocus)
+				if (!hasFocus)
+					return;
+				
+				currentId = v.getId();
+				
+				switch(currentId)
 				{
-					tracker.setMax(300);
-					tracker.setProgress(wayPoint.Alt);
-					currentId = R.id.altitude;
-					tracker.setVisibility(View.VISIBLE);
+						case R.id.altitude:
+							tracker.setMax(300);
+							tracker.setProgress(wayPoint.Alt);
+							break;
+						case R.id.heading:
+							tracker.setMax(360);
+							tracker.setProgress(wayPoint.Heading);
+							break;
+						case R.id.camAngle:
+							tracker.setMax(89);
+							tracker.setProgress(Math.abs(wayPoint.CamAngle));
+							break;				
 				}
+				
+				tracker.setVisibility(View.VISIBLE);
 			}
-		});
+		};
 		
-		heading.setOnFocusChangeListener(new View.OnFocusChangeListener()
-		{
-			@Override
-			public void onFocusChange(View v, boolean hasFocus)
-			{
-				if (hasFocus)
-				{
-					tracker.setMax(360);
-					tracker.setProgress(wayPoint.Heading);
-					currentId = R.id.heading;
-					tracker.setVisibility(View.VISIBLE);
-				}
-			}
-		});
-		
-		camAngle.setOnFocusChangeListener(new View.OnFocusChangeListener()
-		{
-			@Override
-			public void onFocusChange(View v, boolean hasFocus)
-			{
-				if (hasFocus)
-				{
-					tracker.setMax(89);
-					tracker.setProgress(Math.abs(wayPoint.CamAngle));
-					currentId = R.id.camAngle;
-					tracker.setVisibility(View.VISIBLE);
-				}
-			}
-		});
-		
+		altitude.setOnLongClickListener(onLongClickListener);
+		altitude.setOnFocusChangeListener(onFocusChangeListener);
+
+		heading.setOnLongClickListener(onLongClickListener);
+		heading.setOnFocusChangeListener(onFocusChangeListener);
+
+		camAngle.setOnLongClickListener(onLongClickListener);
+		camAngle.setOnFocusChangeListener(onFocusChangeListener);
+
 		Hide();
 	}
-	
+
 	public void SetWayPoint(WayPoint point, long pointIndex, boolean isMapping)
 	{
 		this.isMapping = isMapping;
@@ -210,19 +246,19 @@ public class WayPointEditorBuiltin
 		altitude.setText(Integer.toString(wayPoint.Alt));
 		heading.setText(Integer.toString(wayPoint.Heading));
 		camAngle.setText(Integer.toString(wayPoint.CamAngle));
-		
+
 		tracker.setMax(300);
 		tracker.setProgress(wayPoint.Alt);
 		currentId = R.id.altitude;
 		altitude.setFocusableInTouchMode(true);
 		altitude.requestFocus();
 	}
-	
+
 	public void Show()
 	{
 		wayPointFields.setVisibility(View.VISIBLE);
 		tracker.setVisibility(View.VISIBLE);
-		
+
 		if (isMapping)
 		{
 			heading.setVisibility(View.INVISIBLE);
