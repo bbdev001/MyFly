@@ -38,7 +38,7 @@ public class MainMenu extends Activity
 
 		ListView listView = (ListView) findViewById(R.id.droneTypes);
 
-		final String[] enueItems = new String[] { "Manual control", "GPS routes" };
+		final String[] enueItems = new String[] { getString(R.string.ManualControl), getString(R.string.AutomaticalControl) };
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, enueItems);
 

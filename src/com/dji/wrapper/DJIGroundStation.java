@@ -2,6 +2,8 @@ package com.dji.wrapper;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.my.fly.R;
+
 import android.content.Context;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -109,7 +111,7 @@ public class DJIGroundStation
 			{
 				if (result == GroundStationResult.GS_Result_Success)
 				{
-					String message = "Ground station opened";
+					String message = context.getString(R.string.GroundStationOpened);
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, message));
 
 					object.oneKeyFly(new DJIGroundStationExecuteCallBack()
@@ -120,11 +122,11 @@ public class DJIGroundStation
 							String message;
 							if (result == GroundStationResult.GS_Result_Success)
 							{
-								message = "oneKeyFly success";
+								message = context.getString(R.string.TakeOffDone);
 								isAltAdjustmentNeeded.set(true);
 							}
 							else
-								message = "oneKeyFly error " + result;
+								message = context.getString(R.string.TakeOffError) + " " + result;
 
 							uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, message));
 						}
@@ -132,7 +134,7 @@ public class DJIGroundStation
 				}
 				else
 				{
-					String message = "Ground station does not open " + result;
+					String message = context.getString(R.string.GroundStationDoesNotOpen) + " " + result;
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, message));
 				}
 			}
@@ -148,7 +150,6 @@ public class DJIGroundStation
 			@Override
 			public void onResult(GroundStationResult result)
 			{
-				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Upload WP " + result.toString()));
 				if (result == GroundStationResult.GS_Result_Success)
 				{
 					object.startGroundStationTask(new DJIGroundStationExecuteCallBack()
@@ -159,12 +160,12 @@ public class DJIGroundStation
 							if (result == GroundStationResult.GS_Result_Success)
 								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_STARTED, ""));
 							else
-								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS take off error " + result));
+								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.TaskStartError) + " " + result));
 						}
 					});
 				}
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS task does not upload " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.TaskUploadError) + " " + result));
 			}
 		});
 
@@ -180,11 +181,11 @@ public class DJIGroundStation
 			{
 				if (result == GroundStationResult.GS_Result_Success)
 				{
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS open " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationOpened) + " " + result));
 					GoOnRoute();
 				}
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS does not open " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationDoesNotOpen) + " " + result));
 			}
 		});
 
@@ -200,7 +201,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_ENDED, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS closing error " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationClosingError) + " " + result));
 			}
 		});
 	}
@@ -215,7 +216,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_PAUSED, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS pause error " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationPausingError) + " " + result));
 			}
 		});
 	}
@@ -230,7 +231,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_RESUMED, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS resume error " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationResumingError) + " " + result));
 			}
 		});
 	}
@@ -245,7 +246,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_GO_HOME, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "GS go home error " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationGoHomeError) + " " + result));
 			}
 		});
 	}
@@ -271,7 +272,7 @@ public class DJIGroundStation
 		{
 			isAltAdjustmentNeeded.set(false);
 			gsWrapper.GetJoystik().StopLeftJoystik();
-			uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE, "Take off done"));
+			uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE, context.getString(R.string.AltAdjusted)));
 		}
 	}
 

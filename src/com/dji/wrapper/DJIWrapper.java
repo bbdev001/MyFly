@@ -1,5 +1,7 @@
 package com.dji.wrapper;
 
+import com.my.fly.R;
+
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
@@ -227,66 +229,66 @@ public class DJIWrapper
 		switch (code)
 		{
 			case 0:
-				result = "Obtain Permission Successfully";
+				result = context.getString(R.string.ObtainPermissionSuccessfully);
 				break;
 			case -1:
-				result = "Cannot connect to Internet";
+				result = context.getString(R.string.CanNotConnectToInternet);
 				break;
 			case -2:
-				result = "The Meta data is invalid";
+				result = context.getString(R.string.TheMetaDataIsInvalid);
 				break;
 			case -3:
-				result = "JDK do not support AES 256";
+				result = context.getString(R.string.JDKDoNotSupportAES256);
 				break;
 			case -4:
-				result = "Failed to obtain Device ID";
+				result = context.getString(R.string.FailedToObtainDeviceID);
 				break;
 			case -5:
-				result = "Failed to encrypt AES 256";
+				result = context.getString(R.string.FailedToObtainDeviceID);
 				break;
 			case -6:
-				result = "Failed to parse the permission data";
+				result = context.getString(R.string.FailedToParseThePermissionData);
 				break;
 			case -7:
-				result = "App key is forbidden";
+				result = context.getString(R.string.AppKeyIsForbidden);
 				break;
 			case -8:
-				result = "The active device numbers are up to maximal.";
+				result = context.getString(R.string.TheActiveDeviceNumbersAreUpToMaximal);
 				break;
 			case -9:
-				result = "Parse request URL error";
+				result = context.getString(R.string.ParseRequestURLError);
 				break;
 			case -10:
-				result = "Unknown error";
+				result = context.getString(R.string.UnknownError);
 				break;
 		}
 
 		return result;
 	}
 
-	public static String GetMissionExecutionState(int state)
+	public String GetMissionExecutionState(int state)
 	{
 		String result = "";
 		GroundStationWayPointExecutionState execState = GroundStationWayPointExecutionState.find(state);
 		switch (execState)
 		{
 			case Way_Point_Execution_Init:
-				result = "Init";
+				result = context.getString(R.string.Init);
 				break;
 			case Way_Point_Execution_Moving:
-				result = "Moving";
+				result = context.getString(R.string.Moving);
 				break;
 			case Way_Point_Execution_Rotating:
-				result = "Rotating";
+				result = context.getString(R.string.Rotating);
 				break;
 			case Way_Point_Execution_Inaction:
-				result = "Incation";
+				result = context.getString(R.string.Incation);
 				break;
 			case Way_Point_Execution_Reach_Pre_Action:
-				result = "Pre action";
+				result = context.getString(R.string.PreAction);
 				break;
 			case Way_Point_Execution_Reach_Post_Action:
-				result = "Post action";
+				result = context.getString(R.string.PostAction);
 				break;
 		}
 

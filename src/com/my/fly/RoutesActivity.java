@@ -225,9 +225,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
 				
-		AppendString("Connecting to drone");
+		AppendString(getString(R.string.ConnectingToDrone));
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
-			AppendString("Can't init DJI sdk");
+			AppendString(getString(R.string.CanNotInitDJISdk));
 	}
 
 	@Override
@@ -252,13 +252,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case DJIWrapper.CAMERA_TAKE_PHOTO:
 			{
 				takePhoto.setEnabled(true);
-				AppendString("Take photo done: " + (String) msg.obj);
+				AppendString(getString(R.string.TakePhotoDone) + ": " + (String) msg.obj);
 				break;
 			}
 			case DJIWrapper.CAMERA_TAKE_PHOTO_DONE:
 			{
 				takePhoto.setEnabled(true);
-				AppendString("Take photo stopped: " + (String) msg.obj);
+				AppendString(getString(R.string.TakePhotoStopped) + ": " + (String) msg.obj);
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_TASK_STARTED:
@@ -270,7 +270,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 				routeStarted = true;
 				routePaused = false;
-				AppendString("Task started");
+				AppendString(getString(R.string.TaskStarted));
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_TASK_PAUSED:
@@ -280,7 +280,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				pauseRoute.setEnabled(false);
 
 				routePaused = true;
-				AppendString("Task paused");
+				AppendString(getString(R.string.TaskPaused));
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_TASK_RESUMED:
@@ -290,7 +290,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				pauseRoute.setEnabled(true);
 
 				routePaused = false;
-				AppendString("Task resumed");
+				AppendString(getString(R.string.TaskResumed));
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_GO_HOME:
@@ -301,7 +301,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				stopRoute.setEnabled(true);
 				routeStarted = false;
 				routePaused = false;
-				AppendString("Go home");
+				AppendString(getString(R.string.GoHome));
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_TASK_ENDED:
@@ -364,13 +364,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
 				break;
 			case DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE:
-				AppendString("Take off done");
+				AppendString((String)msg.obj);
 				djiWrapper.GetGroundStation().StartTask(gsTask);
 				break;
 			case DJIWrapper.GROUNDSTATION_MISSION_STATUS:
 			{
 				DJIGroundStationMissionPushInfo missionStatus = (DJIGroundStationMissionPushInfo) msg.obj;
-				routeView.SetMissionFlightStatus(DJIWrapper.GetMissionType(missionStatus.missionType), missionStatus.targetWayPointIndex, DJIWrapper.GetMissionExecutionState(missionStatus.currState));
+				routeView.SetMissionFlightStatus(DJIWrapper.GetMissionType(missionStatus.missionType), missionStatus.targetWayPointIndex, djiWrapper.GetMissionExecutionState(missionStatus.currState));
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_EXECUTION_STATUS:
@@ -379,14 +379,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				switch (execStatus.eventType.value())
 				{
 					case DJIWrapper.EXECUTION_STATUS_UPLOAD_FINISH:
-						AppendString("Wp " + execStatus.wayPointIndex + " uploaded");
+						AppendString(getString(R.string.WaypointUploaded) + ": " + execStatus.wayPointIndex);
 						break;
 					case DJIWrapper.EXECUTION_STATUS_FINISH:
-						AppendString("Route finished");
+						AppendString(getString(R.string.RouteFinished));
 						TaskEnded();
 						break;
 					case DJIWrapper.EXECUTION_STATUS_REACH_POINT:
-						routeView.SetReachedWayPoint(execStatus.wayPointIndex, DJIWrapper.GetMissionExecutionState(execStatus.currentState));
+						routeView.SetReachedWayPoint(execStatus.wayPointIndex, djiWrapper.GetMissionExecutionState(execStatus.currentState));
 						break;
 				}
 				break;
@@ -394,7 +394,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case DJIWrapper.CAMERA_FILE_INFO:
 			{
 				CameraFileInfo info = (CameraFileInfo)msg.obj;
-				AppendString("Done " + info.Name);
+				AppendString(getString(R.string.Done) + " " + info.Name);
 				break;
 			}
 		}
@@ -410,7 +410,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		goHome.setEnabled(true);
 		routeStarted = false;
 		routePaused = false;
-		AppendString("Task ended");
+		AppendString(getString(R.string.TaskEnded));
 	}
 
 	public void LoadRoutesList()
@@ -609,7 +609,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	private void RunGoHomeCommand()
 	{
-		AppendString("RunGoHome");
+		AppendString(getString(R.string.GoHomeStarted));
 
 		TaskBuilder.BuildMyHomeRoute(gsMyHomeTask, lastPosition, userPosition);
 		djiWrapper.GetGroundStation().StartTask(gsMyHomeTask);
@@ -624,7 +624,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		{
 			int defaultAltitude = route.GetWayPoints().get(0).Alt;
 			
-			AppendString("Start task");
+			AppendString(getString(R.string.StartTask));
 			if (djiWrapper.GetMcu().IsFlying())
 				djiWrapper.GetGroundStation().AdjustAltitudeTo(defaultAltitude);
 			else
@@ -632,20 +632,20 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		}
 		else if (routePaused)
 		{
-			AppendString("Resume task");
+			AppendString(getString(R.string.ResumeTask));
 			djiWrapper.GetGroundStation().ResumeTask();
 		}
 	}
 
 	public void OnStopRoute(View v)
 	{
-		AppendString("Stop taks");
+		AppendString(getString(R.string.StopTask));
 		djiWrapper.GetGroundStation().StopTask();
 	}
 
 	public void OnPauseRoute(View v)
 	{
-		AppendString("Pause taks");
+		AppendString(getString(R.string.PauseTask));
 		djiWrapper.GetGroundStation().PauseTask();
 	}
 
@@ -819,7 +819,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	public void OnTakePhoto(View v)
 	{
 		takePhoto.setEnabled(false);
-		AppendString("Take photo started");
+		AppendString(getString(R.string.TakePhotoStarted));
 		djiWrapper.GetCamera().TakePhoto();
 	}
 	
@@ -1065,7 +1065,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void OnAddRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, "Enter route name", "Route name", "My route",
+		final InputBox dialog = new InputBox(this, getString(R.string.EnterRouteName), getString(R.string.RouteName), "My route",
 		new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)
@@ -1093,9 +1093,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
-			alertDialog.setTitle("Confirm Delete...");
-			alertDialog.setMessage("Are you sure you want to delete selected route?");
-			alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener()
+			alertDialog.setTitle(getString(R.string.ConfirmDelete));
+			alertDialog.setMessage(getString(R.string.AreYouSure));
+			alertDialog.setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener()
 			{
 				public void onClick(DialogInterface dialog, int which)
 				{		
@@ -1107,7 +1107,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			});
 
 			// Setting Negative "NO" Button
-			alertDialog.setNegativeButton("NO", null);
+			alertDialog.setNegativeButton(getString(R.string.No), null);
 
 			// Showing Alert Message
 			alertDialog.show();	
@@ -1115,7 +1115,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void OnEditRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, "Enter new route name", "Route name", route.name,
+		final InputBox dialog = new InputBox(this, getString(R.string.EnterRouteName), getString(R.string.RouteName), route.name,
 		new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)

@@ -1,5 +1,7 @@
 package com.dji.wrapper;
 
+import com.my.fly.R;
+
 import dji.sdk.api.DJIDrone;
 import dji.sdk.api.DJIDroneTypeDef.DJIDroneType;
 import dji.sdk.api.Gimbal.DJIGimbalAttitude;
@@ -40,9 +42,8 @@ public class DJIGimbal
             public void onError(int error)
             {
             	if (error != 0)
-            		uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, "Gimbal error " + error));
+            		uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, R.string.GimbalError + " " + error));
             }
-            
         });
 		
 		StartUpdateTimer(interval);

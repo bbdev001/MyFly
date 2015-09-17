@@ -98,11 +98,11 @@ public class MainActivity extends Activity implements OnTouchListener, LocationL
 		cameraSurface.getLayoutParams().width = (int) ((float) scrSize.y * 4.0f / 3.0f);
 		errorMessages = (TextView) findViewById(R.id.errorMessages);
 
-		AppendString("Connecting to drone");
+		AppendString(getString(R.string.ConnectingToDrone));
 		if (!djiWrapper.InitSDK(DJIDroneType.DJIDrone_Phantom3_Professional, getApplicationContext(), this))
-			AppendString("Can't connect to the drone");
+			AppendString(getString(R.string.CanNotInitDJISdk));
 			
-		errorMessages.setText("Test");
+		errorMessages.setText("");
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class MainActivity extends Activity implements OnTouchListener, LocationL
 			case DJIWrapper.GROUNDSTATION_FLYING_STATUS:
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
 				droneAltitude.setText("h " + formatter.format(flyingInfo.altitude) + "m ");
-				errorMessages.setText("Flying mode " + flyingInfo.flightMode.toString());
+				errorMessages.setText(getString(R.string.FlyingMode) + " " + flyingInfo.flightMode.toString());
 				break;
 			default:
 				break;
