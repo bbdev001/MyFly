@@ -78,7 +78,7 @@
         android:background="@android:color/transparent"
         android:onClick="OnTakeOff"
         android:paddingRight="8dp"
-        android:text="Take off"
+        android:text="@+string/TakeOff"
         android:textColor="#ee0000" />
 
     <GridLayout

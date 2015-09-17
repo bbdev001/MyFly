@@ -6,7 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="MCU_NO_ERROR">MCU NO ERROR</string>
     <string name="MCU_CONFIG_ERROR">MCU CONFIG ERROR</string>
-    <string name="MCU_SERIALNUM_ERROR ">MCU SERIALNUM ERROR </string>
+    <string name="MCU_SERIALNUM_ERROR ">MCU SERIAL NUM ERROR </string>
     <string name="MCU_IMU_ERROR">MCU IMU ERROR</string>
     <string name="MCU_X1_ERROR">MCU X1 ERROR</string>
     <string name="MCU_X2_ERROR">MCU X2 ERROR</string>
@@ -85,4 +85,16 @@
 	<string name="AutomaticalControl">Automatical control</string>
 	<string name="FlyingMode">Flying mode</string>
 	<string name="MCUStatus">MCU status</string>
+	<string name="Edit">Edit</string>
+	<string name="Cancel">Cancel</string>
+	<string name="Delete">Delete</string>
+	<string name="SelectFlightMode">Select flight mode</string>
+	<string name="Routing">Routing</string>
+	<string name="Mapping">Mapping</string>
+	<string name="TakeOff">Take off</string>
+	<string name="AltitudeM">Altitude (m)</string>
+	<string name="HeadingD">Heading (0-359)</string>
+	<string name="CamAngle">Cam angle (0-89)</string>
+	<string name="RouteAdding">Route adding</string>
+	<string name="RouteNameEditing">Route name editing</string>
 </resources>

@@ -1065,7 +1065,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void OnAddRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, getString(R.string.EnterRouteName), getString(R.string.RouteName), "My route",
+		final InputBox dialog = new InputBox(this, getString(R.string.RouteAdding), getString(R.string.RouteName), "My route",
 		new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)
@@ -1115,7 +1115,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void OnEditRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, getString(R.string.EnterRouteName), getString(R.string.RouteName), route.name,
+		final InputBox dialog = new InputBox(this, getString(R.string.RouteNameEditing), getString(R.string.RouteName), route.name,
 		new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)

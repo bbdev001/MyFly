@@ -64,7 +64,7 @@
                     android:layout_height="40dp"
                     android:onClick="OnEditRoute"
                     android:padding="0dp"
-                    android:text="Edit" />
+                    android:text="@+string/Edit" />
             </LinearLayout>
         </LinearLayout>
 
@@ -177,7 +177,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="OnRouteTypeChanged"
-            android:text="Routing"
+            android:text="@+string/Routing"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -186,7 +186,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="OnRouteTypeChanged"
-            android:text="Mapping"
+            android:text="@+string/Mapping"
             android:textSize="11sp"
             android:textStyle="bold" />
     </RadioGroup>
@@ -243,21 +243,21 @@
                         android:id="@+id/altitudeCaption"
                         android:layout_width="wrap_content"
                         android:layout_height="10sp"
-                        android:padding="2sp"
+                        android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
-                        android:text="Altitude (m)"
+                        android:text="@+string/AltitudeM"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@android:color/black"
-                        android:textSize="6sp" />
+                        android:textSize="8sp" />
 
                     <EditText
                         android:id="@+id/altitude"
                         android:layout_width="fill_parent"
-                        android:layout_height="17sp"
+                        android:layout_height="22sp"
                         android:editable="false"
-                        android:hint="Altitude (m)"
-                        android:padding="2sp"
+                        android:hint="@+string/AltitudeM"
+                        android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
                         android:textColor="@android:color/black"
@@ -272,21 +272,21 @@
                         android:id="@+id/headingCaption"
                         android:layout_width="wrap_content"
                         android:layout_height="10sp"
-                        android:padding="2sp"
+                        android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
-                        android:text="Heading (deg 0-359)"
+                        android:text="@+string/HeadingD"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@android:color/black"
-                        android:textSize="6sp" />
+                        android:textSize="8sp" />
 
                     <EditText
                         android:id="@+id/heading"
                         android:layout_width="fill_parent"
-                        android:layout_height="17sp"
+                        android:layout_height="22sp"
                         android:editable="false"
-                        android:hint="Heading (deg 0-359)"
-                        android:padding="2sp"
+                        android:hint="@+string/HeadingD"
+                        android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
                         android:textColor="@android:color/black"
@@ -300,21 +300,21 @@
                         android:id="@+id/camAngleCaption"
                         android:layout_width="wrap_content"
                         android:layout_height="10sp"
-                        android:padding="2sp"
+                        android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
-                        android:text="Cam angle (deg 0-89)"
+                        android:text="@+string/CamAngle"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@android:color/black"
-                        android:textSize="6sp" />
+                        android:textSize="8sp" />
 
                     <EditText
                         android:id="@+id/camAngle"
                         android:layout_width="fill_parent"
-                        android:layout_height="17sp"
+                        android:layout_height="22sp"
                         android:editable="false"
-                        android:hint="Cam angle (deg 0-89)"
-                        android:padding="2sp"
+                        android:hint="@+string/CamAngle"
+                        android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
                         android:textColor="@android:color/black"
@@ -335,18 +335,18 @@
                             android:id="@+id/btnCancel"
                             style="?android:attr/buttonStyleSmall"
                             android:layout_width="wrap_content"
-                            android:layout_height="20sp"
-                            android:padding="0dp"
-                            android:text="Cancel"
+                            android:layout_height="24sp"
+                            android:padding="2dp"
+                            android:text="@+string/Cancel"
                             android:textSize="10sp" />
 
                         <Button
                             android:id="@+id/btnDelete"
                             style="?android:attr/buttonStyleSmall"
                             android:layout_width="wrap_content"
-                            android:layout_height="20sp"
-                            android:padding="0dp"
-                            android:text="Delete"
+                            android:layout_height="24sp"
+                            android:padding="2dp"
+                            android:text="@+string/Delete"
                             android:textSize="10sp" />
                     </LinearLayout>
                 </LinearLayout>

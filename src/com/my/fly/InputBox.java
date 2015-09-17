@@ -9,10 +9,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class InputBox extends Dialog implements View.OnClickListener
 {
 	protected EditText input;
+	protected TextView caption;
 	
 	public interface OnDialogClosedListener
 	{
@@ -31,6 +33,9 @@ public class InputBox extends Dialog implements View.OnClickListener
 		this.onClosedListener = onClosedListener;
 		input = (EditText) findViewById(R.id.textLine);
 		input.setText(defaultValue);
+		
+		this.caption = (TextView) findViewById(R.id.captionLine);
+		this.caption.setText(caption);
 			
 		((Button) findViewById(R.id.btnOk)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnCancel)).setOnClickListener(this);
