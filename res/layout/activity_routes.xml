@@ -256,12 +256,15 @@
                         android:layout_width="fill_parent"
                         android:layout_height="22sp"
                         android:editable="false"
+                        android:enabled="true"
                         android:hint="@+string/AltitudeM"
+                        android:inputType="number"
                         android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
                         android:textColor="@android:color/black"
                         android:textSize="10sp" >
+
                     </EditText>
 
                     <Space
@@ -286,6 +289,7 @@
                         android:layout_height="22sp"
                         android:editable="false"
                         android:hint="@+string/HeadingD"
+                        android:inputType="number"
                         android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
@@ -314,6 +318,7 @@
                         android:layout_height="22sp"
                         android:editable="false"
                         android:hint="@+string/CamAngle"
+                        android:inputType="number"
                         android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"

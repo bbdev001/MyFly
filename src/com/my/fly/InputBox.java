@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +24,7 @@ public class InputBox extends Dialog implements View.OnClickListener
 	protected OnDialogClosedListener onClosedListener = null;
 	protected Activity context = null;
 
-	public InputBox(Activity context, String title, String caption, String defaultValue, OnDialogClosedListener onClosedListener)
+	public InputBox(Activity context, String title, String caption, String defaultValue, boolean isNumeric, OnDialogClosedListener onClosedListener)
 	{
 		super(context);
 		this.context = context;
@@ -34,6 +35,9 @@ public class InputBox extends Dialog implements View.OnClickListener
 		input = (EditText) findViewById(R.id.textLine);
 		input.setText(defaultValue);
 		
+		if (isNumeric)
+			input.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
+				
 		this.caption = (TextView) findViewById(R.id.captionLine);
 		this.caption.setText(caption);
 			

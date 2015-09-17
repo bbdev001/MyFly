@@ -93,9 +93,9 @@ public class WayPointEditorBuiltin
 			{
 				AlertDialog.Builder alertDialog = new AlertDialog.Builder(self.parent);
 
-				alertDialog.setTitle("Confirm Delete...");
-				alertDialog.setMessage("Are you sure you want to delete this?");
-				alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener()
+				alertDialog.setTitle(self.parent.getString(R.string.ConfirmDelete));
+				alertDialog.setMessage(self.parent.getString(R.string.AreYouSure));
+				alertDialog.setPositiveButton(self.parent.getString(R.string.Yes), new DialogInterface.OnClickListener()
 				{
 					public void onClick(DialogInterface dialog, int which)
 					{
@@ -106,7 +106,7 @@ public class WayPointEditorBuiltin
 				});
 
 				// Setting Negative "NO" Button
-				alertDialog.setNegativeButton("NO", null);
+				alertDialog.setNegativeButton(self.parent.getString(R.string.No), null);
 
 				// Showing Alert Message
 				alertDialog.show();
@@ -159,8 +159,23 @@ public class WayPointEditorBuiltin
 			public boolean onLongClick(View v)
 			{
 				currentId = v.getId();
+				String caption = "";
+				
+				switch (currentId)
+				{
+					case R.id.altitude:
+						caption = self.parent.getString(R.string.AltitudeM);
+						break;
+					case R.id.heading:
+						caption = self.parent.getString(R.string.HeadingD);
+						break;
+					case R.id.camAngle:
+						caption = self.parent.getString(R.string.CamAngle);
+						break;
+				}
+				
 				String data = ((EditText)v).getText().toString();				 
-				final InputBox dialog = new InputBox(self.parent, "Enter new route name", "Route name", data, new InputBox.OnDialogClosedListener()
+				final InputBox dialog = new InputBox(self.parent, self.parent.getString(R.string.EnterValue), caption, data, true, new InputBox.OnDialogClosedListener()
 				{
 					public void OnClosed(boolean isCancel, String result)
 					{

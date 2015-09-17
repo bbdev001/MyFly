@@ -576,8 +576,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	protected void SaveRoute()
 	{
+		boolean result = false;
 		if (!route.name.isEmpty())
-			route.SaveToCSV(BASE_PATH, route.name);
+			result = route.SaveToCSV(BASE_PATH, route.name);
+		
+		if (result)
+			AppendString(getString(R.string.RouteSaved));
+		else
+			AppendString(getString(R.string.CantSaveRoute));
 	}
 
 	@Override
@@ -1065,7 +1071,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void OnAddRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, getString(R.string.RouteAdding), getString(R.string.RouteName), "My route",
+		final InputBox dialog = new InputBox(this, getString(R.string.RouteAdding), getString(R.string.RouteName), "My route", false, 
 		new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)
@@ -1115,7 +1121,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void OnEditRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, getString(R.string.RouteNameEditing), getString(R.string.RouteName), route.name,
+		final InputBox dialog = new InputBox(this, getString(R.string.RouteNameEditing), getString(R.string.RouteName), route.name, false,
 		new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)

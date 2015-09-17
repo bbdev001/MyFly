@@ -97,4 +97,7 @@
 	<string name="CamAngle">Угол камеры (0-89)</string>
 	<string name="RouteAdding">Добавление маршрута</string>
 	<string name="RouteNameEditing">Изменение названия</string>
+	<string name="CantSaveRoute">Ошибка сохранения маршрута</string>
+	<string name="RouteSaved">Маршрут сохранен</string>
+	<string name="EnterValue">Введите значение</string>
 </resources>

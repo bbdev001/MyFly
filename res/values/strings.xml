@@ -97,4 +97,7 @@
 	<string name="CamAngle">Cam angle (0-89)</string>
 	<string name="RouteAdding">Route adding</string>
 	<string name="RouteNameEditing">Route name editing</string>
+	<string name="CantSaveRoute">Can not save route</string>
+	<string name="RouteSaved">Route saved</string>
+	<string name="EnterValue">Enter value</string>
 </resources>
