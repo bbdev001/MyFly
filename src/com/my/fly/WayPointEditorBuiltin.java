@@ -261,19 +261,19 @@ public class WayPointEditorBuiltin
 
 		if (isMapping)
 		{
-			heading.setActivated(false);
-			camAngle.setActivated(false);
-			headLabel.setActivated(false);
-			camLabel.setActivated(false);
-			delete.setActivated(false);
+			heading.setVisibility(View.INVISIBLE);
+			camAngle.setVisibility(View.INVISIBLE);
+			headLabel.setVisibility(View.INVISIBLE);
+			camLabel.setVisibility(View.INVISIBLE);
+			delete.setVisibility(View.INVISIBLE);
 		}
 		else
 		{
-			heading.setActivated(true);
-			camAngle.setActivated(true);
-			headLabel.setActivated(true);
-			camLabel.setActivated(true);
-			delete.setActivated(true);
+			heading.setVisibility(View.VISIBLE);
+			camAngle.setVisibility(View.VISIBLE);
+			headLabel.setVisibility(View.VISIBLE);
+			camLabel.setVisibility(View.VISIBLE);
+			delete.setVisibility(View.VISIBLE);
 		}
 	}
 
