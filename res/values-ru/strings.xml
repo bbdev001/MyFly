@@ -100,7 +100,7 @@
 	<string name="CantSaveRoute">Ошибка сохранения маршрута</string>
 	<string name="RouteSaved">Маршрут сохранен</string>
 	<string name="EnterValue">Введите значение</string>
-	<string name="LengthM">Длина (м)</string>
+	<string name="LengthM">Длина маршрута (м)</string>
 	<string name="SpeedMS">Скорость (мс)</string>
 	<string name="DistanceM">Расстояние (м)</string>
 	<string name="PowerlevelPerc">Уровень заряда (%)</string>

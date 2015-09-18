@@ -100,7 +100,7 @@
 	<string name="CantSaveRoute">Can not save route</string>
 	<string name="RouteSaved">Route saved</string>
 	<string name="EnterValue">Enter value</string>
-	<string name="LengthM">Length (m)</string>
+	<string name="LengthM">Route length (m)</string>
 	<string name="SpeedMS">Speed (ms)</string>
 	<string name="DistanceM">Distance (m)</string>
 	<string name="PowerlevelPerc">Power level (%)</string>
