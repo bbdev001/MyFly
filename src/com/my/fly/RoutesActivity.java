@@ -124,7 +124,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected int bigPreviewWidth = 0;
 	protected int bigPreviewHeight = 0;
 	protected boolean isPreviewSmall = true;
-
+	
+	protected View leftColumn1 = null;
+	protected View leftColumn2 = null;
+	protected View leftColumn3 = null;
+	protected int baseLeftColumnWidth = 0;
+	protected int baseLeftColumnHeight = 0;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -147,6 +153,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		djiSurfaceViewLayout = (RelativeLayout) findViewById(R.id.djiSurfaceViewLayout);
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 
+		leftColumn1 = (View)findViewById(R.id.leftColumn1);
+		leftColumn2 = (View)findViewById(R.id.leftColumn2);
+		leftColumn3 = (View)findViewById(R.id.leftColumn3);
+		
+		baseLeftColumnWidth = leftColumn1.getLayoutParams().width;
+		baseLeftColumnHeight = leftColumn1.getLayoutParams().height;
+		
 		pauseRoute.setEnabled(false);
 		stopRoute.setEnabled(false);
 		goHome.setEnabled(true);
@@ -261,6 +274,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			}
 			case DJIWrapper.GROUNDSTATION_TASK_STARTED:
 			{
+				HideLeftColumn();
+				
 				startRoute.setEnabled(false);
 				pauseRoute.setEnabled(true);
 				stopRoute.setEnabled(true);
@@ -402,6 +417,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	private void TaskEnded()
 	{
+		ShowLeftColumn();
+		
 		startRoute.setEnabled(true);
 		stopRoute.setEnabled(false);
 		pauseRoute.setEnabled(false);
@@ -1147,5 +1164,15 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		route = new Route("");
 		BuildRouteForType(false);
+	}
+	
+	public void HideLeftColumn()
+	{
+		leftColumn1.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
+	}
+	
+	public void ShowLeftColumn()
+	{
+		leftColumn1.setLayoutParams(new RelativeLayout.LayoutParams(baseLeftColumnWidth, baseLeftColumnHeight));
 	}
 }

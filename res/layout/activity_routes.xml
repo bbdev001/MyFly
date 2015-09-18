@@ -188,7 +188,7 @@
         android:orientation="horizontal" >
 
         <Space
-            android:id="@+id/leftCOlumn3"
+            android:id="@+id/leftColumn3"
             android:layout_width="150dp"
             android:layout_height="fill_parent"
             />
