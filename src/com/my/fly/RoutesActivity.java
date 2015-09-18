@@ -425,6 +425,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		goHome.setEnabled(true);
 		routeStarted = false;
 		routePaused = false;
+		
 		AppendString(getString(R.string.TaskEnded));
 	}
 
