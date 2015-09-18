@@ -100,4 +100,16 @@
 	<string name="CantSaveRoute">Ошибка сохранения маршрута</string>
 	<string name="RouteSaved">Маршрут сохранен</string>
 	<string name="EnterValue">Введите значение</string>
+	<string name="SpeedMS">Скорость (мс)</string>
+	<string name="DistanceM">Расстояние (м)</string>
+	<string name="PowerlevelPerc">Уровень заряда (%)</string>
+	<string name="EstFlightTime">Время маршрута (мин)</string>
+	<string name="RemFlightTime">Осталось лететь (мин)</string>
+	<string name="Pitch">Наклон X (грд)</string>
+	<string name="Roll">Наклон Y (грд)</string>
+	<string name="Heading">Курс (грд)</string>
+	<string name="GSType">Тип упр</string>
+	<string name="GSMode">Руежим упр</string>
+	<string name="TargetWP">След точка</string>
+	<string name="ReachedWP">Текущяя точка</string>
 </resources>

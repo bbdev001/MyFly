@@ -93,11 +93,23 @@
 	<string name="Mapping">Mapping</string>
 	<string name="TakeOff">Take off</string>
 	<string name="AltitudeM">Altitude (m)</string>
-	<string name="HeadingD">Heading (0-359)</string>
-	<string name="CamAngle">Cam angle (0-89)</string>
+	<string name="HeadingD">Heading (deg)</string>
+	<string name="CamAngle">Cam angle (deg)</string>
 	<string name="RouteAdding">Route adding</string>
 	<string name="RouteNameEditing">Route name editing</string>
 	<string name="CantSaveRoute">Can not save route</string>
 	<string name="RouteSaved">Route saved</string>
 	<string name="EnterValue">Enter value</string>
+	<string name="SpeedMS">Speed (ms)</string>
+	<string name="DistanceM">Distance (m)</string>
+	<string name="PowerlevelPerc">Power level (%)</string>
+	<string name="EstFlightTime">Est flt time (min)</string>
+	<string name="RemFlightTime">Rem flt time (min)</string>
+	<string name="Pitch">Pitch (deg)</string>
+	<string name="Roll">Roll (deg)</string>
+	<string name="Heading">Heading (deg)</string>
+	<string name="GSType">Ctrl type</string>
+	<string name="GSMode">Ctrl mode</string>
+	<string name="TargetWP">Target WP</string>
+	<string name="ReachedWP">Reached WP</string>
 </resources>
