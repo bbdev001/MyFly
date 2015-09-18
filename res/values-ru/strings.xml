@@ -24,7 +24,7 @@
     <string name="title_route_list">Маршруты</string>
     <string name="title_route_detail">Маршрут</string>
     <string name="title_activity_routes">Полет по маршруту</string>
-    <string name="title_activity_tap_joystik">Экранный джлйстик</string>
+    <string name="title_activity_tap_joystik">Экранный джойстик</string>
 	<string name="Camera">Камера</string>
 	<string name="GimbalError">Ошибка подвеса камеры</string>
 	<string name="Error">Ошибка</string>
