@@ -130,7 +130,7 @@
         <Space
             android:id="@+id/leftColumn2"
             android:layout_width="150dp"
-            android:layout_height="fill_parent"/>
+            android:layout_height="fill_parent" />
 
         <LinearLayout
             android:id="@+id/linearLayoutLeft4"
@@ -153,33 +153,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <RadioGroup
-        android:id="@+id/routeType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:orientation="horizontal"
-        android:paddingRight="8dp" >
-
-        <RadioButton
-            android:id="@+id/routeTypeRouting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="OnRouteTypeChanged"
-            android:text="@+string/Routing"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <RadioButton
-            android:id="@+id/routeTypeMapping"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="OnRouteTypeChanged"
-            android:text="@+string/Mapping"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-    </RadioGroup>
-
     <LinearLayout
         android:id="@+id/linearLayout5"
         android:layout_width="fill_parent"
@@ -190,8 +163,7 @@
         <Space
             android:id="@+id/leftColumn3"
             android:layout_width="150dp"
-            android:layout_height="fill_parent"
-            />
+            android:layout_height="fill_parent" />
 
         <LinearLayout
             android:id="@+id/linearLayoutRight2"
@@ -210,11 +182,37 @@
                 <SeekBar
                     android:id="@+id/tracker"
                     android:layout_width="fill_parent"
-                    android:layout_height="35sp"
+                    android:layout_height="35dp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginRight="133sp"
+                    android:layout_marginRight="133dp"
                     android:background="@android:color/transparent" />
+
+                <RadioGroup
+                    android:id="@+id/routeType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="75dp"
+                    android:orientation="horizontal"
+                    android:paddingRight="4dp" >
+
+                    <RadioButton
+                        android:id="@+id/routeTypeRouting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="OnRouteTypeChanged"
+                        android:text="@+string/Routing"
+                        android:textSize="8sp"/>
+
+                    <RadioButton
+                        android:id="@+id/routeTypeMapping"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="OnRouteTypeChanged"
+                        android:text="@+string/Mapping"
+                        android:textSize="8sp"/>
+                </RadioGroup>
 
                 <LinearLayout
                     android:id="@+id/wayPointFields"
@@ -222,7 +220,7 @@
                     android:layout_height="fill_parent"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
-                    android:layout_marginTop="80sp"
+                    android:layout_marginTop="105sp"
                     android:background="#1faaaaaa"
                     android:clickable="true"
                     android:orientation="vertical"
@@ -347,8 +345,7 @@
 
             <Space
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                />
+                android:layout_height="50dp" />
         </LinearLayout>
     </LinearLayout>
 
