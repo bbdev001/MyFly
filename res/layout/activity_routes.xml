@@ -13,7 +13,7 @@
         android:orientation="horizontal" >
 
         <LinearLayout
-            android:id="@+id/linearLayoutLeft1"
+            android:id="@+id/leftColumn1"
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:baselineAligned="false"
@@ -128,7 +128,7 @@
         android:orientation="horizontal" >
 
         <Space
-            android:id="@+id/spaceLeft1"
+            android:id="@+id/leftColumn2"
             android:layout_width="150dp"
             android:layout_height="fill_parent"/>
 
@@ -188,7 +188,7 @@
         android:orientation="horizontal" >
 
         <Space
-            android:id="@+id/spaceLeft2"
+            android:id="@+id/leftCOlumn3"
             android:layout_width="150dp"
             android:layout_height="fill_parent"
             />
@@ -295,7 +295,7 @@
                         android:padding="0sp"
                         android:shadowColor="@android:color/white"
                         android:shadowRadius="2"
-                        android:text="@+string/CamAngle"
+                        android:text="@+string/CamAngleD"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@android:color/black"
                         android:textSize="8sp" />
@@ -305,7 +305,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="22sp"
                         android:editable="false"
-                        android:hint="@+string/CamAngle"
+                        android:hint="@+string/CamAngleD"
                         android:inputType="none"
                         android:padding="0sp"
                         android:shadowColor="@android:color/white"

@@ -169,7 +169,7 @@ public class WayPointEditorBuiltin
 						caption = self.parent.getString(R.string.HeadingD);
 						break;
 					case R.id.camAngle:
-						caption = self.parent.getString(R.string.CamAngle);
+						caption = self.parent.getString(R.string.CamAngleD);
 						break;
 				}
 				

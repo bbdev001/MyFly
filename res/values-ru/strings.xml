@@ -94,12 +94,13 @@
 	<string name="TakeOff">Взлет</string>
 	<string name="AltitudeM">Высрта (m)</string>
 	<string name="HeadingD">Направление (0-359)</string>
-	<string name="CamAngle">Угол камеры (0-89)</string>
+	<string name="CamAngleD">Угол камеры (0-89)</string>
 	<string name="RouteAdding">Добавление маршрута</string>
 	<string name="RouteNameEditing">Изменение названия</string>
 	<string name="CantSaveRoute">Ошибка сохранения маршрута</string>
 	<string name="RouteSaved">Маршрут сохранен</string>
 	<string name="EnterValue">Введите значение</string>
+	<string name="LengthM">Длина (м)</string>
 	<string name="SpeedMS">Скорость (мс)</string>
 	<string name="DistanceM">Расстояние (м)</string>
 	<string name="PowerlevelPerc">Уровень заряда (%)</string>
