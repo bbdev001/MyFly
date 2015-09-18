@@ -144,9 +144,8 @@ public class WayPointEditorBuiltin
 							self.onHeadingChanged.OnHeadingChanged(wayPointIndex, wayPoint.Heading);
 							break;
 						case R.id.camAngle:
-							progress = -progress;
 							camAngle.setText(Integer.toString(progress));
-							wayPoint.CamAngle = progress;
+							wayPoint.CamAngle = -progress;
 							break;
 					}
 				}
@@ -199,6 +198,7 @@ public class WayPointEditorBuiltin
 									break;
 							}
 							
+							self.onSaved.OnSaved(wayPoint, self.wayPointIndex);
 						}
 					}
 				});
@@ -260,7 +260,7 @@ public class WayPointEditorBuiltin
 
 		altitude.setText(Integer.toString(wayPoint.Alt));
 		heading.setText(Integer.toString(wayPoint.Heading));
-		camAngle.setText(Integer.toString(wayPoint.CamAngle));
+		camAngle.setText(Integer.toString(Math.abs(wayPoint.CamAngle)));
 
 		tracker.setMax(300);
 		tracker.setProgress(wayPoint.Alt);

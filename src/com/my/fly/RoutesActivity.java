@@ -83,7 +83,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, NavmiiControl.ReverseLookupCallback, NavmiiControl.ControlEventListener, NavmiiControl.MapControlEventListener, NavmiiControl.UserItemsOnMapEventListener, NavmiiControl.OnRouteEventListener
+public class RoutesActivity extends Activity implements OnItemClickListener, LocationListener, Handler.Callback, NavmiiControl.ReverseLookupCallback, NavmiiControl.ControlEventListener, NavmiiControl.MapControlEventListener,
+		NavmiiControl.UserItemsOnMapEventListener, NavmiiControl.OnRouteEventListener
 {
 	private DJIWrapper djiWrapper = new DJIWrapper();
 	private static final String TAG = "RoutesActivity";
@@ -113,7 +114,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private NavmiiControl navigationSystem;
 	private String resourcePath = "";
 	private WayPointEditorBuiltin wpEditorBuiltIn = null;
-	
+
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
 	public String BASE_PATH = Environment.getExternalStorageDirectory() + "/MyFly";
@@ -123,12 +124,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected int bigPreviewWidth = 0;
 	protected int bigPreviewHeight = 0;
 	protected boolean isPreviewSmall = true;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-        
+
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		Log.e(TAG, BASE_PATH);
@@ -145,78 +146,75 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		djiSurfaceView = (DjiGLSurfaceView) findViewById(R.id.djiSurfaceView);
 		djiSurfaceViewLayout = (RelativeLayout) findViewById(R.id.djiSurfaceViewLayout);
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
-		
+
 		pauseRoute.setEnabled(false);
 		stopRoute.setEnabled(false);
 		goHome.setEnabled(true);
 
-		wpEditorBuiltIn = new WayPointEditorBuiltin(this,
-				new WayPointEditorBuiltin.OnSavedListener()
-				{
-					@Override
-					public void OnSaved(WayPoint wayPoint, long markerId)
-					{
-						Log.e(TAG, "WPSaved.onSaved");
+		wpEditorBuiltIn = new WayPointEditorBuiltin(this, new WayPointEditorBuiltin.OnSavedListener()
+		{
+			@Override
+			public void OnSaved(WayPoint wayPoint, long markerId)
+			{
+				Log.e(TAG, "WPSaved.onSaved");
 
-						if (!isMapping)
-						{
-							routeView.SetWayPointHeading(markerId, wayPoint.Heading);
-							BuildTask(isMapping);
-						}
-						else
-						{
-							route.mappingAltitude = wayPoint.Alt;
-							BuildTask(isMapping);
-							routeView.SetRoute(route, true);
-						}
-						
-						SaveRoute();
-					}
-				},
-				new WayPointEditorBuiltin.OnDeletedListener()
-				{	
-					@Override
-					public void OnDeleted(long markerId, boolean isMapping)
-					{
-						Log.e(TAG, "WPSaved.onDeleted");
-						int wayPointId = routeView.GetWayPointNumberByMarkerId(markerId);
-						
-						if (!isMapping)
-						{
-							route.GetWayPoints().remove(wayPointId);
-							routeView.SetRoute(route, false);
-							
-							selectedWayPointId = -1;
-							
-							BuildTask(isMapping);
-						}
-						
-						SaveRoute();	
-					}
-				},
-				new WayPointEditorBuiltin.OnHeadingChangedListener()
+				if (!isMapping)
 				{
-					@Override
-					public void OnHeadingChanged(long markerId, int heading)
-					{
-						routeView.SetWayPointHeading(markerId, heading);
-					}
-				});
+					routeView.SetWayPointHeading(markerId, wayPoint.Heading);
+					BuildTask(isMapping);
+				}
+				else
+				{
+					route.mappingAltitude = wayPoint.Alt;
+					BuildTask(isMapping);
+					routeView.SetRoute(route, true);
+				}
+
+				SaveRoute();
+			}
+		}, new WayPointEditorBuiltin.OnDeletedListener()
+		{
+			@Override
+			public void OnDeleted(long markerId, boolean isMapping)
+			{
+				Log.e(TAG, "WPSaved.onDeleted");
+				int wayPointId = routeView.GetWayPointNumberByMarkerId(markerId);
+
+				if (!isMapping)
+				{
+					route.GetWayPoints().remove(wayPointId);
+					routeView.SetRoute(route, false);
+
+					selectedWayPointId = -1;
+
+					BuildTask(isMapping);
+				}
+
+				SaveRoute();
+			}
+		}, new WayPointEditorBuiltin.OnHeadingChangedListener()
+		{
+			@Override
+			public void OnHeadingChanged(long markerId, int heading)
+			{
+				routeView.SetWayPointHeading(markerId, heading);
+			}
+		});
 
 		wpEditorBuiltIn.Hide();
-		
-		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";	
+
+		resourcePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/navmii-assets";
 		navigationSystem = NavmiiControl.Create(this);
-		
+
 		navigationSystem.onCreate(mapView, resourcePath);
-		
+
 		navigationSystem.SetControlEventListener(this);
 		navigationSystem.SetMapControlEventListener(this);
 		navigationSystem.SetItemsOnMapEventListener(this);
 		navigationSystem.SetOnRouteEventListener(this);
 
 		routeView.SetNavigationSystem(navigationSystem, resourcePath);
-		
+
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
@@ -224,7 +222,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesListArapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.mylistview_item, routes);
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
-				
+
 		AppendString(getString(R.string.ConnectingToDrone));
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString(getString(R.string.CanNotInitDJISdk));
@@ -243,9 +241,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case DJIWrapper.PERMISSION_STATUS:
 			{
 				AppendString(djiWrapper.GetPermissionErrorResultMessage);
-				
-				//DownloadRoutes();
-				
+
+				// DownloadRoutes();
+
 				djiWrapper.ConnectDroneDevices(djiSurfaceView);
 				break;
 			}
@@ -326,8 +324,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			}
 			case DJIWrapper.GIMBAL_STATUS:
 			{
-				DJIGimbalAttitude status = (DJIGimbalAttitude)msg.obj;
-				
+				DJIGimbalAttitude status = (DJIGimbalAttitude) msg.obj;
+
 				routeView.SetGimbalStatus(status.pitch, status.roll, status.yaw);
 				break;
 			}
@@ -344,9 +342,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 				float[] distance = new float[3];
 				Location.distanceBetween(lastPosition.Lat, lastPosition.Lon, userPosition.Lat, userPosition.Lon, distance);
-				
+
 				routeView.SetDronePosition(lastPosition, status.altitude, status.speed, (double) distance[0], status.remainFlyTime, status.powerLevel, status.pitch, status.roll, Utilities.ConvertYawToHeading(status.yaw));
-				
+
 				break;
 			}
 			case DJIWrapper.REMOTE_CONTROLLER_STATE:
@@ -357,14 +355,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				break;
 			}
 			case DJIWrapper.BATTERY_STATUS:
-				DJIBatteryProperty status = (DJIBatteryProperty)msg.obj;
+				DJIBatteryProperty status = (DJIBatteryProperty) msg.obj;
 				routeView.SetPowerPercent(status.remainPowerPercent);
 				break;
 			case DJIWrapper.GROUNDSTATION_FLYING_STATUS:
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
 				break;
 			case DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE:
-				AppendString((String)msg.obj);
+				AppendString((String) msg.obj);
 				djiWrapper.GetGroundStation().StartTask(gsTask);
 				break;
 			case DJIWrapper.GROUNDSTATION_MISSION_STATUS:
@@ -393,7 +391,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			}
 			case DJIWrapper.CAMERA_FILE_INFO:
 			{
-				CameraFileInfo info = (CameraFileInfo)msg.obj;
+				CameraFileInfo info = (CameraFileInfo) msg.obj;
 				AppendString(getString(R.string.Done) + " " + info.Name);
 				break;
 			}
@@ -563,13 +561,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	}
 
 	private Route route = new Route("");
+
 	protected void LoadRoute(String curRouteName)
-	{	
+	{
 		if (curRouteName.isEmpty())
 			return;
-		
+
 		route.LoadFromCSV(BASE_PATH, curRouteName);
-					
+
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
 		BuildRouteForType(false);
 	}
@@ -579,7 +578,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		boolean result = false;
 		if (!route.name.isEmpty())
 			result = route.SaveToCSV(BASE_PATH, route.name);
-		
+
 		if (result)
 			AppendString(getString(R.string.RouteSaved));
 		else
@@ -625,11 +624,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		if (route.GetWayPoints().size() == 0)
 			return;
-		
+
 		if (!routeStarted)
 		{
 			int defaultAltitude = route.GetWayPoints().get(0).Alt;
-			
+
 			AppendString(getString(R.string.StartTask));
 			if (djiWrapper.GetMcu().IsFlying())
 				djiWrapper.GetGroundStation().AdjustAltitudeTo(defaultAltitude);
@@ -671,7 +670,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		if (bigPreviewWidth > 0 || bigPreviewHeight > 0)
 			djiSurfaceView.setLayoutParams(new RelativeLayout.LayoutParams(bigPreviewWidth, bigPreviewHeight));
 	}
-	
+
 	public void VideoPreviewOnClick(View v)
 	{
 		if (isPreviewSmall)
@@ -685,7 +684,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			SetPreviewSizeSmall();
 		}
 	}
-	
+
 	public void OnErrorMsgClear(View v)
 	{
 		prevMessage = "";
@@ -800,10 +799,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		navigationSystem.onConfigurationChanged(newConfig);
 	}
-	
 
 	protected int selectedWayPointId = -1;
-
 
 	public void WayPointSelected(final Long markerId)
 	{
@@ -815,9 +812,9 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			return;
 
 		final WayPoint wayPoint = wayPointId >= 0 ? route.GetWayPoints().get(wayPointId) : route.GetWayPoints().get(0);
-		
+
 		selectedWayPointId = wayPointId;
-		
+
 		wpEditorBuiltIn.SetWayPoint(wayPoint, markerId, isMapping);
 		wpEditorBuiltIn.Show();
 	}
@@ -828,7 +825,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		AppendString(getString(R.string.TakePhotoStarted));
 		djiWrapper.GetCamera().TakePhoto();
 	}
-	
+
 	public void OnRouteTypeChanged(View view)
 	{
 		boolean checked = ((RadioButton) view).isChecked();
@@ -851,6 +848,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				break;
 			}
 		}
+		
+		wpEditorBuiltIn.Hide();
 	}
 
 	private void BuildTask(boolean isMapping)
@@ -859,18 +858,18 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			TaskBuilder.BuildMappingRoute(gsTask, route);
 		else
 			TaskBuilder.BuildSequientialRoute(gsTask, route, true);
-		
+
 		route.RecalculateLength();
 	}
-	
+
 	private void BuildRouteForType(boolean isMapping)
 	{
 		Log.i(TAG, "ChangeRouteType");
 		this.isMapping = isMapping;
-		//String routeName = currentRouteName;
-		
+		// String routeName = currentRouteName;
+
 		BuildTask(isMapping);
-	
+
 		routeView.SetRoute(route, true);
 	}
 
@@ -889,67 +888,66 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			newCoord.CopyTo(route.viewPoint.coord);
 			route.SetHeadingsToViewPoint();
 		}
-		
-		TaskBuilder.BuildSequientialRoute(gsTask, route, true);
-		routeView.SetRoute(route, false);		
-	}
 
+		TaskBuilder.BuildSequientialRoute(gsTask, route, true);
+		routeView.SetRoute(route, false);
+	}
 
 	@Override
 	public void onUserMarkerClicked(long markerId)
 	{
-		//if (routeView.SelectWayPointByMarkerId(markerId))	
-		//	WayPointSelected(markerId);
+		// if (routeView.SelectWayPointByMarkerId(markerId))
+		// WayPointSelected(markerId);
 	}
 
 	@Override
 	public void onReverseLookupFinished()
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onControlInitialized()
 	{
-		navigationSystem.SetMapViewMode3D(false);	
+		navigationSystem.SetMapViewMode3D(false);
 		navigationSystem.SetMapRotation(0.0f);
 		navigationSystem.SetSnapToGps(false);
-		
+
 		smallPreviewWidth = djiSurfaceView.getWidth();
 		smallPreviewHeight = djiSurfaceView.getHeight();
-		
+
 		bigPreviewWidth = mapView.getWidth();
 		bigPreviewHeight = mapView.getHeight();
-		
+
 		LoadRoutesList();
 	}
 
 	@Override
 	public void onUserMarkerUnpressed(long markerId)
 	{
-		SaveRoute();	
+		SaveRoute();
 	}
 
 	@Override
 	public void onDirectionListCreated(Direction[] arg0)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onDirectionUpdated(float arg0, DirectionType arg1, DirectionType arg2, long arg3, float arg4)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onUserMarkerLongPress(long arg0)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -974,14 +972,14 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		route.AddWayPoint(wayPoint);
 		long markerId = routeView.AddWayPoint(wayPoint, route.GetWayPoints().size() - 1);
 		routeView.SetViewPoint(route.viewPoint.coord);
-		
+
 		if (routeView.SelectWayPointByMarkerId(markerId))
 			WayPointSelected(markerId);
-		
+
 		BuildTask(false);
-		
+
 		SaveRoute();
-			
+
 		return false;
 	}
 
@@ -989,21 +987,21 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	public void onMapCenterChanged(MapCoord arg0)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onPositionChanged(MapCoord arg0)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onRotationChanged(float arg0)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -1011,7 +1009,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	{
 		if (wpEditorBuiltIn != null)
 			wpEditorBuiltIn.Hide();
-		
+
 		return false;
 	}
 
@@ -1019,36 +1017,36 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	public void onZoomChanged(float arg0)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onRouteCalculationFinished(RouteCalculationStatus arg0)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onRouteCalculationStarted()
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void onUserMarkerMoved(long markerId, MapCoord newPosition)
 	{
 		int number = routeView.GetWayPointNumberByMarkerId(markerId);
-		
+
 		if (number >= 0)
 		{
 			DegPoint degPoint = route.GetWayPoints().get(number).coord;
 			degPoint.Lon = newPosition.lon;
-			degPoint.Lat = newPosition.lat;	
-		
+			degPoint.Lat = newPosition.lat;
+
 			routeView.ChangeRoutePointPosition(number, newPosition);
-		
+
 			route.RecalculateLength();
 			routeView.invalidate();
 		}
@@ -1066,13 +1064,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	public void onReverseLookupItemAdded(String addressLine1, String addressLine2, String country, String county, String city, String adminHierarchy, String roadName, String roadNumber)
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	public void OnAddRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, getString(R.string.RouteAdding), getString(R.string.RouteName), "My route", false, 
-		new InputBox.OnDialogClosedListener()
+		final InputBox dialog = new InputBox(this, getString(R.string.RouteAdding), getString(R.string.RouteName), "My route", false, new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)
 			{
@@ -1081,48 +1078,47 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				if (!isCancel)
 				{
 					SaveRoute();
-					
+
 					route = new Route(result);
 					BuildRouteForType(false);
-					
+
 					SaveRoute();
-					
+
 					LoadRoutesList();
 				}
 			}
 		});
-		
+
 		dialog.show();
 	}
-		
+
 	public void OnDelRoute(View v)
 	{
-			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
-			alertDialog.setTitle(getString(R.string.ConfirmDelete));
-			alertDialog.setMessage(getString(R.string.AreYouSure));
-			alertDialog.setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener()
+		alertDialog.setTitle(getString(R.string.ConfirmDelete));
+		alertDialog.setMessage(getString(R.string.AreYouSure));
+		alertDialog.setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface dialog, int which)
 			{
-				public void onClick(DialogInterface dialog, int which)
-				{		
-					DeleteRoute();
-					LoadRoutesList();
-					
-					dialog.dismiss();					
-				}
-			});
+				DeleteRoute();
+				LoadRoutesList();
 
-			// Setting Negative "NO" Button
-			alertDialog.setNegativeButton(getString(R.string.No), null);
+				dialog.dismiss();
+			}
+		});
 
-			// Showing Alert Message
-			alertDialog.show();	
+		// Setting Negative "NO" Button
+		alertDialog.setNegativeButton(getString(R.string.No), null);
+
+		// Showing Alert Message
+		alertDialog.show();
 	}
-	
+
 	public void OnEditRoute(View v)
 	{
-		final InputBox dialog = new InputBox(this, getString(R.string.RouteNameEditing), getString(R.string.RouteName), route.name, false,
-		new InputBox.OnDialogClosedListener()
+		final InputBox dialog = new InputBox(this, getString(R.string.RouteNameEditing), getString(R.string.RouteName), route.name, false, new InputBox.OnDialogClosedListener()
 		{
 			public void OnClosed(boolean isCancel, String result)
 			{
@@ -1131,26 +1127,25 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				if (!isCancel)
 				{
 					DeleteRoute();
-					
+
 					route.name = result;
 					routeView.invalidate();
 					SaveRoute();
-					
-					LoadRoutesList();					
+
+					LoadRoutesList();
 				}
 			}
 		});
-		
-		dialog.show();	
+
+		dialog.show();
 	}
-	
+
 	public void DeleteRoute()
 	{
 		File toDelete = new File(BASE_PATH + "/" + route.name + ".csv");
 		toDelete.delete();
-		
+
 		route = new Route("");
-		BuildRouteForType(false);	
+		BuildRouteForType(false);
 	}
 }
-
