@@ -41,5 +41,10 @@ public class DegPoint extends GeoPoint
 		 
 		return (int)Math.round(angle);
 	}
+	
+	public DegPoint Clone()
+	{
+		return new DegPoint(Lat, Lon);
+	}
 }
 

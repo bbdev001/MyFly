@@ -116,6 +116,7 @@
                     android:layout_height="wrap_content"
                     android:onClick="OnTakePhoto"
                     android:src="@android:drawable/ic_menu_camera" />
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

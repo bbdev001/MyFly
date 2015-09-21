@@ -17,7 +17,7 @@ import dji.sdk.widget.DjiGLSurfaceView;
 public class DJIWrapper
 {
 	public static final int PERMISSION_STATUS = 0;
-	public static final int ERROR_MESSAGE = 1;
+	public static final int INFO_MESSAGE = 1;
 	public static final int CHECK_CAMERA_STATE = 2;
 	public static final int BATTERY_STATUS = 3;
 	public static final int MCU_STATUS = 4;
@@ -36,7 +36,8 @@ public class DJIWrapper
 	public static final int CAMERA_FILE_INFO = 17;
 	public static final int GIMBAL_STATUS = 18;
 	public static final int GROUNDSTATION_TAKE_OFF_DONE = 19;
-
+	public static final int TASK_ERROR_MESSAGE = 20;
+	
 	public static final int NAVI_MODE_ATTITUDE = 0;
 	public static final int NAVI_MODE_WAYPOINT = 1;
 	public static final int EXECUTION_STATUS_UPLOAD_FINISH = 0;

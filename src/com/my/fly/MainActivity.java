@@ -114,7 +114,10 @@ public class MainActivity extends Activity implements OnTouchListener, LocationL
 				AppendString(djiWrapper.GetPermissionErrorResultMessage);
 				djiWrapper.ConnectDroneDevices(cameraSurface);
 				break;
-			case DJIWrapper.ERROR_MESSAGE:
+			case DJIWrapper.INFO_MESSAGE:
+				AppendString((String) msg.obj);
+				break;
+			case DJIWrapper.TASK_ERROR_MESSAGE:
 				AppendString((String) msg.obj);
 				break;
 			case DJIWrapper.MCU_STATUS:

@@ -24,4 +24,9 @@ public class MrcPoint extends GeoPoint
 		
 		return Math.sqrt(dx * dx + dy * dy);
 	}
+	
+	public MrcPoint Clone()
+	{
+		return new MrcPoint(Lat, Lon);
+	}
 }

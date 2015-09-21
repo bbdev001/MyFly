@@ -2,7 +2,7 @@ package com.my.fly.utilities;
 
 import geolife.android.navigationsystem.NavmiiControl.MapCoord;
 
-public class GeoPoint
+public abstract class GeoPoint
 {
 	public double Lat;
 	public double Lon;
@@ -42,10 +42,8 @@ public class GeoPoint
 		return mapCoord; 
 	}
 	
-	public GeoPoint Clone()
-	{
-		return new GeoPoint(Lat, Lon);
-	}
+	public abstract GeoPoint Clone();
+
 	
 	public void Sub(GeoPoint point)
 	{

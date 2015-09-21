@@ -42,7 +42,7 @@ public class DJIGimbal
             public void onError(int error)
             {
             	if (error != 0)
-            		uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, R.string.GimbalError + " " + error));
+            		uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, R.string.GimbalError + " " + error));
             }
         });
 		

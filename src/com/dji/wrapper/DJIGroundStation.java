@@ -112,7 +112,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 				{
 					String message = context.getString(R.string.GroundStationOpened);
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, message));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, message));
 
 					object.oneKeyFly(new DJIGroundStationExecuteCallBack()
 					{
@@ -128,14 +128,14 @@ public class DJIGroundStation
 							else
 								message = context.getString(R.string.TakeOffError) + " " + result;
 
-							uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, message));
+							uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.TASK_ERROR_MESSAGE, message));
 						}
 					});
 				}
 				else
 				{
 					String message = context.getString(R.string.GroundStationDoesNotOpen) + " " + result;
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, message));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.TASK_ERROR_MESSAGE, message));
 				}
 			}
 		});
@@ -160,12 +160,12 @@ public class DJIGroundStation
 							if (result == GroundStationResult.GS_Result_Success)
 								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_STARTED, ""));
 							else
-								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.TaskStartError) + " " + result));
+								uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.TASK_ERROR_MESSAGE, context.getString(R.string.TaskStartError) + " " + result));
 						}
 					});
 				}
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.TaskUploadError) + " " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.TASK_ERROR_MESSAGE, context.getString(R.string.TaskUploadError) + " " + result));
 			}
 		});
 
@@ -181,11 +181,11 @@ public class DJIGroundStation
 			{
 				if (result == GroundStationResult.GS_Result_Success)
 				{
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationOpened) + " " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.GroundStationOpened) + " " + result));
 					GoOnRoute();
 				}
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationDoesNotOpen) + " " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.TASK_ERROR_MESSAGE, context.getString(R.string.GroundStationDoesNotOpen) + " " + result));
 			}
 		});
 
@@ -201,7 +201,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_ENDED, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationClosingError) + " " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.TASK_ERROR_MESSAGE, context.getString(R.string.GroundStationClosingError) + " " + result));
 			}
 		});
 	}
@@ -216,7 +216,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_PAUSED, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationPausingError) + " " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.GroundStationPausingError) + " " + result));
 			}
 		});
 	}
@@ -231,7 +231,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_TASK_RESUMED, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationResumingError) + " " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.GroundStationResumingError) + " " + result));
 			}
 		});
 	}
@@ -246,7 +246,7 @@ public class DJIGroundStation
 				if (result == GroundStationResult.GS_Result_Success)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.GROUNDSTATION_GO_HOME, ""));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.GroundStationGoHomeError) + " " + result));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.GroundStationGoHomeError) + " " + result));
 			}
 		});
 	}

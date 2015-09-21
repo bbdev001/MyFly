@@ -83,7 +83,7 @@ public class DJICamera
 				}
 				catch(Exception e)
 				{
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.Camera) + " " + e.getMessage()));	
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.Camera) + " " + e.getMessage()));	
 				}
 			}
 		});
@@ -162,7 +162,7 @@ public class DJICamera
 			@Override
 			public void onResult(DJIError state)
 			{
-				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.Camera )+ " " + state.errorCode + " " + DJIError.getErrorDescriptionByErrcode(state.errorCode)));
+				uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.Camera )+ " " + state.errorCode + " " + DJIError.getErrorDescriptionByErrcode(state.errorCode)));
 			}
 		});
 		
@@ -243,7 +243,7 @@ public class DJICamera
 				if (err.errorCode == DJIError.RESULT_OK || err.errorCode == DJIError.RESULT_SUCCEED)
 					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.CAMERA_TAKE_PHOTO_DONE, DJIError.getErrorDescriptionByErrcode(err.errorCode)));
 				else
-					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.ERROR_MESSAGE, context.getString(R.string.Camera) + " " + err.errorCode + " " + DJIError.getErrorDescriptionByErrcode(err.errorCode)));
+					uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.Camera) + " " + err.errorCode + " " + DJIError.getErrorDescriptionByErrcode(err.errorCode)));
 			}
 		});
 	}

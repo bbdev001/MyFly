@@ -57,7 +57,8 @@
 	<string name="PreAction">Pre action</string>
 	<string name="PostAction">Post action</string>
 	<string name="RouteFinished">Route finished</string>
-	<string name="WaypointUploaded">Waypoint uploaded:</string>
+	<string name="WaypointsUploaded">Route uploaded</string>
+	<string name="WaypointsDoesNotUploaded">Route is not valid</string>
 	<string name="ConnectingToDrone">Connecting to drone</string>
 	<string name="CanNotInitDJISdk">Can not init DJI sdk</string>
 	<string name="TakePhotoDone">Take photo done</string>

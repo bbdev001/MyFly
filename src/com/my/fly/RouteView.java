@@ -67,9 +67,10 @@ public class RouteView extends View
 	private MapCoord dronePosition = new MapCoord();
 	private MapCoord viewPoint = new MapCoord();
 	private DegPoint droneUserPosition = new DegPoint();
-	private Long droneMarkerId = (long)0;
-	private Long homeMarkerId = (long)0;
-	private Long viewPointMarkerId = (long)0;
+	private Long droneTrackId = NavmiiControl.INVALID_USER_ITEM_ID;
+	private Long droneMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
+	private Long homeMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
+	private Long viewPointMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
 	private HashMap<Long, MarkerInfo> wayPointMarkers = new HashMap<Long, MarkerInfo>();
 		
 	private double droneSpeed = 0.0;
@@ -93,6 +94,7 @@ public class RouteView extends View
 	private float droneZLevel = 1.0f;
 	private float selectedWpZLevel = 0.9f;
 	private float wpZLevel = 0.8f;
+	private float trackZLevel = 0.75f;
 	private float routeLineZLevel = 0.7f;
 	private Long routeLineId = NavmiiControl.INVALID_USER_ITEM_ID;
 	private Mbr scrMbr = new Mbr();
@@ -181,6 +183,27 @@ public class RouteView extends View
 			homeMarkerId = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/Flag_Finish.png", homePosition, 0.5f, 0.5f, false);
 	}
 
+	protected DegPoint lastDronePosition = null;
+	protected int ToIntegerCoord(double coord)
+	{
+		return (int)(coord * 1000000.0);
+	}
+	
+	protected boolean IsPositionValid(DegPoint position)
+	{
+		if (lastDronePosition == null)
+		{
+			lastDronePosition = position.Clone();
+			return true;
+		}
+		
+		if (ToIntegerCoord(position.Lat) == ToIntegerCoord(lastDronePosition.Lat) &&
+			ToIntegerCoord(position.Lon) == ToIntegerCoord(lastDronePosition.Lon))
+			return false;
+		
+		return true;
+	}
+	
 	public void SetDronePosition(DegPoint position, double alt, double speed, double distance, double remainFlyTime, double powerLevel, double pitch, double roll, double heading)
 	{
 		position.CopyTo(dronePosition);
@@ -193,6 +216,15 @@ public class RouteView extends View
 		droneRoll = roll;
 		droneHeading = heading;
 
+		if (droneTrackId != NavmiiControl.INVALID_USER_ITEM_ID)
+		{
+			if (IsPositionValid(position))
+			{
+				MapCoord trackCoord = position.ToMapCoord();
+				navigationSystem.InsertPointToPolyline(droneTrackId, navigationSystem.GetPolylineSize(droneTrackId), trackCoord);
+			}
+		}
+		
 		if (droneMarkerId != NavmiiControl.INVALID_USER_ITEM_ID)
 		{
 			navigationSystem.SetMarkerPosition(droneMarkerId, dronePosition);
@@ -242,6 +274,16 @@ public class RouteView extends View
 		return markerId;
 	}
 	
+	public void ResetDroneTrack()
+	{
+		lastDronePosition = null;
+		if (droneTrackId != NavmiiControl.INVALID_USER_ITEM_ID)
+			navigationSystem.DeleteItemOnMap(droneTrackId);
+
+		droneTrackId = navigationSystem.CreatePolylineOnMap(0x00FFFF, 3.0f, new NavmiiControl.MapCoord[0]);
+		navigationSystem.SetItemOnMapZLevel(droneTrackId, trackZLevel);
+	}
+	
 	public void SetRoute(Route route, boolean autoScale)
 	{
 		Log.i("RouteView", "Select route");
@@ -260,13 +302,14 @@ public class RouteView extends View
 			viewPointMarkerId = navigationSystem.CreateMarkerOnMap(resourcePath + "/bmp/waypoint_1.png", viewPoint, 0.5f, 0.5f, true);
 		else
 			navigationSystem.SetMarkerPosition(viewPointMarkerId, viewPoint);			
-	
+
+		ResetDroneTrack();
+		
 		if (routeLineId != NavmiiControl.INVALID_USER_ITEM_ID)
 			navigationSystem.DeleteItemOnMap(routeLineId);
 			
 		routeLineId = navigationSystem.CreatePolylineOnMap(0xFF0000, 5.0f, new NavmiiControl.MapCoord[0]);
-		
-		navigationSystem.SetItemOnMapZLevel(routeLineId, routeLineZLevel);	
+		navigationSystem.SetItemOnMapZLevel(routeLineId, routeLineZLevel);
 		
 		ArrayList<WayPoint> wayPoints = route.GetWayPoints();
 		wayPointMarkers.clear();
@@ -331,7 +374,7 @@ public class RouteView extends View
 		mapCoord.lon = mapCenter.Lon;
 		mapCoord.lat = mapCenter.Lat;
 		navigationSystem.SetMapCenter(mapCoord);
-
+		
 		invalidate();
 	}
 	

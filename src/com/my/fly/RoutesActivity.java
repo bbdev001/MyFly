@@ -68,6 +68,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -273,16 +274,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_TASK_STARTED:
-			{
-				HideLeftColumn();
-				
-				startRoute.setEnabled(false);
-				pauseRoute.setEnabled(true);
-				stopRoute.setEnabled(true);
-				goHome.setEnabled(false);
-
-				routeStarted = true;
-				routePaused = false;
+			{	
+				//TaskStarted();
 				AppendString(getString(R.string.TaskStarted));
 				break;
 			}
@@ -331,10 +324,17 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 				break;
 			}
-			case DJIWrapper.ERROR_MESSAGE:
+			case DJIWrapper.INFO_MESSAGE:
 			{
 				AppendString((String) msg.obj);
 
+				break;
+			}
+			case DJIWrapper.TASK_ERROR_MESSAGE:
+			{
+				AppendString((String) msg.obj);
+				
+				TaskEnded();
 				break;
 			}
 			case DJIWrapper.GIMBAL_STATUS:
@@ -392,7 +392,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				switch (execStatus.eventType.value())
 				{
 					case DJIWrapper.EXECUTION_STATUS_UPLOAD_FINISH:
-						AppendString(getString(R.string.WaypointUploaded) + ": " + execStatus.wayPointIndex);
+						if (execStatus.isMissionValid)
+							AppendString(getString(R.string.WaypointsUploaded));
+						else
+							AppendString(getString(R.string.WaypointsDoesNotUploaded));
+						
 						break;
 					case DJIWrapper.EXECUTION_STATUS_FINISH:
 						AppendString(getString(R.string.RouteFinished));
@@ -415,6 +419,21 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		return false;
 	}
 
+	private void TaskStarted()
+	{
+		HideLeftColumn();
+
+		startRoute.setEnabled(false);
+		pauseRoute.setEnabled(true);
+		stopRoute.setEnabled(true);
+		goHome.setEnabled(false);
+
+		routeStarted = true;
+		routePaused = false;
+		
+		routeView.ResetDroneTrack();
+	}
+
 	private void TaskEnded()
 	{
 		ShowLeftColumn();
@@ -425,7 +444,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		goHome.setEnabled(true);
 		routeStarted = false;
 		routePaused = false;
-		
+
 		AppendString(getString(R.string.TaskEnded));
 	}
 
@@ -645,6 +664,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 		if (!routeStarted)
 		{
+			TaskStarted();
+			
 			int defaultAltitude = route.GetWayPoints().get(0).Alt;
 
 			AppendString(getString(R.string.StartTask));
@@ -1169,11 +1190,15 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void HideLeftColumn()
 	{
-		leftColumn1.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
+		leftColumn1.setLayoutParams(new LinearLayout.LayoutParams(0, 0));
+		leftColumn2.setLayoutParams(new LinearLayout.LayoutParams(0, 0));
+		leftColumn3.setLayoutParams(new LinearLayout.LayoutParams(0, 0));
 	}
 	
 	public void ShowLeftColumn()
 	{
-		leftColumn1.setLayoutParams(new RelativeLayout.LayoutParams(baseLeftColumnWidth, baseLeftColumnHeight));
+		leftColumn1.setLayoutParams(new LinearLayout.LayoutParams(baseLeftColumnWidth, baseLeftColumnHeight));
+		leftColumn2.setLayoutParams(new LinearLayout.LayoutParams(baseLeftColumnWidth, baseLeftColumnHeight));
+		leftColumn3.setLayoutParams(new LinearLayout.LayoutParams(baseLeftColumnWidth, baseLeftColumnHeight));
 	}
 }

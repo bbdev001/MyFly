@@ -57,7 +57,8 @@
 	<string name="PreAction">Pre action</string>
 	<string name="PostAction">Post action</string>
 	<string name="RouteFinished">Route finished</string>
-	<string name="WaypointUploaded">Загружена птевая точка</string>
+	<string name="WaypointsUploaded">Маршрут загружен</string>
+	<string name="WaypointsDoesNotUploaded">Маршрут некорректен</string>
 	<string name="ConnectingToDrone">Соеденение с БПЛА</string>
 	<string name="CanNotInitDJISdk">Немогу соедениться с БПЛА</string>
 	<string name="TakePhotoDone">Фотографирование закончено</string>
