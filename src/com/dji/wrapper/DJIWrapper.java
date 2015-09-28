@@ -11,7 +11,7 @@ import dji.sdk.api.DJIDroneTypeDef.DJIDroneType;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationStatusPushType;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationWayPointExecutionState;
-import dji.sdk.interfaces.DJIGerneralListener;
+import dji.sdk.interfaces.DJIGeneralListener;
 import dji.sdk.widget.DjiGLSurfaceView;
 
 public class DJIWrapper
@@ -143,7 +143,7 @@ public class DJIWrapper
 			{
 				try
 				{
-					DJIDrone.checkPermission(context, new DJIGerneralListener()
+					DJIDrone.checkPermission(context, new DJIGeneralListener()
 					{
 						@Override
 						public void onGetPermissionResult(int result)
