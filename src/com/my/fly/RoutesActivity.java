@@ -1201,4 +1201,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		leftColumn2.setLayoutParams(new LinearLayout.LayoutParams(baseLeftColumnWidth, baseLeftColumnHeight));
 		leftColumn3.setLayoutParams(new LinearLayout.LayoutParams(baseLeftColumnWidth, baseLeftColumnHeight));
 	}
+	
+	public void OnMediaSync(View v)
+	{
+	}
 }

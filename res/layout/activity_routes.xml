@@ -117,6 +117,13 @@
                     android:onClick="OnTakePhoto"
                     android:src="@android:drawable/ic_menu_camera" />
 
+                <ImageButton
+                    android:id="@+id/mediaSync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="OnMediaSync"
+                    android:src="@android:drawable/ic_menu_refresh" />
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
