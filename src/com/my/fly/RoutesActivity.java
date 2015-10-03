@@ -668,6 +668,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			
 			int defaultAltitude = route.GetWayPoints().get(0).Alt;
 
+			djiWrapper.GetCamera().SetCaptureMode();
+			
 			AppendString(getString(R.string.StartTask));
 			if (djiWrapper.GetMcu().IsFlying())
 				djiWrapper.GetGroundStation().AdjustAltitudeTo(defaultAltitude);
@@ -1204,5 +1206,6 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	
 	public void OnMediaSync(View v)
 	{
+		djiWrapper.GetCamera().RequestMediaList();
 	}
 }

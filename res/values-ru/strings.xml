@@ -114,4 +114,6 @@
 	<string name="GSMode">Руежим упр</string>
 	<string name="TargetWP">След точка</string>
 	<string name="ReachedWP">Текущяя точка</string>
+	<string name="SetCaptureModeError">Ошибка переклюения камеры в режим записи</string>
+	<string name="InitDownloadModeError">Ошибка переклюения камеры в режим загрузки изображений</string>
 </resources>

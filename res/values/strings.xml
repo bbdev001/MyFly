@@ -114,4 +114,6 @@
 	<string name="GSMode">Ctrl mode</string>
 	<string name="TargetWP">Target WP</string>
 	<string name="ReachedWP">Reached WP</string>
+	<string name="SetCaptureModeError">Set camera capture mode error</string>
+	<string name="InitDownloadModeError">Set camera download mode error</string>
 </resources>
