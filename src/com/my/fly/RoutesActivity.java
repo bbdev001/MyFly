@@ -49,6 +49,7 @@ import dji.sdk.api.GroundStation.DJIGroundStationWaypoint;
 import dji.sdk.api.GroundStation.DJIGroundStationTypeDef.GroundStationOnWayPointAction;
 import dji.sdk.api.MainController.DJIMainControllerSystemState;
 import dji.sdk.api.RemoteController.DJIRemoteControllerAttitude;
+import dji.sdk.api.media.DJIMedia;
 import dji.sdk.widget.DjiGLSurfaceView;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -115,6 +116,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	private NavmiiControl navigationSystem;
 	private String resourcePath = "";
 	private WayPointEditorBuiltin wpEditorBuiltIn = null;
+	private MediaDB mediaDB = null;
 
 	// private RelativeLayout djiSurfaceViewLayout;
 	public String SERVER_ADDRESS = "http://192.168.1.97:8089/";
@@ -131,6 +133,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected View leftColumn3 = null;
 	protected int baseLeftColumnWidth = 0;
 	protected int baseLeftColumnHeight = 0;
+	
+	private ArrayList<DJIMedia> mediaList = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -237,6 +241,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
 
+		mediaDB = new MediaDB(BASE_PATH + "/MediaDB");
+		
 		AppendString(getString(R.string.ConnectingToDrone));
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString(getString(R.string.CanNotInitDJISdk));
@@ -274,7 +280,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				break;
 			}
 			case DJIWrapper.GROUNDSTATION_TASK_STARTED:
-			{	
+			{
 				//TaskStarted();
 				AppendString(getString(R.string.TaskStarted));
 				break;
@@ -370,16 +376,22 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				break;
 			}
 			case DJIWrapper.BATTERY_STATUS:
+			{
 				DJIBatteryProperty status = (DJIBatteryProperty) msg.obj;
 				routeView.SetPowerPercent(status.remainPowerPercent);
 				break;
+			}
 			case DJIWrapper.GROUNDSTATION_FLYING_STATUS:
+			{
 				DJIGroundStationFlyingInfo flyingInfo = (DJIGroundStationFlyingInfo) msg.obj;
 				break;
+			}
 			case DJIWrapper.GROUNDSTATION_TAKE_OFF_DONE:
+			{
 				AppendString((String) msg.obj);
 				djiWrapper.GetGroundStation().StartTask(gsTask);
 				break;
+			}
 			case DJIWrapper.GROUNDSTATION_MISSION_STATUS:
 			{
 				DJIGroundStationMissionPushInfo missionStatus = (DJIGroundStationMissionPushInfo) msg.obj;
@@ -414,11 +426,42 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				AppendString(getString(R.string.Done) + " " + info.Name);
 				break;
 			}
+			case DJIWrapper.MEDIA_LIST:
+			{
+				mediaList = (ArrayList<DJIMedia>)msg.obj;
+				DownloadNextMedia();
+				
+				break;
+			}
+			case DJIWrapper.MEDIA_DATA_BLOCK:
+			{
+				mediaDB.WriteFileBlock((byte[])msg.obj, msg.arg1);
+				
+				if (msg.arg2 == 100)
+					DownloadNextMedia();
+			}
 		}
 
 		return false;
 	}
-
+	
+	private void DownloadNextMedia()
+	{
+		while (mediaList.size() > 0)
+		{
+			DJIMedia media = mediaList.get(0);
+			mediaList.remove(0);
+			
+			if (mediaDB.HasFile(media.fileName))
+				continue;
+			
+			mediaDB.OpenFile(media.fileName);
+			djiWrapper.GetCamera().StartMediaDownloading(media);
+			
+			break;
+		}	
+	}
+	
 	private void TaskStarted()
 	{
 		HideLeftColumn();

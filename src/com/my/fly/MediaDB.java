@@ -18,8 +18,18 @@ public class MediaDB
         this.path = path;
 	}
 	
+	public boolean HasFile(String fileName)
+	{
+		File destCheck = new File(path + fileName);
+		
+        return destCheck.exists();	
+	}
+	
 	public void OpenFile(String fileName)
 	{
+		if (IsOpened())
+			CloseFile();
+		
 		try 
 		{
             File destCheck = new File(path + fileName);
@@ -51,10 +61,16 @@ public class MediaDB
 		try
 		{
 			file.close();
+			file = null;
 		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean IsOpened()
+	{
+		return file != null;
 	}
 }

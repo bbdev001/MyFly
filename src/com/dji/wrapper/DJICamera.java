@@ -300,7 +300,7 @@ public class DJICamera
 		});
 	}
 	
-	public void StartMediaDounloading(DJIMedia media)
+	public void StartMediaDownloading(DJIMedia media)
 	{
 	       object.fetchMediaData(media, new DJIReceivedFileDataCallBack()
 	       {    
