@@ -116,4 +116,5 @@
 	<string name="ReachedWP">Reached WP</string>
 	<string name="SetCaptureModeError">Set camera capture mode error</string>
 	<string name="InitDownloadModeError">Set camera download mode error</string>
+	<string name="FileTransmissionError">File transmission error</string>
 </resources>

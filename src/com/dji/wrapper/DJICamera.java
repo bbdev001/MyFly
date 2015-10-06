@@ -1,5 +1,6 @@
 package com.dji.wrapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import dji.sdk.interfaces.DJICameraFileNameInfoCallBack;
 import dji.sdk.interfaces.DJICameraPlayBackStateCallBack;
 import dji.sdk.interfaces.DJIExecuteResultCallback;
 import dji.sdk.interfaces.DJIMediaFetchCallBack;
+import dji.sdk.interfaces.DJIReceivedFileDataCallBack;
 import dji.sdk.interfaces.DJIReceivedVideoDataCallBack;
 import dji.sdk.widget.DjiGLSurfaceView;
 
@@ -296,5 +298,21 @@ public class DJICamera
 				}
 			}
 		});
+	}
+	
+	public void StartMediaDounloading(DJIMedia media)
+	{
+	       object.fetchMediaData(media, new DJIReceivedFileDataCallBack()
+	       {    
+               @Override
+               public void onResult(byte[] buffer, int size, int progress, DJIError err) 
+               {
+                   // TODO Auto-generated method stub
+                   if(err.errorCode == DJIError.RESULT_OK )
+                        uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.MEDIA_DATA_BLOCK, size, progress, buffer));
+                   else
+                	   uiHandler.sendMessage(uiHandler.obtainMessage(DJIWrapper.INFO_MESSAGE, context.getString(R.string.FileTransmissionError) + " " + err.errorCode + " " + DJIError.getErrorDescriptionByErrcode(err.errorCode)));                	   
+               }
+	       });
 	}
 }

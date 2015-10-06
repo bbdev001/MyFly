@@ -38,6 +38,7 @@ public class DJIWrapper
 	public static final int GROUNDSTATION_TAKE_OFF_DONE = 19;
 	public static final int TASK_ERROR_MESSAGE = 20;
 	public static final int MEDIA_LIST = 21;
+	public static final int MEDIA_DATA_BLOCK = 22;
 	
 	public static final int NAVI_MODE_ATTITUDE = 0;
 	public static final int NAVI_MODE_WAYPOINT = 1;

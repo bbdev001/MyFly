@@ -1,6 +1,7 @@
 package com.my.fly;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class MediaDB
@@ -27,10 +28,22 @@ public class MediaDB
             
             file = new RandomAccessFile(path + fileName, "rw");
         } 
-		catch (Exception e) 
+		catch (IOException e) 
 		{
 			e.printStackTrace();
         }
+	}
+	
+	public void WriteFileBlock(byte[] buffer, int bufferSize)
+	{
+		try
+		{
+			file.write(buffer, 0, bufferSize);
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public void CloseFile()
@@ -39,7 +52,7 @@ public class MediaDB
 		{
 			file.close();
 		}
-		catch(Exception e)
+		catch(IOException e)
 		{
 			e.printStackTrace();
 		}
