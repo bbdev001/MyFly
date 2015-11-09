@@ -242,8 +242,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesList.setAdapter(routesListArapter);
 		routesList.setOnItemClickListener(this);
 
-		mediaDB = new MediaDB(BASE_PATH + "/MediaDB");
-		mediaDB.RebuildIndexes();//Temporary
+		mediaDB = new MediaDB(this, BASE_PATH + "/MediaDB/");
+		mediaDB.RebuildIndexes();//Calls here temporary
 				
 		AppendString(getString(R.string.ConnectingToDrone));
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
