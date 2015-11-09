@@ -135,6 +135,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 	protected int baseLeftColumnHeight = 0;
 	
 	private ArrayList<DJIMedia> mediaList = null;
+	private ArrayList<String> mediaToCommit = new ArrayList<String>(); 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -242,7 +243,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		routesList.setOnItemClickListener(this);
 
 		mediaDB = new MediaDB(BASE_PATH + "/MediaDB");
-		
+		mediaDB.RebuildIndexes();//Temporary
+				
 		AppendString(getString(R.string.ConnectingToDrone));
 		if (!djiWrapper.InitSDK(droneType, getApplicationContext(), this))
 			AppendString(getString(R.string.CanNotInitDJISdk));
@@ -429,6 +431,8 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			case DJIWrapper.MEDIA_LIST:
 			{
 				mediaList = (ArrayList<DJIMedia>)msg.obj;
+				mediaToCommit.clear();
+				
 				DownloadNextMedia();
 				
 				break;
@@ -438,7 +442,11 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 				mediaDB.WriteFileBlock((byte[])msg.obj, msg.arg1);
 				
 				if (msg.arg2 == 100)
+				{
+					mediaToCommit.add(mediaDB.GetCurrentFileName());					
+					mediaDB.CloseFile();
 					DownloadNextMedia();
+				}
 			}
 		}
 
@@ -457,9 +465,12 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 			
 			mediaDB.OpenFile(media.fileName);
 			djiWrapper.GetCamera().StartMediaDownloading(media);
-			
+
 			break;
-		}	
+		}
+		
+		mediaDB.CommitFiles(mediaToCommit);
+		mediaToCommit.clear();
 	}
 	
 	private void TaskStarted()

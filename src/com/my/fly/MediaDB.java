@@ -3,11 +3,13 @@ package com.my.fly;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 
 public class MediaDB
 {
+	protected String fileName;
 	protected String path;
-	RandomAccessFile file = null;
+	protected RandomAccessFile file = null;
 	
 	public MediaDB(String path)
 	{
@@ -25,18 +27,26 @@ public class MediaDB
         return destCheck.exists();	
 	}
 	
+	public String GetCurrentFileName()
+	{
+		return fileName;
+	}
+	
 	public void OpenFile(String fileName)
 	{
 		if (IsOpened())
 			CloseFile();
-		
+
 		try 
 		{
-            File destCheck = new File(path + fileName);
-            if (destCheck.exists()) 
+			this.fileName = fileName;
+			String fullFileName = path + fileName;
+            File destCheck = new File(fullFileName);
+            
+            if (destCheck.exists())
                 destCheck.delete();
             
-            file = new RandomAccessFile(path + fileName, "rw");
+            file = new RandomAccessFile(fullFileName, "rw");
         } 
 		catch (IOException e) 
 		{
@@ -56,10 +66,43 @@ public class MediaDB
 		}
 	}
 	
+	public void CommitFiles(ArrayList<String> files)
+	{
+		
+	}
+	
+	public void RebuildIndexes()
+	{
+		File file = new File(path);
+		File[] files = file.listFiles();
+
+		if (files == null)
+			return;
+
+		ArrayList<String> filesToCommit = new ArrayList<String>();
+		
+		for (int i = 0; i < files.length; i++)
+		{
+			if (files[i].isDirectory())
+				continue;
+
+			String name = files[i].getName();
+			if (name.indexOf(".jpg") < 0)
+				continue;
+			
+			filesToCommit.add(name);
+		}
+		
+		CommitFiles(filesToCommit);
+
+		filesToCommit.clear();
+	}
+	
 	public void CloseFile()
 	{
 		try
 		{
+			fileName = "";
 			file.close();
 			file = null;
 		}
