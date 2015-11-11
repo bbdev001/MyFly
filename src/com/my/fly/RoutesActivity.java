@@ -661,7 +661,13 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		route.LoadFromCSV(BASE_PATH, curRouteName);
 
 		((RadioButton) findViewById(R.id.routeTypeRouting)).setChecked(true);
-		BuildRouteForType(false);
+		
+		BuildTask(true);
+		BuildTask(false);
+
+		//LoadImages();
+		
+		routeView.SetRoute(route, true);
 	}
 
 	protected void SaveRoute()

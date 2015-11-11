@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
+import com.my.fly.utilities.Mbr;
+
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.media.ExifInterface;
@@ -17,6 +20,7 @@ public class MediaDB
 	protected String path;
 	protected RandomAccessFile file = null;
 	protected MediaDBSql sqlDb = null;
+	protected final float multiplier = 100000.0f;
 
 	public MediaDB(Context context, String path)
 	{
@@ -63,6 +67,20 @@ public class MediaDB
 		}
 	}
 
+	public ArrayList<String> GetMediaNamesByRect(Mbr mbr)
+	{
+		ArrayList<String> result = new ArrayList<String>();
+		
+		int minX = (int)(mbr.Xmin * multiplier);
+		int maxX = (int)(mbr.Xmax * multiplier);
+		int minY = (int)(mbr.Ymin * multiplier);
+		int maxY = (int)(mbr.Ymax * multiplier);
+		
+		sqlDb.GetImagesByRect(minX, maxX, minY, maxY, result);
+		
+		return result;
+	}
+	
 	public void WriteFileBlock(byte[] buffer, int bufferSize)
 	{
 		try
@@ -91,8 +109,8 @@ public class MediaDB
 
 				if (exifInterface.getLatLong(coords))
 				{
-					int latInt = (int) (coords[0] * 100000.0f);
-					int lonInt = (int) (coords[1] * 100000.0f);
+					int latInt = (int) (coords[0] * multiplier);
+					int lonInt = (int) (coords[1] * multiplier);
 					int altInt = (int) altInMeters;
 
 					sqlDb.AddImageInfo(latInt, lonInt, altInt, files.get(i));
@@ -218,6 +236,22 @@ public class MediaDB
 			getWritableDatabase().execSQL("INSERT INTO " + tableName + " (latInt, lonInt, altInt, name) VALUES (" + lat + "," + lon + "," + alt + ",'" + name + "')");
 		}
 
+		public void GetImagesByRect(int minX, int maxX, int minY, int maxY, ArrayList<String> results)
+		{
+	        Cursor c = this.getReadableDatabase().rawQuery("SELECT name table " + tableName + " WHERE latInt<=" + maxY + " AND latInt>=" + minY + " AND lonInt>=" + maxX + " AND lonInt<=" + minX + " GROUP BY latInt,lonInt HAVING max(id)" , null);
+	        
+	        if(c.moveToFirst())
+	        {
+	            do
+	            {  
+	               results.add(c.getString(0));
+	            }
+	            while(c.moveToNext());
+	        }
+	        
+	        c.close();
+		}
+		
 		public void Close()
 		{
 			this.close();
