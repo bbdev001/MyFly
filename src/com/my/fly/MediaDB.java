@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.media.ExifInterface;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 public class MediaDB
 {
@@ -70,6 +71,7 @@ public class MediaDB
 	public ArrayList<String> GetMediaNamesByRect(Mbr mbr)
 	{
 		ArrayList<String> result = new ArrayList<String>();
+		LongSparseArray test = new LongSparseArray();
 		
 		int minX = (int)(mbr.Xmin * multiplier);
 		int maxX = (int)(mbr.Xmax * multiplier);
