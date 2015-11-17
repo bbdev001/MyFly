@@ -127,6 +127,8 @@ public class TaskBuilder
 		double stepInDegY = Utilities.MetersToDeg(stepInMetersY);
 		int speed = viewRadius > 10 ? 10 : 2;
 
+		route.mbrMapping.Reset();
+		
 		DegPoint leftTop = new DegPoint(mbr.Ymax, mbr.Xmin); 
 		if (stepsX > stepsY)
 			HorizontalMapping(gsTask, route, leftTop, stepsX, stepsY, speed, mappingAlt, -89, stepInDegX, stepInDegY);
@@ -173,7 +175,8 @@ public class TaskBuilder
 				wayPoint.Alt = (int) mappingAlt;
 				wayPoint.Heading = heading;
 				route.mappingWayPoints.add(wayPoint);
-
+				route.mbrMapping.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
+				
 				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
 
 				cur.Lon += stepH / f;
@@ -201,7 +204,8 @@ public class TaskBuilder
 				wayPoint.Heading = heading;
 				wayPoint.HoverTime = 0;
 				route.mappingWayPoints.add(wayPoint);
-
+				route.mbrMapping.Adjust(wayPoint.coord.Lon, wayPoint.coord.Lat);
+				
 				gsTask.addWaypoint(CreateMappingWayPoint(wayPoint, camAngle));
 
 				cur.Lat -= stepV;

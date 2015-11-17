@@ -665,11 +665,16 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		BuildTask(true);
 		BuildTask(false);
 
-		//LoadImages();
+		LoadImages();
 		
 		routeView.SetRoute(route, true);
 	}
 
+	protected void LoadImages()
+	{
+		ArrayList<String> mediaNames = mediaDB.GetMediaNamesByRect(route.mbrMapping);
+	}
+	
 	protected void SaveRoute()
 	{
 		boolean result = false;

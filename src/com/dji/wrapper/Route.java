@@ -29,6 +29,7 @@ public class Route
 	public boolean lookAtViewPoint = true;
 	public float length = 0.0f;
 	public Mbr mbr = new Mbr();
+	public Mbr mbrMapping = new Mbr();
 	public WayPoint viewPoint = new WayPoint();
 	
 	public Route(String name)
