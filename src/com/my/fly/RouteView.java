@@ -3,6 +3,7 @@ package com.my.fly;
 import geolife.android.navigationsystem.NavmiiControl;
 import geolife.android.navigationsystem.NavmiiControl.MapCoord;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.media.ExifInterface;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -72,6 +74,7 @@ public class RouteView extends View
 	private Long homeMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
 	private Long viewPointMarkerId = NavmiiControl.INVALID_USER_ITEM_ID;
 	private HashMap<Long, MarkerInfo> wayPointMarkers = new HashMap<Long, MarkerInfo>();
+	private ArrayList<Long> images = new ArrayList<Long>();
 		
 	private double droneSpeed = 0.0;
 	private double droneAlt = 0.0;
@@ -96,6 +99,8 @@ public class RouteView extends View
 	private float wpZLevel = 0.8f;
 	private float trackZLevel = 0.75f;
 	private float routeLineZLevel = 0.7f;
+	private float imagesZLevel = 0.6f;
+	
 	private Long routeLineId = NavmiiControl.INVALID_USER_ITEM_ID;
 	private Mbr scrMbr = new Mbr();
 	
@@ -282,6 +287,44 @@ public class RouteView extends View
 
 		droneTrackId = navigationSystem.CreatePolylineOnMap(0x00FFFF, 3.0f, new NavmiiControl.MapCoord[0]);
 		navigationSystem.SetItemOnMapZLevel(droneTrackId, trackZLevel);
+	}
+	
+	public void ClearMapImages()
+	{
+		for (int i = 0; i < images.size(); i++)
+		{
+			navigationSystem.DeleteItemOnMap(images.get(i));
+		}
+		
+		images.clear();
+	}
+	
+	public void AddMapImage(String filePath)
+	{
+		float[] coords = new float[2];
+		ExifInterface exifInterface;
+		try
+		{
+			exifInterface = new ExifInterface(filePath);
+			if (exifInterface.getLatLong(coords))
+			{
+				MapCoord position = new MapCoord();
+				position.lat = coords[0];
+				position.lon = coords[1];
+				long id = navigationSystem.CreateMarkerOnMap(filePath, position, 0.5f, 0.5f, false);
+				
+				if (id != NavmiiControl.INVALID_USER_ITEM_ID)
+				{
+					navigationSystem.SetItemOnMapZLevel(id, imagesZLevel);
+					images.add(id);
+				}
+			}
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void SetRoute(Route route, boolean autoScale)

@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import com.my.fly.utilities.Mbr;
+import com.my.fly.utilities.Utilities;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -14,6 +15,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.media.ExifInterface;
 import android.util.Log;
 import android.util.LongSparseArray;
+import android.util.SparseArray;
 
 public class MediaDB
 {
@@ -21,7 +23,6 @@ public class MediaDB
 	protected String path;
 	protected RandomAccessFile file = null;
 	protected MediaDBSql sqlDb = null;
-	protected final float multiplier = 100000.0f;
 
 	public MediaDB(Context context, String path)
 	{
@@ -31,7 +32,7 @@ public class MediaDB
 
 		this.path = path;
 
-		sqlDb = new MediaDBSql(context, path + "pictures.db", 1);
+		sqlDb = new MediaDBSql(context, path, 1);
 	}
 
 	public boolean HasFile(String fileName)
@@ -68,19 +69,14 @@ public class MediaDB
 		}
 	}
 
-	public ArrayList<String> GetMediaNamesByRect(Mbr mbr)
+	public LongSparseArray<String> GetMediaNamesByRect(Mbr mbr)
 	{
-		ArrayList<String> result = new ArrayList<String>();
-		LongSparseArray test = new LongSparseArray();
+		int minX = Utilities.ConvertCoordToInt(mbr.Xmin);
+		int maxX = Utilities.ConvertCoordToInt(mbr.Xmax);
+		int minY = Utilities.ConvertCoordToInt(mbr.Ymin);
+		int maxY = Utilities.ConvertCoordToInt(mbr.Ymax);
 		
-		int minX = (int)(mbr.Xmin * multiplier);
-		int maxX = (int)(mbr.Xmax * multiplier);
-		int minY = (int)(mbr.Ymin * multiplier);
-		int maxY = (int)(mbr.Ymax * multiplier);
-		
-		sqlDb.GetImagesByRect(minX, maxX, minY, maxY, result);
-		
-		return result;
+		return sqlDb.GetImagesByRect(minX, maxX, minY, maxY);
 	}
 	
 	public void WriteFileBlock(byte[] buffer, int bufferSize)
@@ -111,8 +107,8 @@ public class MediaDB
 
 				if (exifInterface.getLatLong(coords))
 				{
-					int latInt = (int) (coords[0] * multiplier);
-					int lonInt = (int) (coords[1] * multiplier);
+					int latInt = Utilities.ConvertCoordToInt(coords[0]);
+					int lonInt = Utilities.ConvertCoordToInt(coords[1]);
 					int altInt = (int) altInMeters;
 
 					sqlDb.AddImageInfo(latInt, lonInt, altInt, files.get(i));
@@ -178,15 +174,18 @@ public class MediaDB
 	{
 		return file != null;
 	}
-
+	
 	public class MediaDBSql extends SQLiteOpenHelper
 	{
 		protected final String tableName = "pictures";
 		protected final String latLonIndexName = "picturesLatLon";
-
-		public MediaDBSql(Context context, String databaseFullPath, int version)
+		protected String path = null;
+		
+		public MediaDBSql(Context context, String databasePath, int version)
 		{
-			super(context, databaseFullPath, null, version);
+			super(context, databasePath + "pictures.db" , null, version);
+			
+			path = databasePath;
 		}
 
 		@Override
@@ -238,20 +237,23 @@ public class MediaDB
 			getWritableDatabase().execSQL("INSERT INTO " + tableName + " (latInt, lonInt, altInt, name) VALUES (" + lat + "," + lon + "," + alt + ",'" + name + "')");
 		}
 
-		public void GetImagesByRect(int minX, int maxX, int minY, int maxY, ArrayList<String> results)
+		public LongSparseArray<String> GetImagesByRect(int minX, int maxX, int minY, int maxY)
 		{
-	        Cursor c = this.getReadableDatabase().rawQuery("SELECT name table " + tableName + " WHERE latInt<=" + maxY + " AND latInt>=" + minY + " AND lonInt>=" + maxX + " AND lonInt<=" + minX + " GROUP BY latInt,lonInt HAVING max(id)" , null);
+			LongSparseArray<String> results = new LongSparseArray<String>();
+	        Cursor c = this.getReadableDatabase().rawQuery("SELECT name, latInt, lonInt, table " + tableName + " WHERE latInt<=" + maxY + " AND latInt>=" + minY + " AND lonInt>=" + maxX + " AND lonInt<=" + minX + " GROUP BY latInt,lonInt HAVING max(id)" , null);
 	        
 	        if(c.moveToFirst())
 	        {
 	            do
 	            {  
-	               results.add(c.getString(0));
+	               results.put(Utilities.CombineLong(c.getInt(1), c.getInt(2)), path + c.getString(0));
 	            }
 	            while(c.moveToNext());
 	        }
 	        
 	        c.close();
+	        
+	        return results;
 		}
 		
 		public void Close()

@@ -65,6 +65,7 @@ import android.os.Handler;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -672,7 +673,20 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	protected void LoadImages()
 	{
-		ArrayList<String> mediaNames = mediaDB.GetMediaNamesByRect(route.mbrMapping);
+		LongSparseArray<String> mediaNames = mediaDB.GetMediaNamesByRect(route.mbrMapping);
+		ArrayList<WayPoint> mappingWp = route.GetMappingWayPoints();
+		
+		routeView.ClearMapImages();
+		
+		for (int i = 0; i < mappingWp.size(); i++)
+		{
+			 DegPoint coord = mappingWp.get(i).coord;
+			 long key = Utilities.CombineLong(Utilities.ConvertCoordToInt(coord.Lat), Utilities.ConvertCoordToInt(coord.Lon));
+			 String value = mediaNames.get(key);
+			 
+			 if (value != null)
+				 routeView.AddMapImage(value); 
+		}
 	}
 	
 	protected void SaveRoute()

@@ -128,4 +128,16 @@ public class Utilities
 
 		return yaw;
 	}
+	
+	public static long CombineLong(int a, int b)
+	{
+		long r = (((long)a) << 32) | b;
+		
+		return r;
+	}
+	
+	public static int ConvertCoordToInt(double v)
+	{
+		return (int) (v * 100000.0);
+	}
 }

@@ -182,6 +182,11 @@ public class Route
 		return wayPoints;
 	}
 	
+	public ArrayList<WayPoint> GetMappingWayPoints()
+	{
+		return mappingWayPoints;
+	}
+	
 	public void RecalculateLength()
 	{
 		length = 0.0f;
