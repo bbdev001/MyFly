@@ -673,7 +673,7 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 
 	protected void LoadImages()
 	{
-		LongSparseArray<String> mediaNames = mediaDB.GetMediaNamesByRect(route.mbrMapping);
+		ArrayList<MediaDB.ImageInfo> mediaNames = mediaDB.GetMediaNamesByRect(route.mbrMapping);
 		ArrayList<WayPoint> mappingWp = route.GetMappingWayPoints();
 		
 		routeView.ClearMapImages();
@@ -681,11 +681,17 @@ public class RoutesActivity extends Activity implements OnItemClickListener, Loc
 		for (int i = 0; i < mappingWp.size(); i++)
 		{
 			 DegPoint coord = mappingWp.get(i).coord;
-			 long key = Utilities.CombineLong(Utilities.ConvertCoordToInt(coord.Lat), Utilities.ConvertCoordToInt(coord.Lon));
-			 String value = mediaNames.get(key);
-			 
-			 if (value != null)
-				 routeView.AddMapImage(value); 
+
+			 for (int j = 0; j < mediaNames.size(); j++)
+			 {
+				 MediaDB.ImageInfo info = mediaNames.get(j);
+				 double distance = coord.DistanceTo(info.lat, info.lon);
+				 
+				 if (distance < 5.0)
+				 {
+					 Log.d("Images of route ", info.name + " " + distance);
+				 }
+			 }
 		}
 	}
 	

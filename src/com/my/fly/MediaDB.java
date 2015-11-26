@@ -23,7 +23,23 @@ public class MediaDB
 	protected String path;
 	protected RandomAccessFile file = null;
 	protected MediaDBSql sqlDb = null;
-
+	
+	public class ImageInfo
+	{
+		public double lat;
+		public double lon;
+		public double alt;
+		public String name;
+		
+		public ImageInfo(double lat, double lon, double alt, String name)
+		{
+			this.lat = lat;
+			this.lon = lon;
+			this.alt = alt;
+			this.name = name;
+		}
+	}
+	
 	public MediaDB(Context context, String path)
 	{
 		File dbDir = new File(path);
@@ -32,7 +48,7 @@ public class MediaDB
 
 		this.path = path;
 
-		sqlDb = new MediaDBSql(context, path, 1);
+		sqlDb = new MediaDBSql(context, path, 2);
 	}
 
 	public boolean HasFile(String fileName)
@@ -69,14 +85,9 @@ public class MediaDB
 		}
 	}
 
-	public LongSparseArray<String> GetMediaNamesByRect(Mbr mbr)
+	public ArrayList<ImageInfo> GetMediaNamesByRect(Mbr mbr)
 	{
-		int minX = Utilities.ConvertCoordToInt(mbr.Xmin);
-		int maxX = Utilities.ConvertCoordToInt(mbr.Xmax);
-		int minY = Utilities.ConvertCoordToInt(mbr.Ymin);
-		int maxY = Utilities.ConvertCoordToInt(mbr.Ymax);
-		
-		return sqlDb.GetImagesByRect(minX, maxX, minY, maxY);
+		return sqlDb.GetImagesByRect(mbr.Xmin, mbr.Xmax, mbr.Ymin, mbr.Ymax);
 	}
 	
 	public void WriteFileBlock(byte[] buffer, int bufferSize)
@@ -107,11 +118,11 @@ public class MediaDB
 
 				if (exifInterface.getLatLong(coords))
 				{
-					int latInt = Utilities.ConvertCoordToInt(coords[0]);
-					int lonInt = Utilities.ConvertCoordToInt(coords[1]);
-					int altInt = (int) altInMeters;
+					double lat = coords[0];
+					double lon = coords[1];
+					double alt = altInMeters;
 
-					sqlDb.AddImageInfo(latInt, lonInt, altInt, files.get(i));
+					sqlDb.AddImageInfo(lat, lon, alt, files.get(i));
 				}
 			}
 
@@ -144,7 +155,7 @@ public class MediaDB
 				continue;
 
 			String name = files[i].getName();
-			if (name.indexOf(".jpg") < 0)
+			if (name.toLowerCase().indexOf(".jpg") < 0)
 				continue;
 
 			filesToCommit.add(name);
@@ -191,7 +202,7 @@ public class MediaDB
 		@Override
 		public void onCreate(SQLiteDatabase db)
 		{
-			db.execSQL("CREATE TABLE " + tableName + " (id integer primary key, latInt integer, lonInt integer, altInt integer, name text)");
+			db.execSQL("CREATE TABLE " + tableName + " (id INTEGER PRIMARY KEY, lat REAL, lon REAL, alt REAL, name TEXT)");
 		}
 
 		@Override
@@ -204,7 +215,7 @@ public class MediaDB
 		public void PrepareInsertion()
 		{
 			getWritableDatabase().beginTransaction();
-			getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS " + latLonIndexName + " ON " + tableName + "(latInt, lonInt)");
+			getWritableDatabase().execSQL("CREATE INDEX IF NOT EXISTS " + latLonIndexName + " ON " + tableName + "(lat, lon)");
 		}
 
 		public void DoneInsertion()
@@ -223,7 +234,7 @@ public class MediaDB
 			{
 				getWritableDatabase().beginTransaction();
 				getWritableDatabase().execSQL("DROP INDEX IF EXISTS " + latLonIndexName);
-				getWritableDatabase().execSQL("DELETE * FROM " + tableName);
+				getWritableDatabase().execSQL("DELETE FROM " + tableName);
 				getWritableDatabase().setTransactionSuccessful();
 			}
 			finally
@@ -232,21 +243,25 @@ public class MediaDB
 			}
 		}
 
-		public void AddImageInfo(int lat, int lon, int alt, String name)
+		public void AddImageInfo(double lat, double lon, double alt, String name)
 		{
-			getWritableDatabase().execSQL("INSERT INTO " + tableName + " (latInt, lonInt, altInt, name) VALUES (" + lat + "," + lon + "," + alt + ",'" + name + "')");
+			String sql = "INSERT INTO " + tableName + " (lat, lon, alt, name) VALUES (" + lat + "," + lon + "," + alt + ",'" + name + "')";
+			
+			getWritableDatabase().execSQL(sql);
 		}
 
-		public LongSparseArray<String> GetImagesByRect(int minX, int maxX, int minY, int maxY)
+		public ArrayList<ImageInfo> GetImagesByRect(double minX, double maxX, double minY, double maxY)
 		{
-			LongSparseArray<String> results = new LongSparseArray<String>();
-	        Cursor c = this.getReadableDatabase().rawQuery("SELECT name, latInt, lonInt, table " + tableName + " WHERE latInt<=" + maxY + " AND latInt>=" + minY + " AND lonInt>=" + maxX + " AND lonInt<=" + minX + " GROUP BY latInt,lonInt HAVING max(id)" , null);
+			ArrayList<ImageInfo> results = new ArrayList<ImageInfo>();
+	        String sql = "SELECT name, lat, lon, alt FROM " + tableName + " WHERE lat<=" + maxY + " AND lat>=" + minY + " AND lon>=" + minX + " AND lon<=" + maxX + " GROUP BY lat,lon HAVING max(id)";
+	        
+	        Cursor c = this.getReadableDatabase().rawQuery(sql , null);
 	        
 	        if(c.moveToFirst())
 	        {
 	            do
 	            {  
-	               results.put(Utilities.CombineLong(c.getInt(1), c.getInt(2)), path + c.getString(0));
+	               results.add(new ImageInfo(c.getDouble(1), c.getDouble(2), c.getDouble(3), path + c.getString(0)));
 	            }
 	            while(c.moveToNext());
 	        }

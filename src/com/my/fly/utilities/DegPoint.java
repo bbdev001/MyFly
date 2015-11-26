@@ -23,6 +23,15 @@ public class DegPoint extends GeoPoint
 		return distance[0];
 	}
 	
+	public double DistanceTo(double lat, double lon)
+	{
+		float[] distance = new float[3];
+
+		Location.distanceBetween(Lat, Lon, lat, lon, distance);
+						
+		return distance[0];
+	}
+	
 	public MrcPoint ToMercator()
 	{
 		return new MrcPoint(Utilities.lat2y(Lat), Lon);
